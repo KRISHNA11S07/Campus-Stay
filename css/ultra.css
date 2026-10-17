@@ -1,0 +1,993 @@
+/* ============================================================
+   CampusStay — Ultra Premium Hover & Glow Effects
+   Apple/Linear/Framer/Stripe-inspired interactions
+   ============================================================ */
+
+/* ============================================================
+   1. GLOBAL GLOW VARIABLES
+   ============================================================ */
+:root {
+  --glow-primary: rgba(99, 102, 241, .45);
+  --glow-primary-soft: rgba(99, 102, 241, .18);
+  --glow-accent: rgba(139, 92, 246, .35);
+  --glow-pink: rgba(236, 72, 153, .25);
+  --glow-green: rgba(16, 185, 129, .35);
+  --glow-wa: rgba(34, 197, 94, .4);
+  --glow-blue: rgba(59, 130, 246, .4);
+  --glow-amber: rgba(245, 158, 11, .25);
+  --hover-lift: -12px;
+  --hover-ease: cubic-bezier(.22, 1, .36, 1);
+  --hover-duration: .4s;
+}
+[data-theme="dark"] {
+  --glow-primary: rgba(99, 102, 241, .55);
+  --glow-primary-soft: rgba(99, 102, 241, .25);
+  --glow-accent: rgba(139, 92, 246, .45);
+  --glow-pink: rgba(236, 72, 153, .35);
+}
+
+/* ============================================================
+   2. TARGETED INTERACTIVE ELEMENT TRANSITIONS
+      Smooth, GPU-friendly transitions on interactive surfaces
+   ============================================================ */
+.btn, .cat-card, .listing-card, .step, .testi, .chip,
+.icon-btn, .dash-card, .faq-item, .auth-tabs button {
+  transition-property: transform, box-shadow, border-color;
+  transition-duration: var(--hover-duration);
+  transition-timing-function: var(--hover-ease);
+}
+
+/* ============================================================
+   3. PRIMARY BUTTONS — Neon purple/blue glow
+   ============================================================ */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+/* Soft ambient glow behind button */
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: var(--grad-brand);
+  opacity: 0;
+  filter: blur(18px);
+  z-index: -1;
+  transition: opacity .4s var(--hover-ease), filter .4s;
+}
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow:
+    0 0 20px var(--glow-primary),
+    0 0 60px var(--glow-primary-soft),
+    0 18px 50px -12px rgba(99, 102, 241, .4);
+  filter: brightness(1.08);
+}
+.btn-primary:hover::before {
+  opacity: .7;
+  filter: blur(28px);
+}
+.btn-primary:active {
+  transform: translateY(-1px) scale(.98);
+  box-shadow: 0 0 12px var(--glow-primary), 0 8px 25px -8px rgba(99, 102, 241, .3);
+}
+
+/* ============================================================
+   4. GHOST / OUTLINE BUTTONS — Subtle glass glow
+   ============================================================ */
+.btn-ghost {
+  position: relative;
+}
+.btn-ghost:hover {
+  transform: translateY(-3px);
+  border-color: rgba(99, 102, 241, .5);
+  box-shadow:
+    0 0 15px var(--glow-primary-soft),
+    0 12px 35px -10px rgba(99, 102, 241, .2),
+    inset 0 0 20px rgba(99, 102, 241, .06);
+  color: var(--brand);
+}
+
+/* ============================================================
+   5. CALL & WHATSAPP BUTTONS — Themed neon glow
+   ============================================================ */
+.btn-call:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow:
+    0 0 20px var(--glow-blue),
+    0 0 50px rgba(59, 130, 246, .2),
+    0 16px 45px -12px rgba(99, 102, 241, .35);
+  filter: brightness(1.1);
+}
+.btn-wa:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow:
+    0 0 20px var(--glow-wa),
+    0 0 50px rgba(34, 197, 94, .18),
+    0 16px 45px -12px rgba(22, 163, 74, .35);
+  filter: brightness(1.1);
+}
+
+/* ============================================================
+   6. NAVBAR LINKS — Animated glowing underline
+   ============================================================ */
+.nav-links a {
+  position: relative;
+  transition: color .35s var(--hover-ease), text-shadow .35s;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: -5px;
+  width: 0; height: 2.5px;
+  border-radius: 2px;
+  background: var(--grad-brand);
+  transition: width .4s var(--hover-ease), box-shadow .4s;
+  box-shadow: none;
+}
+.nav-links a:hover {
+  color: var(--text);
+  text-shadow: 0 0 20px var(--glow-primary-soft);
+}
+.nav-links a:hover::after {
+  width: 100%;
+  box-shadow: 0 0 10px var(--glow-primary), 0 0 25px var(--glow-primary-soft);
+}
+
+/* ============================================================
+   7. ICON BUTTONS — Orbital glow on hover
+   ============================================================ */
+.icon-btn:hover {
+  transform: translateY(-3px) rotate(8deg) scale(1.08);
+  box-shadow:
+    0 0 14px var(--glow-primary-soft),
+    0 8px 20px -6px rgba(99, 102, 241, .25);
+  border-color: rgba(99, 102, 241, .4);
+}
+
+/* ============================================================
+   8. CATEGORY CARDS — Float + radiant border glow
+   ============================================================ */
+.cat-card {
+  position: relative;
+  overflow: hidden;
+}
+/* Gradient glow ring on hover */
+.cat-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: var(--grad-brand);
+  opacity: 0;
+  z-index: -1;
+  filter: blur(12px);
+  transition: opacity .45s var(--hover-ease);
+}
+.cat-card:hover {
+  transform: translateY(var(--hover-lift)) scale(1.02);
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, .3),
+    0 0 30px var(--glow-primary-soft),
+    0 25px 65px -15px rgba(99, 102, 241, .2);
+  border-color: rgba(99, 102, 241, .4);
+}
+.cat-card:hover::after { opacity: .35; }
+.cat-card:hover .cat-icon {
+  transform: scale(1.15) rotate(-8deg);
+  box-shadow: 0 0 25px var(--glow-primary), 0 12px 30px -6px rgba(124, 58, 237, .5);
+}
+
+/* ============================================================
+   9. LISTING / PROPERTY CARDS — Premium floating effect
+   ============================================================ */
+.listing-card {
+  position: relative;
+}
+/* Animated gradient border glow */
+.listing-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--glow-primary), var(--glow-pink), var(--glow-accent));
+  opacity: 0;
+  z-index: -1;
+  filter: blur(16px);
+  transition: opacity .5s var(--hover-ease);
+}
+.listing-card:hover {
+  transform: translateY(var(--hover-lift)) scale(1.015);
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, .2),
+    0 0 35px var(--glow-primary-soft),
+    0 30px 80px -20px rgba(99, 102, 241, .22);
+  border-color: rgba(99, 102, 241, .35);
+}
+.listing-card:hover::after { opacity: .4; }
+.listing-card:hover .lc-media img {
+  transform: scale(1.08);
+  filter: brightness(1.04) saturate(1.08);
+}
+
+/* ============================================================
+   10. WISHLIST / HEART BUTTON — Pulse glow
+   ============================================================ */
+.heart-btn:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 16px rgba(239, 68, 68, .35), 0 6px 18px -4px rgba(239, 68, 68, .25);
+  background: rgba(255, 255, 255, .95);
+}
+.heart-btn.active {
+  color: #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, .4);
+}
+.heart-btn.active:hover {
+  box-shadow: 0 0 28px rgba(239, 68, 68, .55), 0 0 60px rgba(239, 68, 68, .2);
+}
+
+/* ============================================================
+   11. COLLEGE CHIPS — Lift with brand border glow
+   ============================================================ */
+.chip:hover {
+  transform: translateY(-4px) scale(1.04);
+  border-color: var(--brand);
+  color: var(--brand);
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, .3),
+    0 0 18px var(--glow-primary-soft),
+    0 12px 35px -10px rgba(99, 102, 241, .2);
+  text-shadow: 0 0 12px var(--glow-primary-soft);
+}
+
+/* ============================================================
+   12. STEP CARDS (How it works) — Glow lift
+   ============================================================ */
+.step:hover {
+  transform: translateY(-10px);
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, .2),
+    0 0 25px var(--glow-primary-soft),
+    0 22px 60px -15px rgba(99, 102, 241, .18);
+  border-color: rgba(99, 102, 241, .35);
+}
+.step:hover .num {
+  box-shadow: 0 0 20px var(--glow-primary), 0 8px 25px -5px rgba(124, 58, 237, .5);
+  transform: scale(1.08);
+}
+
+/* ============================================================
+   13. TESTIMONIAL CARDS — Soft warm glow
+   ============================================================ */
+.testi:hover {
+  transform: translateY(-10px);
+  box-shadow:
+    0 0 0 1px rgba(245, 158, 11, .15),
+    0 0 25px var(--glow-amber),
+    0 22px 60px -15px rgba(245, 158, 11, .15);
+  border-color: rgba(245, 158, 11, .25);
+}
+
+/* ============================================================
+   14. FAQ ITEMS — Expand glow
+   ============================================================ */
+.faq-item {
+  transition: box-shadow .4s var(--hover-ease), border-color .4s, transform .4s var(--hover-ease);
+}
+.faq-item:hover {
+  box-shadow:
+    0 0 18px var(--glow-primary-soft),
+    0 12px 30px -8px rgba(99, 102, 241, .15);
+  border-color: rgba(99, 102, 241, .3);
+}
+.faq-q:hover {
+  color: var(--brand);
+}
+
+/* ============================================================
+   15. DASHBOARD CARDS — Premium gradient border
+   ============================================================ */
+.dash-card {
+  transition: transform .5s var(--hover-ease), box-shadow .5s, border-color .5s;
+  position: relative;
+}
+.dash-card:hover {
+  transform: translateY(-10px) scale(1.01);
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, .3),
+    0 0 30px var(--glow-primary-soft),
+    0 30px 80px -20px rgba(99, 102, 241, .2);
+  border-color: rgba(99, 102, 241, .4);
+}
+.dash-card:hover .dash-icon {
+  transform: scale(1.1) rotate(-5deg);
+}
+.dash-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  transition: transform .4s var(--hover-ease);
+}
+
+/* ============================================================
+   16. SEARCH FIELD — Focus glow ring
+   ============================================================ */
+.search-field:focus-within {
+  border-color: var(--brand);
+  box-shadow:
+    0 0 0 4px rgba(99, 102, 241, .15),
+    0 0 20px var(--glow-primary-soft);
+}
+
+/* ============================================================
+   17. AUTH INPUTS — Premium focus glow
+   ============================================================ */
+.auth-card input:focus {
+  border-color: var(--brand);
+  box-shadow:
+    0 0 0 4px rgba(99, 102, 241, .15),
+    0 0 20px var(--glow-primary-soft);
+}
+.auth-tabs button:hover:not(.active) {
+  background: rgba(99, 102, 241, .08);
+  color: var(--brand);
+}
+.auth-tabs button.active {
+  box-shadow:
+    0 0 20px var(--glow-primary),
+    0 6px 18px rgba(124, 58, 237, .35);
+}
+
+/* ============================================================
+   18. SORT / FILTER SELECTS — Subtle hover glow
+   ============================================================ */
+.sort-select:hover,
+.sort-select:focus {
+  border-color: rgba(99, 102, 241, .4);
+  box-shadow: 0 0 15px var(--glow-primary-soft), 0 4px 12px rgba(99, 102, 241, .1);
+}
+
+/* ============================================================
+   19. FACILITY PILLS — Micro-glow on hover
+   ============================================================ */
+.fac-pill:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, .18), rgba(236, 72, 153, .14));
+  border-color: rgba(99, 102, 241, .35);
+  box-shadow: 0 0 10px var(--glow-primary-soft);
+  transform: translateY(-1px);
+  color: var(--text);
+}
+.fac-item:hover {
+  border-color: rgba(99, 102, 241, .35);
+  box-shadow: 0 0 12px var(--glow-primary-soft);
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   20. TAGS (verified, type, full) — Glow hover
+   ============================================================ */
+.tag:hover {
+  box-shadow: 0 0 12px rgba(255, 255, 255, .25);
+  transform: scale(1.05);
+}
+.tag.verified:hover {
+  box-shadow: 0 0 16px var(--glow-green);
+}
+
+/* ============================================================
+   21. STATS BAND — Subtle shimmer on hover
+   ============================================================ */
+.stats-band:hover {
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, .2),
+    0 0 40px var(--glow-primary-soft),
+    0 30px 80px -20px rgba(99, 102, 241, .15);
+}
+
+/* ============================================================
+   22. CTA BAND — Luminous hover state
+   ============================================================ */
+.cta-band {
+  transition: box-shadow .5s var(--hover-ease), transform .5s;
+}
+.cta-band:hover {
+  box-shadow:
+    0 0 40px var(--glow-primary),
+    0 0 100px rgba(99, 102, 241, .2),
+    0 30px 80px -15px rgba(124, 58, 237, .4);
+  transform: scale(1.005);
+}
+.cta-band .btn:hover {
+  box-shadow:
+    0 0 20px rgba(255, 255, 255, .4),
+    0 12px 35px -8px rgba(99, 102, 241, .3);
+  transform: translateY(-3px) scale(1.04);
+}
+
+/* ============================================================
+   23. SHOWCASE DOTS — Glow active state
+   ============================================================ */
+.showcase-dots button:hover {
+  background: rgba(255, 255, 255, .7);
+  box-shadow: 0 0 10px rgba(255, 255, 255, .4);
+}
+.showcase-dots button.active {
+  box-shadow: 0 0 16px rgba(255, 255, 255, .5), 0 0 40px rgba(255, 255, 255, .15);
+}
+
+/* ============================================================
+   24. FOOTER LINKS — Subtle brand glow
+   ============================================================ */
+footer ul a {
+  transition: color .3s var(--hover-ease), text-shadow .3s;
+}
+footer ul a:hover {
+  color: var(--brand);
+  text-shadow: 0 0 12px var(--glow-primary-soft);
+}
+
+/* ============================================================
+   25. LOGO HOVER — Brand glow pulse
+   ============================================================ */
+.logo:hover .logo-mark {
+  box-shadow: 0 0 25px var(--glow-primary), 0 8px 20px rgba(124, 58, 237, .5);
+  transform: scale(1.08) rotate(-3deg);
+  transition: all .4s var(--hover-ease);
+}
+.logo-mark {
+  transition: box-shadow .4s var(--hover-ease), transform .4s var(--hover-ease);
+}
+
+/* ============================================================
+   26. 6-COLUMN CATEGORY GRID
+   ============================================================ */
+.cat-grid-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
+@media (max-width: 1024px) {
+  .cat-grid-6 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 640px) {
+  .cat-grid-6 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ============================================================
+   27. DASHBOARD GRID
+   ============================================================ */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.6rem;
+}
+.dash-card {
+  padding: 2.4rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+.dash-card h3 { margin-bottom: .6rem; }
+.dash-card p { color: var(--text-2); font-size: .92rem; margin-bottom: 1.4rem; }
+@media (max-width: 640px) {
+  .dash-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   28. GALLERY IMAGE HOVER — Luminous zoom
+   ============================================================ */
+.gallery img:hover {
+  transform: scale(1.06);
+  filter: brightness(1.06) saturate(1.05);
+  box-shadow: inset 0 0 60px rgba(99, 102, 241, .1);
+}
+
+/* ============================================================
+   29. REVIEW FORM — Focus glow
+   ============================================================ */
+.review-form textarea:focus,
+.review-form select:focus,
+.review-form input:focus {
+  border-color: var(--brand);
+  box-shadow:
+    0 0 0 4px rgba(99, 102, 241, .12),
+    0 0 18px var(--glow-primary-soft);
+}
+
+/* ============================================================
+   30. CURSOR GLOW LAYER (driven by JS)
+       A radial glow that follows the cursor globally
+   ============================================================ */
+.cursor-glow {
+  position: fixed;
+  width: 350px; height: 350px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9990;
+  background: radial-gradient(circle, rgba(99, 102, 241, .08) 0%, transparent 65%);
+  transform: translate(-50%, -50%);
+  transition: opacity .3s;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+[data-theme="dark"] .cursor-glow {
+  background: radial-gradient(circle, rgba(99, 102, 241, .12) 0%, transparent 65%);
+}
+
+/* ============================================================
+   31. SMOOTH MOBILE TOUCH FEEDBACK
+   ============================================================ */
+@media (hover: none) {
+  .btn:active, .cat-card:active, .listing-card:active, .chip:active,
+  .step:active, .testi:active, .icon-btn:active {
+    transform: scale(.97);
+    transition-duration: .1s;
+  }
+}
+
+/* ============================================================
+   32. PERFORMANCE GUARD — Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    --hover-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+  .cursor-glow { display: none; }
+}
+
+/* ============================================================
+   33. APPLE-INSPIRED FINISHING LAYER
+   Refined typography, quieter glass, and GPU-friendly motion.
+   ============================================================ */
+:root {
+  --font-display: "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+  --font-body: "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+  --motion-fast: 220ms;
+  --motion-ui: 420ms;
+  --motion-slow: 720ms;
+  --ease-apple: cubic-bezier(.25, .1, .25, 1);
+  --ease-out-apple: cubic-bezier(.16, 1, .3, 1);
+  --hover-lift: -6px;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-body);
+  letter-spacing: -.011em;
+  line-height: 1.58;
+  font-kerning: normal;
+  font-synthesis: none;
+}
+
+h1, h2, h3, h4,
+.logo, .price, .stat b, .hero-stats .hs b,
+.showcase-meta b, .price-box .big-price {
+  font-family: var(--font-display);
+  text-wrap: balance;
+}
+
+h1 {
+  letter-spacing: -.052em;
+  font-weight: 750;
+}
+
+h2 {
+  letter-spacing: -.042em;
+  font-weight: 720;
+}
+
+h3, h4 {
+  letter-spacing: -.024em;
+  font-weight: 650;
+}
+
+p, li, label, input, select, textarea, button, a {
+  font-kerning: normal;
+}
+
+.lead, .sec-head p, .cat-card p, .step p, .testi p,
+.dash-card p, .faq-a p, .footer-grid p, .lc-loc {
+  letter-spacing: -.006em;
+}
+
+.btn, .nav-links, .badge-pill, .chip, .tag, .fac-pill,
+.f-title, .faq-q, .auth-tabs button {
+  letter-spacing: -.008em;
+}
+
+.price, .stat b, .hero-stats .hs b, .showcase-meta b,
+.price-box .big-price, .range-val {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: rgba(99, 102, 241, .22);
+}
+
+/* Quieter, more dimensional liquid glass */
+.glass {
+  background-color: var(--glass);
+  background-image:
+    radial-gradient(180px circle at var(--gx) var(--gy), rgba(255,255,255,.14), transparent 68%),
+    linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.025) 46%, rgba(255,255,255,.06));
+  background-blend-mode: screen, normal;
+  -webkit-backdrop-filter: blur(12px) saturate(155%) brightness(1.03);
+  backdrop-filter: blur(12px) saturate(155%) brightness(1.03);
+  border-color: rgba(255,255,255,.58);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.32),
+    inset 0 -1px 0 rgba(255,255,255,.08),
+    0 14px 42px rgba(10,15,40,.10);
+}
+
+[data-theme="dark"] .glass {
+  border-color: rgba(255,255,255,.13);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 -1px 0 rgba(255,255,255,.025),
+    0 16px 46px rgba(0,0,0,.34);
+}
+
+.glass::before {
+  background: linear-gradient(145deg, rgba(255,255,255,.72), rgba(255,255,255,.10) 34%, transparent 55%, rgba(255,255,255,.14));
+  opacity: .72;
+}
+
+.glass::after,
+.cat-card::after,
+.listing-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(110deg, transparent 18%, rgba(255,255,255,.16) 40%, transparent 58%),
+    radial-gradient(220px circle at var(--gx) var(--gy), rgba(255,255,255,.13), transparent 62%);
+  opacity: 0;
+  filter: none;
+  transform: translate3d(-8%, 0, 0);
+  transition: opacity var(--motion-ui) var(--ease-apple), transform var(--motion-slow) var(--ease-out-apple);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.glass:hover::after,
+.cat-card:hover::after,
+.listing-card:hover::after {
+  opacity: .72;
+  transform: translate3d(0, 0, 0);
+}
+
+.navbar {
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.24),
+    0 10px 34px rgba(10,15,40,.08);
+  transition:
+    box-shadow var(--motion-ui) var(--ease-apple),
+    background var(--motion-ui) var(--ease-apple),
+    transform var(--motion-ui) var(--ease-out-apple),
+    width var(--motion-ui) var(--ease-apple);
+  will-change: transform, background, box-shadow;
+}
+
+.navbar.scrolled {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.28),
+    0 14px 44px rgba(10,15,40,.14),
+    0 0 0 1px rgba(99,102,241,.06);
+}
+
+[data-theme="dark"] .navbar,
+[data-theme="dark"] .navbar.scrolled {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    0 16px 48px rgba(0,0,0,.32);
+}
+
+/* Calm, precise interactive feedback */
+a, button, input, select, textarea,
+.btn, .icon-btn, .chip, .heart-btn, .fac-pill, .fac-item,
+.auth-tabs button, .sort-select, .faq-item, .showcase-dots button {
+  transition-duration: var(--motion-fast);
+  transition-timing-function: var(--ease-apple);
+}
+
+.btn {
+  will-change: auto;
+  transition:
+    transform var(--motion-ui) var(--ease-out-apple),
+    box-shadow var(--motion-ui) var(--ease-apple),
+    filter var(--motion-fast) var(--ease-apple),
+    background-position var(--motion-slow) var(--ease-apple);
+}
+
+.btn-primary::before {
+  inset: 1px;
+  z-index: 0;
+  border-radius: inherit;
+  background: linear-gradient(110deg, transparent 18%, rgba(255,255,255,.24) 42%, transparent 62%);
+  opacity: .48;
+  filter: none;
+  transform: translate3d(-70%, 0, 0);
+  transition: transform var(--motion-slow) var(--ease-out-apple);
+  pointer-events: none;
+}
+
+.btn-primary:hover::before {
+  opacity: .48;
+  filter: none;
+  transform: translate3d(70%, 0, 0);
+}
+
+.btn-primary:hover {
+  transform: translate3d(0,-2px,0);
+  filter: brightness(1.025);
+  box-shadow:
+    0 14px 32px -12px rgba(99,102,241,.42),
+    0 0 0 1px rgba(255,255,255,.12);
+}
+
+.btn-primary:active,
+.btn-ghost:active,
+.btn-call:active,
+.btn-wa:active {
+  transform: translate3d(0,0,0) scale(.985);
+  transition-duration: 100ms;
+}
+
+.btn-ghost:hover {
+  transform: translate3d(0,-2px,0);
+  border-color: rgba(99,102,241,.28);
+  color: var(--brand);
+  box-shadow:
+    0 12px 28px -14px rgba(99,102,241,.24),
+    inset 0 1px 0 rgba(255,255,255,.16);
+}
+
+.btn-call:hover, .btn-wa:hover {
+  transform: translate3d(0,-2px,0);
+  filter: brightness(1.025);
+  box-shadow: 0 14px 30px -14px currentColor;
+}
+
+.icon-btn:hover {
+  transform: translate3d(0,-2px,0) scale(1.025);
+  border-color: rgba(99,102,241,.24);
+  box-shadow: 0 10px 24px -14px rgba(99,102,241,.34);
+}
+
+.nav-links a {
+  text-shadow: none;
+}
+
+.nav-links a::after {
+  height: 1.5px;
+  box-shadow: none;
+  transition: width var(--motion-ui) var(--ease-out-apple), opacity var(--motion-fast) ease;
+}
+
+.nav-links a:hover {
+  text-shadow: none;
+}
+
+.nav-links a:hover::after {
+  box-shadow: none;
+}
+
+.logo:hover .logo-mark {
+  transform: translate3d(0,-1px,0) scale(1.035);
+  box-shadow: 0 10px 24px -10px rgba(124,58,237,.42);
+}
+
+.cat-card, .listing-card, .step, .testi, .dash-card {
+  will-change: auto;
+  transition:
+    transform var(--motion-ui) var(--ease-out-apple),
+    box-shadow var(--motion-ui) var(--ease-apple),
+    border-color var(--motion-ui) var(--ease-apple);
+}
+
+.cat-card:hover, .listing-card:hover, .step:hover,
+.testi:hover, .dash-card:hover {
+  transform: translate3d(0,var(--hover-lift),0);
+  border-color: rgba(99,102,241,.20);
+  box-shadow:
+    0 22px 54px -24px rgba(10,15,40,.28),
+    0 0 0 1px rgba(99,102,241,.055);
+}
+
+[data-theme="dark"] .cat-card:hover,
+[data-theme="dark"] .listing-card:hover,
+[data-theme="dark"] .step:hover,
+[data-theme="dark"] .testi:hover,
+[data-theme="dark"] .dash-card:hover {
+  box-shadow:
+    0 24px 58px -22px rgba(0,0,0,.58),
+    0 0 0 1px rgba(99,102,241,.09);
+}
+
+.cat-card:hover .cat-icon {
+  transform: translate3d(0,-2px,0) scale(1.055) rotate(-2deg);
+  box-shadow: 0 14px 28px -12px rgba(124,58,237,.46);
+}
+
+.step:hover .num {
+  transform: translate3d(0,-1px,0) scale(1.045);
+  box-shadow: 0 12px 24px -12px rgba(124,58,237,.48);
+}
+
+.testi:hover {
+  border-color: rgba(245,158,11,.16);
+}
+
+.dash-card:hover .dash-icon {
+  transform: translate3d(0,-2px,0) scale(1.045) rotate(-2deg);
+}
+
+.listing-card:hover .lc-media img {
+  transform: scale(1.045);
+  filter: saturate(1.025) brightness(1.015);
+}
+
+.chip:hover {
+  transform: translate3d(0,-2px,0);
+  text-shadow: none;
+  border-color: rgba(99,102,241,.28);
+  box-shadow: 0 12px 28px -16px rgba(99,102,241,.28);
+}
+
+.heart-btn:hover {
+  transform: translate3d(0,-1px,0) scale(1.07);
+  box-shadow: 0 10px 24px -14px rgba(239,68,68,.36);
+}
+
+.heart-btn.active,
+.heart-btn.active:hover {
+  box-shadow: 0 10px 26px -15px rgba(239,68,68,.42);
+}
+
+.fac-pill:hover, .fac-item:hover {
+  transform: translate3d(0,-1px,0);
+  box-shadow: 0 8px 18px -14px rgba(99,102,241,.32);
+}
+
+.faq-item:hover {
+  transform: none;
+  border-color: rgba(99,102,241,.18);
+  box-shadow: 0 14px 36px -24px rgba(99,102,241,.30);
+}
+
+.stats-band:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.30),
+    0 22px 58px -30px rgba(99,102,241,.26);
+}
+
+.cta-band:hover {
+  transform: translate3d(0,-2px,0);
+  box-shadow: 0 24px 58px -24px rgba(124,58,237,.44);
+}
+
+.cta-band .btn:hover {
+  transform: translate3d(0,-2px,0);
+  box-shadow: 0 14px 30px -16px rgba(255,255,255,.52);
+}
+
+.showcase-dots button:hover,
+.showcase-dots button.active {
+  box-shadow: 0 6px 18px -8px rgba(255,255,255,.58);
+}
+
+footer ul a:hover {
+  text-shadow: none;
+}
+
+/* Motion polish */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0,24px,0) scale(.994);
+  transition:
+    opacity var(--motion-slow) var(--ease-apple),
+    transform var(--motion-slow) var(--ease-out-apple);
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: translate3d(0,0,0) scale(1);
+}
+
+.reveal-word {
+  filter: none;
+  transform: translate3d(0,18px,0);
+  animation-duration: .72s;
+  animation-timing-function: var(--ease-out-apple);
+}
+
+@keyframes wordIn {
+  to {
+    opacity: 1;
+    transform: translate3d(0,0,0);
+    filter: none;
+  }
+}
+
+.tilt {
+  transform-style: preserve-3d;
+  transition: box-shadow var(--motion-ui) var(--ease-apple);
+  will-change: transform;
+}
+.tilt:not([data-gsap-tilt-bound]) {
+  transition:
+    transform var(--motion-ui) var(--ease-out-apple),
+    box-shadow var(--motion-ui) var(--ease-apple);
+}
+
+.tilt .tilt-glow {
+  background: radial-gradient(260px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.12), transparent 66%);
+  transition: opacity var(--motion-ui) var(--ease-apple);
+}
+
+.showcase-slide {
+  transition: opacity .9s var(--ease-apple);
+}
+
+.showcase-slide .img {
+  transition: transform 7s var(--ease-apple);
+  will-change: transform;
+}
+
+.cinema-bg .ph {
+  will-change: transform, translate;
+}
+
+.page-veil {
+  transition: opacity var(--motion-ui) var(--ease-apple);
+}
+
+body.cs-leaving {
+  transform: translate3d(0,5px,0) scale(.998);
+  transition: opacity .28s var(--ease-apple), transform .34s var(--ease-apple);
+}
+
+.scroll-progress {
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+  box-shadow: 0 2px 10px rgba(124,58,237,.24);
+}
+
+.search-field:focus-within,
+.auth-card input:focus,
+.review-form textarea:focus,
+.review-form select:focus,
+.review-form input:focus {
+  box-shadow:
+    0 0 0 3px rgba(99,102,241,.12),
+    0 10px 26px -18px rgba(99,102,241,.34);
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid rgba(99,102,241,.72);
+  outline-offset: 3px;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-3);
+  opacity: .82;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal, .reveal.in, .reveal-word, body.cs-leaving {
+    opacity: 1;
+    transform: none;
+  }
+  .scroll-progress { display: none; }
+}

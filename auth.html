@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome — CampusStay</title>
+  <meta name="description" content="Sign in or create a CampusStay account as a student or property owner.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-page">
+  <div class="auth-ambient" aria-hidden="true">
+    <div class="auth-orb auth-orb--one"></div>
+    <div class="auth-orb auth-orb--two"></div>
+    <div class="auth-grid"></div>
+  </div>
+
+  <nav class="auth-nav" aria-label="Authentication navigation">
+    <a href="index.html" class="auth-brand" aria-label="CampusStay home">
+      <span class="auth-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </span>
+      <span>Campus<span>Stay</span></span>
+    </a>
+    <a class="auth-nav-link" href="index.html">Back to explore <span aria-hidden="true">↗</span></a>
+  </nav>
+
+  <main class="auth-shell">
+    <section class="auth-story" aria-label="CampusStay introduction">
+      <div class="auth-eyebrow"><span></span> Built for better student living</div>
+      <h1>A more considered way to <em>find your place.</em></h1>
+      <p>Verified homes, real neighbourhood context, and an account that remembers where your search left off.</p>
+      <div class="story-scene" aria-hidden="true">
+        <div class="scene-window"><i></i><i></i><i></i></div>
+        <div class="scene-building scene-building--rear"></div>
+        <div class="scene-building scene-building--front"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="scene-plant"><i></i><i></i><i></i></div>
+        <div class="scene-card"><span class="scene-card-icon">⌂</span><b>Made to feel at home</b><small>From shortlisting to moving in</small></div>
+      </div>
+      <div class="auth-trust-row">
+        <span><b>4.8/5</b> student experience</span>
+        <span><b>Zero</b> brokerage on contact</span>
+      </div>
+    </section>
+
+    <section class="auth-card" id="auth-card" aria-labelledby="auth-title">
+      <div class="auth-card-glow" aria-hidden="true"></div>
+      <div class="auth-card-header">
+        <p class="auth-kicker">Your CampusStay account</p>
+        <h2 id="auth-title">Welcome back</h2>
+        <p id="auth-sub">Pick up your rental search exactly where you left it.</p>
+      </div>
+
+      <div class="auth-message" id="auth-message" role="status" aria-live="polite"></div>
+      <div class="auth-config-notice" id="auth-config-notice" hidden role="status">
+        Authentication is not configured for this environment. Add the Supabase project URL and publishable key to <code>js/runtime-config.js</code>.
+      </div>
+
+      <div class="segmented-control auth-mode-toggle" aria-label="Choose authentication action">
+        <span class="segment-indicator" aria-hidden="true"></span>
+        <button type="button" class="active" data-mode="signin">Sign in</button>
+        <button type="button" data-mode="signup">Sign up</button>
+      </div>
+
+      <div class="role-section">
+        <div class="role-section-heading">
+          <span>Continue as</span>
+          <strong id="auth-role-copy">You are continuing as a Student</strong>
+        </div>
+        <div class="segmented-control role-toggle" aria-label="Choose account role">
+          <span class="segment-indicator" aria-hidden="true"></span>
+          <button type="button" class="active" data-role="student"><span aria-hidden="true">✦</span> Student</button>
+          <button type="button" data-role="owner"><span aria-hidden="true">⌂</span> Owner</button>
+        </div>
+      </div>
+
+      <form id="signin-form" class="auth-form" novalidate>
+        <div class="auth-field" id="field-signin-email">
+          <input type="email" id="signin-email" name="email" placeholder=" " autocomplete="email" inputmode="email" required>
+          <label for="signin-email">Email address</label>
+          <p class="auth-field-error" id="error-signin-email" hidden></p>
+        </div>
+        <div class="auth-field auth-field--password" id="field-signin-password">
+          <input type="password" id="signin-password" name="password" placeholder=" " autocomplete="current-password" required>
+          <label for="signin-password">Password</label>
+          <button type="button" class="password-toggle" data-password-toggle="signin-password" aria-label="Show password" aria-pressed="false"><span data-password-copy>Show</span></button>
+          <p class="auth-field-error" id="error-signin-password" hidden></p>
+        </div>
+        <button type="submit" class="auth-submit" id="btn-signin">Sign in as Student</button>
+      </form>
+
+      <form id="signup-form" class="auth-form" novalidate hidden>
+        <div class="auth-field" id="field-name">
+          <input type="text" id="signup-name" name="name" placeholder=" " autocomplete="name" required>
+          <label for="signup-name">Full name</label>
+          <p class="auth-field-error" id="error-name" hidden></p>
+        </div>
+        <div class="auth-field" id="field-email">
+          <input type="email" id="signup-email" name="email" placeholder=" " autocomplete="email" inputmode="email" required>
+          <label for="signup-email">Email address</label>
+          <p class="auth-field-error" id="error-email" hidden></p>
+        </div>
+        <div class="auth-field auth-field--phone" id="field-phone">
+          <span class="phone-prefix" aria-hidden="true">+91</span>
+          <input type="tel" id="signup-phone" name="phone" placeholder=" " autocomplete="tel" inputmode="numeric" maxlength="10" required>
+          <label for="signup-phone">Mobile number</label>
+          <p class="auth-field-error" id="error-phone" hidden></p>
+        </div>
+        <div class="auth-field auth-field--password" id="field-password">
+          <input type="password" id="signup-password" name="password" placeholder=" " autocomplete="new-password" minlength="8" required>
+          <label for="signup-password">Create password</label>
+          <button type="button" class="password-toggle" data-password-toggle="signup-password" aria-label="Show password" aria-pressed="false"><span data-password-copy>Show</span></button>
+          <p class="auth-field-error" id="error-password" hidden></p>
+        </div>
+        <button type="submit" class="auth-submit" id="btn-signup">Create student account</button>
+      </form>
+
+      <div class="auth-divider"><span></span><small>or continue with</small><span></span></div>
+      <button type="button" class="google-button" id="btn-google-login">
+        <svg aria-hidden="true" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.59.102-1.167.282-1.707V4.96H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.04l3.007-2.333z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.508.453 3.44 1.347l2.58-2.58C13.463.891 11.426 0 9 0 5.483 0 2.443 2.029.957 4.96l3.007 2.332C4.672 5.164 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+
+      <p class="auth-switch"><span id="auth-switch-copy">New to CampusStay?</span> <button type="button" id="btn-switch-mode">Create an account</button></p>
+      <p class="auth-terms">By continuing, you agree to the <a href="help.html#terms">Terms</a> and <a href="help.html#privacy">Privacy Policy</a>.</p>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/runtime-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

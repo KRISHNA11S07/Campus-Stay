@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Stays — CampusStay</title>
+  <meta name="description" content="Browse verified rooms, hostels, PGs and flats near your college, ranked by student ratings.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/premium.css">
+  <link rel="stylesheet" href="css/ultra.css">
+  <link rel="stylesheet" href="css/apple-polish.css">
+  <link rel="stylesheet" href="css/luxe.css">
+  <link rel="stylesheet" href="css/liquid-glass.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+</head>
+<body>
+  <div class="orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo"><span class="logo-mark">🏠</span><span>Campus<em>Stay</em></span></a>
+    <div class="nav-links">
+      <a href="index.html#explore">Explore</a>
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#featured">Featured</a>
+      <a href="listings.html?view=wishlist">Wishlist</a>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">🌙</button>
+      <a href="auth.html" class="btn btn-primary btn-sm" data-auth-cta>Sign in</a>
+      <button class="icon-btn hamburger" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+  <div class="mobile-menu glass">
+    <a href="index.html#explore">Explore</a>
+    <a href="index.html#how">How it works</a>
+    <a href="listings.html?view=wishlist">Wishlist</a>
+    <a href="auth.html" class="btn btn-primary" data-auth-cta>Sign in</a>
+  </div>
+
+  <header class="page-head">
+    <div class="container">
+      <h1 id="page-title">Browse all stays</h1>
+      <p class="sub" id="page-sub">Ranked by student ratings — highest rated first.</p>
+    </div>
+  </header>
+
+  <main class="container results-layout">
+    <aside class="filters glass" id="filters">
+      <h3>Filters <button id="clear-filters" class="btn btn-ghost btn-sm">Reset all</button></h3>
+
+      <div class="f-group">
+        <label class="f-title">Accommodation type</label>
+        <label class="f-check"><input type="checkbox" name="type" value="room"> 🚪 Rooms</label>
+        <label class="f-check"><input type="checkbox" name="type" value="hostel"> 🏢 Hostels</label>
+        <label class="f-check"><input type="checkbox" name="type" value="pg"> 🍱 PGs</label>
+        <label class="f-check"><input type="checkbox" name="type" value="flat"> 🏙️ Flats</label>
+        <label class="f-check" style="opacity:0.55; cursor:not-allowed;" title="🔒 Coming Soon"><input type="checkbox" name="type" value="apartment" disabled> 🔒 Apartments (Coming soon)</label>
+        <label class="f-check" style="opacity:0.55; cursor:not-allowed;" title="🔒 Coming Soon"><input type="checkbox" name="type" value="villa" disabled> 🔒 Villas (Coming soon)</label>
+      </div>
+
+      <div class="f-group">
+        <label class="f-title">Max rent: <span class="range-val" id="rent-val">₹50,000</span></label>
+        <input type="range" id="f-rent" min="4000" max="50000" step="500" value="50000">
+      </div>
+
+      <div class="f-group" id="distance-group">
+        <label class="f-title">Max distance: <span class="range-val" id="dist-val">5.0 km</span></label>
+        <input type="range" id="f-dist" min="0.5" max="5" step="0.5" value="5">
+      </div>
+
+      <div class="f-group">
+        <label class="f-title">Minimum rating</label>
+        <label class="f-check"><input type="radio" name="rating" value="0" checked> Any rating</label>
+        <label class="f-check"><input type="radio" name="rating" value="4"> ★ 4.0+</label>
+        <label class="f-check"><input type="radio" name="rating" value="4.5"> ★ 4.5+</label>
+      </div>
+
+      <div class="f-group">
+        <label class="f-title">Facilities</label>
+        <div id="facility-filters"></div>
+      </div>
+
+      <div class="f-group">
+        <label class="f-check"><input type="checkbox" id="f-verified"> ✓ Verified only</label>
+        <label class="f-check"><input type="checkbox" id="f-available" checked> Available now</label>
+      </div>
+    </aside>
+
+    <section>
+      <div class="results-bar">
+        <span class="count" id="result-count">Loading…</span>
+        <div style="display:flex; gap:.6rem; align-items:center;">
+          <button class="btn btn-ghost btn-sm filters-toggle" id="filters-toggle">⚙️ Filters</button>
+          <select class="sort-select" id="sort">
+            <option value="rating">Sort: Top rated</option>
+            <option value="distance">Sort: Nearest first</option>
+            <option value="rent-asc">Sort: Rent (low → high)</option>
+            <option value="rent-desc">Sort: Rent (high → low)</option>
+          </select>
+        </div>
+      </div>
+      <div class="listing-grid" id="results-grid">
+        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-bottom">
+      <div class="copyright-notice">
+        <p>© 2026 Campus Stay. All Rights Reserved.</p>
+        <p>The original source code, content, graphics, and other original materials on this website are protected by applicable copyright laws.</p>
+        <p>Unauthorized copying, reproduction, or redistribution of protected materials is prohibited.</p>
+      </div>
+      <a href="index.html">← Back to home</a>
+    </div>
+  </footer>
+
+  <!-- Lenis, GSAP & ScrollTrigger for Premium Scroll Animations -->
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Liquid Glass Refraction Engine -->
+  <script src="js/liquid-glass/displacement.js"></script>
+  <script src="js/liquid-glass/filters.js"></script>
+  <script src="js/liquid-glass/liquid-glass.js"></script>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/listings.js"></script>
+  <script src="js/fx.js"></script>
+</body>
+</html>

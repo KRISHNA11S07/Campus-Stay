@@ -1,0 +1,33 @@
+# Local configuration: copy the checked-in example, then keep real values local.
+.env
+.env.*
+!.env.example
+js/runtime-config.js
+
+# Dependencies, generated output, logs, and local tooling
+node_modules/
+dist/
+build/
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*.local.json
+
+# Local database exports, certificates, and backups
+*.sqlite
+*.sqlite3
+*.db
+*.sqlitedb
+*.bak
+*.backup
+*.dump
+*.pem
+*.key
+*.p12
+*.pfx

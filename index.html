@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CampusStay — Premium Student Accommodation in Maharashtra</title>
+    <meta
+      name="description"
+      content="CampusStay helps college freshers find verified rooms, hostels, PGs, and flats near KIT Kolhapur."
+    />
+    <meta
+      property="og:title"
+      content="CampusStay — Student Accommodation, Sorted."
+    />
+    <meta
+      property="og:description"
+      content="Verified rooms, hostels, PGs, and flats near your Maharashtra college. Ranked by students, for students."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/premium.css" />
+    <link rel="stylesheet" href="css/ultra.css" />
+    <link rel="stylesheet" href="css/apple-polish.css" />
+    <link rel="stylesheet" href="css/luxe.css" />
+    <link rel="stylesheet" href="css/liquid-glass.css" />
+    <link rel="stylesheet" href="css/experience.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>"
+    />
+  </head>
+  <body class="home-page">
+    <div class="preloader" role="status" aria-live="polite">
+      <div class="preloader-inner">
+        <div class="preloader-brand" aria-hidden="true">CS</div>
+        <p class="preloader-copy">Finding Your Perfect Stay...</p>
+        <div class="preloader-line" aria-hidden="true"><span></span></div>
+      </div>
+    </div>
+    <div class="orbs">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="orb orb-4"></div>
+    </div>
+
+    <!-- ============ NAVBAR ============ -->
+    <nav class="navbar" id="main-nav">
+      <!-- Liquid Glass Layers (Reference Implementation) -->
+      <div class="navbar-lg-filter"></div>
+      <div class="navbar-lg-overlay"></div>
+      <div class="navbar-lg-specular"></div>
+      <!-- /Liquid Glass Layers -->
+      <a href="index.html" class="logo"
+        ><span class="logo-mark">🏠</span><span>Campus<em>Stay</em></span></a
+      >
+      <div class="nav-links">
+        <a href="index.html#explore">Explore</a>
+        <a href="index.html#showcase">Showcase</a>
+        <a href="index.html#how">How it works</a>
+        <a href="listings.html?view=wishlist">Wishlist</a>
+        <a href="auth.html?next=matches.html">Dashboard</a>
+      </div>
+      <div class="nav-actions">
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">
+          🌙
+        </button>
+        <a href="auth.html" class="btn btn-primary btn-sm" data-auth-cta
+          >Sign in</a
+        >
+        <button class="icon-btn hamburger" aria-label="Menu">☰</button>
+      </div>
+    </nav>
+    <div class="mobile-menu glass">
+      <a href="index.html#explore">Explore</a>
+      <a href="index.html#showcase">Showcase</a>
+      <a href="index.html#how">How it works</a>
+      <a href="listings.html?view=wishlist">Wishlist</a>
+      <a href="auth.html?next=matches.html">Dashboard</a>
+      <a href="auth.html" class="btn btn-primary" data-auth-cta>Sign in</a>
+    </div>
+
+    <!-- ============ CINEMATIC HERO ============ -->
+    <header class="cinema-hero">
+      <div class="cinema-bg">
+        <div class="layer ph parallax" data-parallax="0.15"></div>
+        <div class="layer scrim"></div>
+      </div>
+      <div class="container">
+        <span class="badge-pill"
+          ><span class="dot"></span> STUDENT ACCOMMODATION, REIMAGINED</span
+        >
+        <h1 data-words>
+          Find a place that<br />
+          <span class="grad-text">feels like home.</span>
+        </h1>
+        <p class="lead">
+          Rooms, PGs, Hostels and Flats near your campus — all in one place. Verified stays around KIT Kolhapur with zero broker hassle.
+        </p>
+
+        <form class="search-card glass" id="hero-search">
+          <div class="search-title-label">Where are you studying?</div>
+          <div class="search-row">
+            <label class="search-field">
+              <span>🎓</span>
+              <input
+                type="text"
+                id="college-input"
+                list="college-list"
+                placeholder="Search your college or campus..."
+                autocomplete="off"
+                required
+              />
+            </label>
+            <button type="submit" class="btn btn-primary" id="hero-search-btn">
+              📍 Find My Stay
+            </button>
+          </div>
+          <datalist id="college-list"></datalist>
+          <div class="search-hint">
+            ⚡ Stays mapped within 5 km of your campus with honest student reviews
+          </div>
+        </form>
+
+        <div class="hero-actions" data-cs-hero-actions>
+          <a href="#explore" class="btn btn-primary">Explore Stays <span aria-hidden="true">↓</span></a>
+          <a href="owner-onboarding.html" class="btn btn-ghost hero-owner-btn">List Your Property <span aria-hidden="true">→</span></a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hs">
+            <b data-count="2400">2,400+</b><span>Verified listings</span>
+          </div>
+          <div class="hs">
+            <b data-count="1">1</b><span>Partner college</span>
+          </div>
+          <div class="hs"><b>4.8★</b><span>Avg. student rating</span></div>
+        </div>
+      </div>
+      <a href="#explore" class="scroll-cue"
+        ><span class="mouse"></span><span>Scroll to explore</span></a
+      >
+    </header>
+
+    <!-- ============ TRUST MARQUEE ============ -->
+    <div class="trust-strip">
+      <div class="trust-track">
+        <span>🏛️ KIT Kolhapur</span><span>★ 12,000+ students housed</span><span>🛡️ 100% verified owners</span><span>🏡 Rooms, PGs, Hostels, Flats</span>
+        <span>🏛️ KIT Kolhapur</span><span>★ 12,000+ students housed</span><span>🛡️ 100% verified owners</span><span>🏡 Rooms, PGs, Hostels, Flats</span>
+        <span>🏛️ KIT Kolhapur</span><span>★ 12,000+ students housed</span><span>🛡️ 100% verified owners</span><span>🏡 Rooms, PGs, Hostels, Flats</span>
+        <span>🏛️ KIT Kolhapur</span><span>★ 12,000+ students housed</span><span>🛡️ 100% verified owners</span><span>🏡 Rooms, PGs, Hostels, Flats</span>
+      </div>
+    </div>
+
+    <!-- ============ ACCOMMODATION EXPLORER ============ -->
+    <section id="explore" class="stay-explorer" aria-labelledby="stay-explorer-title">
+      <div class="container explorer-intro">
+        <div class="explorer-intro__content">
+          <span class="kicker">CHOOSE YOUR STAY</span>
+          <h2 id="stay-explorer-title">Find a space that fits<br>your next chapter.</h2>
+          <p class="explorer-intro__desc">Choose a stay type to see live listings. Hover to reveal a little more; on touch screens, tap once to preview and again to open.</p>
+        </div>
+      </div>
+      <div class="explorer-viewport">
+        <div class="explorer-track">
+          <a class="explorer-panel" href="listings.html?type=room" data-category="room">
+            <span class="explorer-number">01</span>
+            <span class="explorer-type">ROOMS</span>
+            <div class="explorer-content">
+              <b>Independent rooms</b>
+              <small>Privacy, flexibility and your own rhythm.</small>
+              <em>From ₹4,500 / mo <i aria-hidden="true">→</i></em>
+            </div>
+            <div class="explorer-art"><img data-category-image alt="Bright independent student room" loading="lazy" decoding="async" /></div>
+          </a>
+          <a class="explorer-panel" href="listings.html?type=pg" data-category="pg">
+            <span class="explorer-number">02</span>
+            <span class="explorer-type">PGs</span>
+            <div class="explorer-content">
+              <b>Student PGs</b>
+              <small>Meals, housekeeping and a ready-made routine.</small>
+              <em>From ₹6,500 / mo <i aria-hidden="true">→</i></em>
+            </div>
+            <div class="explorer-art"><img data-category-image alt="Comfortable student PG interior" loading="lazy" decoding="async" /></div>
+          </a>
+          <a class="explorer-panel" href="listings.html?type=hostel" data-category="hostel">
+            <span class="explorer-number">03</span>
+            <span class="explorer-type">HOSTELS</span>
+            <div class="explorer-content">
+              <b>Community hostels</b>
+              <small>Study spaces, mess and people in the same chapter.</small>
+              <em>From ₹5,000 / mo <i aria-hidden="true">→</i></em>
+            </div>
+            <div class="explorer-art"><img data-category-image alt="Modern student hostel lounge" loading="lazy" decoding="async" /></div>
+          </a>
+          <a class="explorer-panel" href="listings.html?type=flat" data-category="flat">
+            <span class="explorer-number">04</span>
+            <span class="explorer-type">FLATS</span>
+            <div class="explorer-content">
+              <b>Shared flats</b>
+              <small>More space, more independence, better with friends.</small>
+              <em>From ₹9,000 / mo <i aria-hidden="true">→</i></em>
+            </div>
+            <div class="explorer-art"><img data-category-image alt="Shared student flat living space" loading="lazy" decoding="async" /></div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FULL-SCREEN 4K SHOWCASE ============ -->
+    <section class="showcase" id="showcase">
+      <div class="showcase-stage" id="showcase-stage"></div>
+    </section>
+
+    <!-- ============ POPULAR COLLEGES ============ -->
+    <section>
+      <div class="container">
+        <div class="sec-head reveal">
+          <span class="kicker">Popular hubs</span>
+          <h2>Stays near top Maharashtra colleges</h2>
+          <p>Jump straight into the most searched campuses on CampusStay.</p>
+        </div>
+        <div class="college-chips reveal" id="college-chips"></div>
+      </div>
+    </section>
+
+    <!-- ============ HOW IT WORKS ============ -->
+    <section id="how">
+      <div class="container">
+        <div class="sec-head reveal">
+          <span class="kicker">How it works</span>
+          <h2>From admission letter to move-in, in 4 steps</h2>
+        </div>
+        <div class="steps-grid">
+          <div class="step glass tilt reveal">
+            <div class="num">1</div>
+            <h3>Enter your college</h3>
+            <p>
+              Tell us where you got admission — we know the neighbourhoods
+              around KIT Kolhapur.
+            </p>
+          </div>
+          <div class="step glass tilt reveal reveal-d1">
+            <div class="num">2</div>
+            <h3>Share your location</h3>
+            <p>
+              Allow location access and we map every stay within a 5 km radius.
+            </p>
+          </div>
+          <div class="step glass tilt reveal reveal-d2">
+            <div class="num">3</div>
+            <h3>Compare &amp; shortlist</h3>
+            <p>
+              Filter by rent, distance, facilities and ratings. Save favourites
+              to your wishlist.
+            </p>
+          </div>
+          <div class="step glass tilt reveal reveal-d3">
+            <div class="num">4</div>
+            <h3>Call or WhatsApp</h3>
+            <p>Talk directly to verified owners — zero brokerage, zero spam.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FEATURED ============ -->
+    <section id="featured">
+      <div class="container">
+        <div class="sec-head reveal">
+          <span class="kicker">Hand-picked</span>
+          <h2>Featured listings this week</h2>
+          <p>
+            The highest-rated stays across our Maharashtra partner campuses
+            right now.
+          </p>
+        </div>
+        <div class="listing-grid" id="featured-grid"></div>
+        <div style="text-align: center; margin-top: 2.4rem" class="reveal">
+          <a href="listings.html" class="btn btn-ghost"
+            >Browse all listings →</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STATS ============ -->
+    <section>
+      <div class="container">
+        <div class="stats-band glass reveal">
+          <div class="stat">
+            <b data-count="12000">0</b><span>Students housed</span>
+          </div>
+          <div class="stat">
+            <b data-count="2400">0</b><span>Verified properties</span>
+          </div>
+          <div class="stat">
+            <b data-count="35000">0</b><span>Reviews written</span>
+          </div>
+          <div class="stat">
+            <b data-count="1">0</b><span>College live</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TESTIMONIALS ============ -->
+    <section>
+      <div class="container">
+        <div class="sec-head reveal">
+          <span class="kicker">Student stories</span>
+          <h2>Freshers who found home with us</h2>
+        </div>
+        <div class="testi-grid">
+          <div class="testi glass tilt reveal">
+            <div class="stars">★★★★★</div>
+            <p>
+              "I moved to Kolhapur knowing nobody. Within 2 hours of landing, I had
+              shortlisted three PGs near KIT Kolhapur and booked one the same evening.
+              CampusStay is a blessing."
+            </p>
+            <div class="testi-user">
+              <div class="avatar">R</div>
+              <div><b>Rahul Deshmukh</b><span>B.Tech, KIT Kolhapur</span></div>
+            </div>
+          </div>
+          <div class="testi glass tilt reveal reveal-d1">
+            <div class="stars">★★★★★</div>
+            <p>
+              "The reviews are the real deal — written by seniors who actually
+              lived there. Saved me from a bad hostel, found one with an amazing
+              mess and a coding lab!"
+            </p>
+            <div class="testi-user">
+              <div class="avatar">S</div>
+              <div><b>Sneha Kulkarni</b><span>B.Tech CS, KIT Kolhapur</span></div>
+            </div>
+          </div>
+          <div class="testi glass tilt reveal reveal-d2">
+            <div class="stars">★★★★½</div>
+            <p>
+              "As a girl moving from Nagpur to Kolhapur for KIT, the verified
+              badges and security details on each listing gave my parents real
+              peace of mind. Found the perfect girls PG."
+            </p>
+            <div class="testi-user">
+              <div class="avatar">A</div>
+              <div><b>Anjali Patil</b><span>B.Tech, KIT Kolhapur</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OWNER & STUDENT DASHBOARDS CTA ============ -->
+    <section id="dashboards">
+      <div class="container">
+        <div class="dash-grid">
+          <div class="dash-card glass reveal">
+            <div class="dash-icon">🎓</div>
+            <h3>Student Dashboard</h3>
+            <p>
+              Track your bookings, manage your wishlist, post reviews and get
+              AI-powered stay recommendations — all from one place.
+            </p>
+            <a href="auth.html" class="btn btn-primary"
+              >Open Student Dashboard</a
+            >
+          </div>
+          <div class="dash-card glass reveal reveal-d1">
+            <div class="dash-icon">🏠</div>
+            <h3>Owner Dashboard</h3>
+            <p>
+              List your property, manage bookings, respond to reviews and track
+              performance analytics for your accommodation business.
+            </p>
+            <a href="owner-dashboard.html" class="btn btn-primary"
+              >Open Owner Dashboard</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section>
+      <div class="container">
+        <div class="sec-head reveal">
+          <span class="kicker">FAQ</span>
+          <h2>Questions, answered</h2>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item glass reveal">
+            <button class="faq-q">
+              Is CampusStay free for students? <span class="chev">▼</span>
+            </button>
+            <div class="faq-a">
+              <p>
+                Yes — 100% free, forever. No brokerage, no booking fees.
+                Property owners pay a small listing fee, which keeps the
+                platform free for students.
+              </p>
+            </div>
+          </div>
+          <div class="faq-item glass reveal">
+            <button class="faq-q">
+              Which Maharashtra colleges are covered?
+              <span class="chev">▼</span>
+            </button>
+            <div class="faq-a">
+              <p>
+                We currently cover KIT College of Engineering Kolhapur — with
+                more colleges being added every semester.
+              </p>
+            </div>
+          </div>
+          <div class="faq-item glass reveal">
+            <button class="faq-q">
+              What does the "Verified" badge mean? <span class="chev">▼</span>
+            </button>
+            <div class="faq-a">
+              <p>
+                Our team has physically visited the property, confirmed the
+                owner's identity, and checked that photos, rent and facilities
+                match reality.
+              </p>
+            </div>
+          </div>
+          <div class="faq-item glass reveal">
+            <button class="faq-q">
+              Can property owners list on CampusStay?
+              <span class="chev">▼</span>
+            </button>
+            <div class="faq-a">
+              <p>
+                Absolutely. Create an owner account, submit your property
+                details and photos, and our team will schedule a verification
+                visit within 48 hours.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA ============ -->
+    <section>
+      <div class="container">
+        <div class="cta-band reveal">
+          <h2>Your hostel hunt ends today.</h2>
+          <p>
+            Join 12,000+ students who found their home in Maharashtra without a
+            single broker call.
+          </p>
+          <a
+            href="#hero-search"
+            class="btn"
+            onclick="document.getElementById('college-input').focus()"
+            >Start searching →</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <a href="index.html" class="logo"
+              ><span class="logo-mark">🏠</span><span>Campus<em>Stay</em></span></a
+            >
+            <p>
+              The student-first accommodation platform for Maharashtra. Verified
+              stays, honest reviews, zero brokerage — built for freshers in a
+              new city.
+            </p>
+          </div>
+          <div>
+            <h4>Explore</h4>
+            <ul>
+              <li><a href="listings.html?type=room">Rooms</a></li>
+              <li><a href="listings.html?type=hostel">Hostels</a></li>
+              <li><a href="listings.html?type=pg">PGs</a></li>
+              <li><a href="listings.html?type=flat">Flats</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4>Colleges</h4>
+            <ul>
+              <li><a href="listings.html?college=kit">KIT Kolhapur</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4>Platform</h4>
+            <ul>
+              <li>
+                <a href="auth.html">Student Dashboard</a>
+              </li>
+              <li><a href="owner-dashboard.html">Owner Dashboard</a></li>
+              <li><a href="#how">How it works</a></li>
+              <li><a href="#">Safety &amp; verification</a></li>
+              <li><a href="#">Help center</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <div class="copyright-notice">
+            <p>© 2026 Campus Stay. All Rights Reserved.</p>
+            <p>The original source code, content, graphics, and other original materials on this website are protected by applicable copyright laws.</p>
+            <p>Unauthorized copying, reproduction, or redistribution of protected materials is prohibited.</p>
+          </div>
+          <span>🇮🇳 Live near KIT Kolhapur</span>
+        </div>
+      </div>
+    </footer>
+
+    <svg style="position: absolute; width: 0; height: 0; pointer-events: none; opacity: 0;" aria-hidden="true">
+      <filter id="lg-dist" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise" />
+        <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
+        <feDisplacementMap in="SourceGraphic" in2="blurred" scale="70" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+
+    <!-- Lenis, GSAP & ScrollTrigger for Premium Scroll Animations -->
+    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- Liquid Glass Refraction Engine -->
+    <script src="js/liquid-glass/displacement.js?v=4"></script>
+    <script src="js/liquid-glass/filters.js?v=4"></script>
+    <script src="js/liquid-glass/liquid-glass.js?v=4"></script>
+
+    <script src="js/data.js?v=4"></script>
+    <script src="js/main.js?v=4"></script>
+    <script src="js/home.js?v=4"></script>
+    <script src="js/fx.js?v=4"></script>
+    <script src="js/experience.js?v=4"></script>
+  </body>
+</html>

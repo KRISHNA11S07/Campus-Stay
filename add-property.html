@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Property — CampusStay</title>
+  <meta name="description" content="List your property on CampusStay for students.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/premium.css">
+  <link rel="stylesheet" href="css/ultra.css">
+  <link rel="stylesheet" href="css/apple-polish.css">
+  <link rel="stylesheet" href="css/luxe.css">
+  <link rel="stylesheet" href="css/liquid-glass.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+</head>
+<body data-require-auth="owner">
+  <div class="orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo"><span class="logo-mark">🏠</span><span>Campus<em>Stay</em></span></a>
+    <div class="nav-links">
+      <a href="owner-dashboard.html">Dashboard</a>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">🌙</button>
+      <a href="#" class="btn btn-primary btn-sm" data-auth-cta>Owner</a>
+    </div>
+  </nav>
+
+  <main class="container create-wrap">
+    <!-- Step indicator -->
+    <div class="step-indicator">
+      <div class="step-dot active" data-step="1"></div>
+      <div class="step-line"></div>
+      <div class="step-dot" data-step="2"></div>
+      <div class="step-line"></div>
+      <div class="step-dot" data-step="3"></div>
+      <div class="step-line"></div>
+      <div class="step-dot" data-step="4"></div>
+      <div class="step-line"></div>
+      <div class="step-dot" data-step="5"></div>
+    </div>
+
+    <div class="create-card glass">
+      <h2 id="create-title">Property Details</h2>
+      <p class="sub" id="create-sub">Step 1 of 5 — Tell us about your property</p>
+
+      <form id="property-form" class="onboard-form">
+        <div class="form-field">
+          <label for="prop-title">Property Title</label>
+          <input type="text" id="prop-title" placeholder="e.g. Shivam Boys PG, Kasaba Bawda" required>
+        </div>
+
+        <div class="form-field">
+          <label for="prop-desc">Description</label>
+          <textarea id="prop-desc" rows="4" placeholder="Describe your property — facilities, nearby landmarks, what makes it special for students..." style="padding:.9rem 1.1rem; border-radius:14px; border:1px solid var(--line); background:var(--bg-2); outline:none; resize:vertical; font-size:.95rem;" required></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="prop-area">Area / Locality</label>
+            <input type="text" id="prop-area" placeholder="e.g. Kasaba Bawda, Kolhapur" required>
+          </div>
+          <div class="form-field">
+            <label for="prop-college">Nearest College</label>
+            <select id="prop-college" required>
+              <option value="">Select college</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="prop-rent">Annual Rent (₹/year)</label>
+            <input type="number" id="prop-rent" placeholder="e.g. 90000" min="1000" required>
+          </div>
+          <div class="form-field">
+            <label for="prop-deposit">Security Deposit (₹)</label>
+            <input type="number" id="prop-deposit" placeholder="e.g. 15000" min="0" required>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="prop-phone">Owner Phone Number</label>
+          <div style="display:flex; align-items:center; gap:.5rem;">
+            <span style="padding:.9rem .6rem; background:var(--bg-2); border:1px solid var(--line); border-radius:14px 0 0 14px; font-size:.9rem; color:var(--text-2);">+91</span>
+            <input type="tel" id="prop-phone" placeholder="e.g. 9823001001" pattern="[0-9]{10}" maxlength="10" style="border-radius:0 14px 14px 0; flex:1;" required>
+          </div>
+          <small style="color:var(--text-3); font-size:.78rem;">Students will use this for Call & WhatsApp</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="prop-gender">For</label>
+            <select id="prop-gender" required>
+              <option value="any">Everyone (Co-ed)</option>
+              <option value="male">Boys Only</option>
+              <option value="female">Girls Only</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="prop-type">Property Type</label>
+            <input type="text" id="prop-type" readonly style="opacity:.7; text-transform:uppercase;">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="prop-lat">Latitude</label>
+            <input type="number" id="prop-lat" placeholder="e.g. 16.6945" step="any">
+          </div>
+          <div class="form-field">
+            <label for="prop-lng">Longitude</label>
+            <input type="number" id="prop-lng" placeholder="e.g. 74.2342" step="any">
+          </div>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-get-location" style="justify-self:start;">
+          📍 Use my current location
+        </button>
+
+        <button class="btn btn-primary btn-block" type="submit" id="btn-next-step">
+          Save & Continue to Photos →
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-bottom">
+      <span>© 2026 CampusStay.</span>
+      <a href="owner-dashboard.html">← Back to dashboard</a>
+    </div>
+  </footer>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/runtime-config.js"></script>
+
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="js/liquid-glass/displacement.js"></script>
+  <script src="js/liquid-glass/filters.js"></script>
+  <script src="js/liquid-glass/liquid-glass.js"></script>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/add-property.js"></script>
+  <script src="js/fx.js"></script>
+</body>
+</html>

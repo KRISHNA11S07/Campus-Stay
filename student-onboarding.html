@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Your preferences — CampusStay</title>
+  <meta name="description" content="Personalize your CampusStay recommendations.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/account.css">
+</head>
+<body class="account-page" data-require-auth="student">
+  <nav class="navbar"><a href="index.html" class="logo"><span class="logo-mark">⌂</span><span>Campus<em>Stay</em></span></a><div class="nav-actions"><a href="#" class="btn btn-primary btn-sm" data-auth-cta>Account</a></div></nav>
+  <main class="onboarding-shell">
+    <section class="onboarding-card account-surface" aria-labelledby="onboarding-title">
+      <div class="onboarding-head"><div><h1 id="onboarding-title">Tell us how you like to live.</h1><p>Optional preferences help us surface places and potential roommates that are a better fit. You can change these anytime.</p></div><span class="onboarding-step"><i></i> Optional setup</span></div>
+      <div id="preference-chips" class="preference-grid" aria-label="Lifestyle preferences"></div>
+      <div class="onboarding-actions"><button type="button" class="skip-link" id="skip-preferences">Skip for now</button><button type="button" class="btn btn-primary" id="save-preferences">Save preferences</button></div>
+      <p class="onboarding-note">Your preferences are private and only used to improve your CampusStay experience.</p>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="js/runtime-config.js"></script><script src="js/data.js"></script><script src="js/main.js"></script><script src="js/supabase-config.js"></script><script src="js/auth-guard.js"></script><script src="js/student-onboarding.js"></script>
+</body>
+</html>

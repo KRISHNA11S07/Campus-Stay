@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings Visual Test — CampusStay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/premium.css">
+  <link rel="stylesheet" href="css/ultra.css">
+  <link rel="stylesheet" href="css/apple-polish.css">
+  <link rel="stylesheet" href="css/luxe.css">
+  <link rel="stylesheet" href="css/liquid-glass.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/settings.css">
+</head>
+<body class="auth-ready">
+  <div class="orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+
+  <nav class="navbar" id="main-nav">
+    <a href="index.html" class="logo"><span class="logo-mark">🏠</span><span>Campus<em>Stay</em></span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="listings.html">Browse</a>
+      <a href="settings.html" class="active">Settings</a>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">🌙</button>
+      <a href="#" class="btn btn-primary btn-sm">🎓 TestUser</a>
+    </div>
+  </nav>
+
+  <main class="container settings-wrap">
+    <div class="settings-layout">
+      <aside class="settings-nav" id="settings-nav">
+        <button class="settings-nav-item active" data-section="profile"><span class="nav-icon">👤</span> Profile</button>
+        <button class="settings-nav-item" data-section="password"><span class="nav-icon">🔒</span> Password</button>
+        <button class="settings-nav-item" data-section="preferences"><span class="nav-icon">⚙️</span> Preferences</button>
+        <button class="settings-nav-item" data-section="notifications"><span class="nav-icon">🔔</span> Notifications</button>
+        <button class="settings-nav-item" data-section="saved"><span class="nav-icon">❤️</span> Saved</button>
+        <button class="settings-nav-item" data-section="signout"><span class="nav-icon">🚪</span> Sign Out</button>
+        <button class="settings-nav-item danger" data-section="danger"><span class="nav-icon">⚠️</span> Delete Account</button>
+      </aside>
+
+      <div class="settings-content">
+        <!-- Profile -->
+        <section class="settings-section active" id="sec-profile">
+          <div class="settings-card">
+            <h2>Profile</h2>
+            <p class="card-sub">Manage your personal information.</p>
+            <div class="avatar-section">
+              <div class="avatar-preview">T</div>
+              <div class="avatar-info">
+                <h3>Test User</h3>
+                <p>🎓 Student</p>
+              </div>
+            </div>
+            <form class="settings-form">
+              <div class="s-field"><label>Full Name</label><input type="text" value="Test User" placeholder="Your full name"></div>
+              <div class="s-row">
+                <div class="s-field"><label>Occupation</label><input type="text" value="Student" placeholder="e.g. Student"></div>
+                <div class="s-field"><label>Age</label><input type="number" value="20" placeholder="Age"></div>
+              </div>
+              <div class="s-row">
+                <div class="s-field"><label>Gender</label><select><option value="male" selected>Male</option><option value="female">Female</option><option value="other">Other</option></select></div>
+                <div class="s-field"><label>Phone</label><input type="tel" disabled value="+91 9876543210"><span class="field-hint">Phone is managed by your authentication provider.</span></div>
+              </div>
+              <div class="s-field"><label>Email</label><input type="email" disabled value="test@campus.edu"><span class="field-hint">Email is managed by your authentication provider.</span></div>
+              <div class="settings-actions"><button type="button" class="btn-save">Save Changes</button><button type="button" class="btn-cancel">Cancel</button></div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Password -->
+        <section class="settings-section" id="sec-password">
+          <div class="settings-card">
+            <h2>Change Password</h2>
+            <p class="card-sub">Update your account password.</p>
+            <form class="settings-form">
+              <div class="s-field"><label>New Password</label><input type="password" placeholder="Minimum 6 characters">
+                <div class="password-strength"><div class="strength-bar weak"></div><div class="strength-bar weak"></div><div class="strength-bar"></div><div class="strength-bar"></div></div>
+              </div>
+              <div class="s-field"><label>Confirm New Password</label><input type="password" placeholder="Re-enter new password"></div>
+              <div class="settings-actions"><button type="button" class="btn-save">Update Password</button></div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Preferences -->
+        <section class="settings-section" id="sec-preferences">
+          <div class="settings-card">
+            <h2>Preferences</h2>
+            <p class="card-sub">Customize your experience.</p>
+            <div class="toggle-row">
+              <div class="toggle-label"><span>Dark Mode</span><small>Switch between light and dark theme.</small></div>
+              <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Notifications -->
+        <section class="settings-section" id="sec-notifications">
+          <div class="settings-card">
+            <h2>Notifications</h2>
+            <p class="card-sub">Control how you receive updates.</p>
+            <div class="toggle-row">
+              <div class="toggle-label"><span>Email Notifications</span><small>Receive booking updates via email.</small></div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label"><span>New Listings</span><small>Get notified when new properties are listed.</small></div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="settings-actions"><button type="button" class="btn-save">Save Preferences</button></div>
+          </div>
+        </section>
+
+        <!-- Saved -->
+        <section class="settings-section" id="sec-saved">
+          <div class="settings-card">
+            <h2>Saved Properties</h2>
+            <p class="card-sub">Your favorited rooms and stays.</p>
+            <div style="padding:1.2rem;border-radius:14px;background:var(--grad-soft);border:1px solid rgba(99,102,241,.15);text-align:center;margin-top:1rem;">
+              <span style="font-size:1.8rem;display:block;margin-bottom:.3rem;">❤️</span>
+              <strong style="font-size:1.2rem;">3</strong>
+              <span style="color:var(--text-2);font-size:.85rem;display:block;">saved properties</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sign Out -->
+        <section class="settings-section" id="sec-signout">
+          <div class="settings-card">
+            <h2>Sign Out</h2>
+            <p class="card-sub">Sign out of your CampusStay account on this device.</p>
+            <div style="margin-top:1rem;"><button type="button" class="btn-save" style="background:var(--text);box-shadow:0 8px 20px rgba(0,0,0,.15);">Sign Out</button></div>
+          </div>
+        </section>
+
+        <!-- Danger Zone -->
+        <section class="settings-section" id="sec-danger">
+          <div class="settings-card danger-zone">
+            <h2>Delete Account</h2>
+            <p class="card-sub">Permanently delete your CampusStay account and all associated data. This action cannot be undone.</p>
+            <div style="margin-top:1rem;"><button type="button" class="btn-danger" id="btn-delete-account">Delete My Account</button></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Delete Account Modal -->
+  <div class="modal-overlay" id="delete-modal">
+    <div class="modal-card">
+      <div class="modal-icon">⚠️</div>
+      <h3>Delete your account?</h3>
+      <p>This will permanently delete your account, profile, and all data. This action <strong>cannot be undone</strong>.<br><br>Type <strong>DELETE</strong> below to confirm.</p>
+      <input type="text" class="confirm-input" id="delete-confirm-input" placeholder='Type "DELETE" to confirm'>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-cancel" id="btn-modal-cancel">Cancel</button>
+        <button type="button" class="btn-modal-confirm" id="btn-modal-confirm" disabled>Delete Account</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Tab navigation
+    document.querySelectorAll('.settings-nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.settings-nav-item').forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+        document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+        const sec = document.getElementById('sec-' + item.dataset.section);
+        if (sec) sec.classList.add('active');
+      });
+    });
+
+    // Delete modal
+    const modal = document.getElementById('delete-modal');
+    const input = document.getElementById('delete-confirm-input');
+    const confirmBtn = document.getElementById('btn-modal-confirm');
+
+    document.getElementById('btn-delete-account').addEventListener('click', () => {
+      modal.classList.add('show');
+      input.value = '';
+      confirmBtn.disabled = true;
+      input.focus();
+    });
+
+    document.getElementById('btn-modal-cancel').addEventListener('click', () => modal.classList.remove('show'));
+    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('show'); });
+    input.addEventListener('input', () => { confirmBtn.disabled = input.value.trim() !== 'DELETE'; });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') modal.classList.remove('show'); });
+  </script>
+</body>
+</html>

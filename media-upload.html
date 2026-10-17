@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Photos — CampusStay</title>
+  <meta name="description" content="Upload photos and videos for your property listing.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/premium.css">
+  <link rel="stylesheet" href="css/ultra.css">
+  <link rel="stylesheet" href="css/apple-polish.css">
+  <link rel="stylesheet" href="css/luxe.css">
+  <link rel="stylesheet" href="css/liquid-glass.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+</head>
+<body data-require-auth="owner">
+  <div class="orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo"><span class="logo-mark">🏠</span><span>Campus<em>Stay</em></span></a>
+    <div class="nav-links"><a href="owner-dashboard.html">Dashboard</a></div>
+    <div class="nav-actions">
+      <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">🌙</button>
+      <a href="#" class="btn btn-primary btn-sm" data-auth-cta>Owner</a>
+    </div>
+  </nav>
+
+  <main class="container create-wrap">
+    <div class="step-indicator">
+      <div class="step-dot done" data-step="1"></div>
+      <div class="step-line done"></div>
+      <div class="step-dot active" data-step="2"></div>
+      <div class="step-line"></div>
+      <div class="step-dot" data-step="3"></div>
+      <div class="step-line"></div>
+      <div class="step-dot" data-step="4"></div>
+      <div class="step-line"></div>
+      <div class="step-dot" data-step="5"></div>
+    </div>
+
+    <div class="create-card glass">
+      <h2>Upload Photos & Videos 📸</h2>
+      <p class="sub">Step 2 of 5 — Add images and videos of your property</p>
+
+      <div class="upload-zone" id="upload-zone">
+        <div class="icon">📁</div>
+        <p>Drag & drop files here or click to browse</p>
+        <small>Supports JPG, PNG, WebP, MP4 — Max 10 MB per file</small>
+        <input type="file" id="file-input" multiple accept="image/jpeg,image/png,image/webp,video/mp4">
+      </div>
+
+      <div class="media-grid" id="media-grid"></div>
+
+      <p style="font-size:.82rem; color:var(--text-3); margin-top:.8rem;" id="upload-status"></p>
+
+      <div style="display:flex; gap:.8rem; margin-top:1.5rem;">
+        <a class="btn btn-ghost" id="btn-back" style="flex:1; text-align:center;">← Back</a>
+        <button class="btn btn-primary" id="btn-next" style="flex:1;" type="button">Continue to Facilities →</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-bottom">
+      <span>© 2026 CampusStay.</span>
+      <a href="owner-dashboard.html">← Back to dashboard</a>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/runtime-config.js"></script>
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="js/liquid-glass/displacement.js"></script>
+  <script src="js/liquid-glass/filters.js"></script>
+  <script src="js/liquid-glass/liquid-glass.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/media-upload.js"></script>
+  <script src="js/fx.js"></script>
+</body>
+</html>

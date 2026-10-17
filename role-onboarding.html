@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Welcome to CampusStay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/account.css">
+</head>
+<body class="account-page" data-require-auth="any">
+  <nav class="navbar"><a href="index.html" class="logo"><span class="logo-mark">⌂</span><span>Campus<em>Stay</em></span></a><div class="nav-actions"><a href="#" class="btn btn-primary btn-sm" data-auth-cta>Account</a></div></nav>
+  <main class="onboarding-shell">
+    <section class="onboarding-card account-surface role-onboarding" aria-labelledby="role-title">
+      <div class="onboarding-head"><div><p class="account-eyebrow">Welcome to CampusStay</p><h1 id="role-title">How will you use CampusStay?</h1><p>This tailors your home experience. You can update account preferences later.</p></div><span class="onboarding-step"><i></i> One quick choice</span></div>
+      <div class="role-choice-grid" id="role-choice-grid">
+        <button class="role-choice-card" type="button" data-role-choice="student"><span aria-hidden="true">✦</span><b>I'm a Student</b><small>Explore verified stays, save favourites, and contact owners directly.</small><i aria-hidden="true">→</i></button>
+        <button class="role-choice-card" type="button" data-role-choice="owner"><span aria-hidden="true">⌂</span><b>I'm a Property Owner</b><small>List your property, add photos, and reach students faster.</small><i aria-hidden="true">→</i></button>
+      </div>
+      <p class="onboarding-note" id="role-choice-status" role="status">Your choice is saved securely to your CampusStay profile.</p>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="js/runtime-config.js"></script><script src="js/data.js"></script><script src="js/main.js"></script><script src="js/supabase-config.js"></script><script src="js/auth-guard.js"></script><script src="js/role-onboarding.js"></script>
+</body>
+</html>

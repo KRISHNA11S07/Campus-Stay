@@ -1,0 +1,2045 @@
+/* ============================================================
+   CampusStay — Apple-Inspired Polish Layer
+   Typography refinement + premium animation smoothing.
+   Loaded LAST to refine, not replace.
+   ============================================================ */
+
+/* ============================================================
+   1. APPLE FONT STACK & BASE TYPOGRAPHY
+   ============================================================ */
+:root {
+  --font-display: "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+  --font-body: "Inter", "SF Pro Display", "Segoe UI", sans-serif;
+  --type-scale: 1;
+
+  /* Spacing scale */
+  --space-xs: 6px;
+  --space-sm: 12px;
+  --space-md: 18px;
+  --space-lg: 28px;
+  --space-xl: 44px;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-lg: 14px;
+
+  /* Color tokens */
+  --brand: #7c3aed;
+  --brand-2: #6366f1;
+  --muted: #6b7280;
+  --glass-alpha: 0.42;
+
+  /* Surface/gradients */
+  --hero-gradient: linear-gradient(
+    135deg,
+    rgba(124, 58, 237, 0.12),
+    rgba(99, 102, 241, 0.08)
+  );
+  --btn-ghost: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0)
+  );
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv11", "ss01";
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  letter-spacing: -0.011em;
+  line-height: 1.62;
+  font-optical-sizing: auto;
+}
+
+/* ============================================================
+   2. HEADING HIERARCHY — Refined, Lighter, Apple-like
+   ============================================================ */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  text-wrap: balance;
+  line-height: 1.12;
+}
+
+/* Hero h1: reduce from 6rem max to 4.2rem, lighter weight */
+.cinema-hero h1 {
+  font-size: clamp(2.2rem, 5.5vw, 4.2rem);
+  font-weight: 600;
+  letter-spacing: -0.032em;
+  line-height: 1.08;
+}
+
+/* Section headings: reduce from 2.6rem to 2.1rem, medium weight */
+.sec-head h2 {
+  font-size: clamp(1.55rem, 2.8vw, 2.1rem);
+  font-weight: 600;
+  letter-spacing: -0.028em;
+  line-height: 1.14;
+}
+
+/* Page titles (listings, etc.) */
+.page-head h1 {
+  font-size: clamp(1.5rem, 2.8vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.024em;
+}
+
+/* CTA band heading */
+.cta-band h2 {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 600;
+  letter-spacing: -0.024em;
+}
+
+/* Showcase slide titles */
+.showcase-content h2 {
+  font-size: clamp(1.7rem, 3.8vw, 2.8rem);
+  font-weight: 600;
+  letter-spacing: -0.028em;
+}
+
+/* Stat numbers */
+.stat b {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 600;
+}
+
+/* Card h3 headings */
+.cat-card h3 {
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: -0.014em;
+}
+
+.step h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.014em;
+}
+
+.listing-card .lc-body h3,
+.lc-body h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+
+.dash-card h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.014em;
+}
+
+.testi-user b {
+  font-weight: 600;
+}
+
+/* Footer headings */
+footer h4 {
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: -0.006em;
+  text-transform: none;
+}
+
+/* Auth card heading */
+.auth-card h2 {
+  font-weight: 600;
+}
+
+/* Property page title */
+.prop-title-row h1 {
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  font-weight: 600;
+  letter-spacing: -0.024em;
+}
+
+/* ============================================================
+   3. BODY TEXT REFINEMENT
+   ============================================================ */
+
+/* Lead/subtitle text */
+.lead,
+.cinema-hero .lead {
+  font-size: clamp(0.95rem, 1.4vw, 1.12rem);
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: -0.006em;
+}
+
+/* Section description text */
+.sec-head p {
+  font-size: 0.94rem;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.003em;
+}
+
+/* Card body text */
+.cat-card p,
+.step p,
+.testi p,
+.dash-card p,
+.faq-a p,
+.footer-grid p {
+  font-size: 0.88rem;
+  font-weight: 400;
+  line-height: 1.58;
+  letter-spacing: -0.003em;
+}
+
+/* Navigation */
+.nav-links {
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: -0.006em;
+}
+
+/* Logo */
+.logo {
+  font-weight: 650;
+  font-size: 1.15rem;
+  letter-spacing: -0.018em;
+}
+
+/* Buttons */
+.btn {
+  font-weight: 500;
+  font-size: 0.92rem;
+  letter-spacing: -0.006em;
+}
+
+.btn-sm {
+  font-size: 0.82rem;
+}
+
+/* Premium button gradients and spacing */
+.btn-primary {
+  background: linear-gradient(180deg, var(--brand), var(--brand-2));
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 30px -12px rgba(99, 102, 241, 0.36),
+    inset 0 -6px 18px rgba(0, 0, 0, 0.06);
+  border: 0;
+}
+.btn-primary:active {
+  transform: translate3d(0, 0, 0) scale(0.995);
+}
+
+.btn-ghost {
+  background: var(--btn-ghost);
+  color: var(--brand-2);
+  border: 1px solid rgba(99, 102, 241, 0.08);
+  padding: 10px 16px;
+  border-radius: 12px;
+}
+
+/* CTA emphasis */
+.cta-band .btn-primary {
+  padding: 14px 22px;
+  font-size: 1.02rem;
+}
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.06) 0%,
+    rgba(0, 0, 0, 0.04) 50%,
+    rgba(0, 0, 0, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Preloader */
+.preloader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(11, 18, 32, 0.04);
+  z-index: 99999;
+  transition:
+    opacity 420ms var(--ease-smooth),
+    visibility 420ms;
+}
+.preloader .preloader-inner {
+  width: 84px;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.03)
+  );
+  backdrop-filter: blur(6px);
+}
+.preloader.hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Counter style */
+[data-count] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Reveal: set transform-origin and allow stagger via --stagger */
+.reveal {
+  transform-origin: 50% 60%;
+}
+.reveal.in {
+  transition-timing-function: var(--ease-out-smooth);
+}
+
+/* Kicker/label text */
+.sec-head .kicker {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+/* Badge pill */
+.badge-pill {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: -0.003em;
+}
+
+/* Chips */
+.chip {
+  font-weight: 500;
+  font-size: 0.88rem;
+}
+
+/* Price */
+.price {
+  font-weight: 650;
+  font-size: 1.08rem;
+}
+
+.price-box .big-price {
+  font-weight: 650;
+  font-size: 1.85rem;
+}
+
+/* FAQ */
+.faq-q {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Trust strip */
+.trust-track {
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.006em;
+}
+
+/* Stats labels */
+.stat span {
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+/* Hero stats */
+.hero-stats .hs b {
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.hero-stats .hs span {
+  font-size: 0.78rem;
+  font-weight: 400;
+}
+
+/* Step numbers */
+.step .num {
+  font-weight: 650;
+}
+
+/* Tabs */
+.auth-tabs button {
+  font-weight: 500;
+  font-size: 0.88rem;
+}
+
+/* Tags */
+.tag {
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+
+/* Facility pills */
+.fac-pill {
+  font-weight: 450;
+  font-size: 0.72rem;
+}
+
+/* Rating chip */
+.rating-chip {
+  font-weight: 600;
+}
+
+/* Showcase meta */
+.showcase-meta b {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.showcase-meta span {
+  font-size: 0.76rem;
+}
+
+/* Location text */
+.lc-loc {
+  font-size: 0.8rem;
+  letter-spacing: -0.003em;
+}
+
+/* Review text */
+.review .r-head b {
+  font-weight: 600;
+}
+
+/* Filter titles */
+.f-title {
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+/* ============================================================
+   4. GRADIENT TEXT — Subdued for headings
+   Remove flashy animated shine on large hero heading.
+   Keep the gradient color, just stop the animation.
+   ============================================================ */
+.cinema-hero .grad-text {
+  animation: none;
+  background-size: 100% auto;
+}
+
+/* ============================================================
+   5. SELECTION
+   ============================================================ */
+::selection {
+  background: rgba(99, 102, 241, 0.18);
+}
+
+/* ============================================================
+   6. IMPROVED SPACING
+   ============================================================ */
+
+/* Section spacing — slightly tighter */
+section {
+  padding: clamp(56px, 7.5vw, 88px) 0;
+}
+
+/* Section header margin */
+.sec-head {
+  margin-bottom: 2.8rem;
+}
+
+/* Hero search card */
+.cinema-hero .search-card {
+  margin-top: 1.8rem;
+}
+
+/* Hero stats spacing */
+.hero-stats {
+  margin-top: 1.8rem;
+  gap: 2rem;
+}
+
+/* FAQ list gap */
+.faq-list {
+  gap: 0.7rem;
+}
+
+/* Steps grid gap */
+.steps-grid {
+  gap: 1.1rem;
+}
+
+/* ============================================================
+   7. PREMIUM ANIMATION TIMING SYSTEM
+   Fluid, spring-like easing for a living, breathing UI.
+   ============================================================ */
+:root {
+  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-liquid: cubic-bezier(0.22, 0.68, 0, 1);
+  --motion-gentle: 400ms;
+  --motion-medium: 600ms;
+  --motion-slow: 900ms;
+  --motion-flow: 1100ms;
+  --glow-hover-color: rgba(99, 102, 241, 0.08);
+  --glow-hover-spread: 0px 0px 28px;
+}
+
+[data-theme="dark"] {
+  --glow-hover-color: rgba(99, 102, 241, 0.12);
+}
+
+/* ============================================================
+   8. INTERACTIVE ELEMENT HOVER EFFECTS
+   Richer hover lifts, glows, and transitions.
+   ============================================================ */
+
+/* Universal interactive transition — longer, smoother */
+a,
+button,
+.btn,
+.cat-card,
+.listing-card,
+.step,
+.testi,
+.chip,
+.fac-item,
+.fac-pill,
+.tag,
+.heart-btn,
+.icon-btn,
+.dash-card,
+.faq-item,
+.auth-tabs button,
+.sort-select,
+.f-check,
+.showcase-dots button,
+input,
+select,
+textarea {
+  transition-duration: var(--motion-gentle);
+  transition-timing-function: var(--ease-out-smooth);
+}
+
+/* Buttons — rich outer glow with lift */
+.btn {
+  transition:
+    transform var(--motion-medium) var(--ease-out-smooth),
+    box-shadow var(--motion-medium) var(--ease-smooth),
+    filter 300ms var(--ease-smooth),
+    background-position var(--motion-slow) var(--ease-smooth);
+}
+
+.btn-primary:hover {
+  transform: translate3d(0, -3px, 0);
+  filter: brightness(1.04);
+  box-shadow:
+    0 16px 36px -10px rgba(99, 102, 241, 0.42),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0 28px rgba(99, 102, 241, 0.12);
+}
+
+.btn-ghost:hover {
+  transform: translate3d(0, -3px, 0);
+  box-shadow:
+    0 14px 30px -12px rgba(99, 102, 241, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 22px rgba(99, 102, 241, 0.08);
+}
+
+.btn-call:hover,
+.btn-wa:hover {
+  transform: translate3d(0, -3px, 0);
+  filter: brightness(1.04);
+}
+
+/* Cards — pronounced floating effect with smooth spring */
+.cat-card,
+.listing-card,
+.step,
+.testi,
+.dash-card {
+  transition:
+    transform var(--motion-medium) var(--ease-out-smooth),
+    box-shadow var(--motion-medium) var(--ease-smooth),
+    border-color var(--motion-gentle) var(--ease-smooth);
+}
+
+.cat-card:hover,
+.listing-card:hover,
+.step:hover,
+.testi:hover,
+.dash-card:hover {
+  transform: translate3d(0, -8px, 0);
+  box-shadow:
+    0 24px 56px -20px rgba(10, 15, 40, 0.28),
+    0 0 0 1px rgba(99, 102, 241, 0.06),
+    0 0 24px rgba(99, 102, 241, 0.06);
+}
+
+[data-theme="dark"] .cat-card:hover,
+[data-theme="dark"] .listing-card:hover,
+[data-theme="dark"] .step:hover,
+[data-theme="dark"] .testi:hover,
+[data-theme="dark"] .dash-card:hover {
+  box-shadow:
+    0 26px 60px -18px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(99, 102, 241, 0.1),
+    0 0 26px rgba(99, 102, 241, 0.08);
+}
+
+/* Cat icon — scale + rotate on card hover */
+.cat-card:hover .cat-icon {
+  transform: translate3d(0, -3px, 0) scale(1.08) rotate(-4deg);
+}
+
+.cat-icon {
+  transition: transform var(--motion-medium) var(--ease-spring);
+}
+
+/* Step numbers — pop on hover */
+.step:hover .num {
+  transform: translate3d(0, -2px, 0) scale(1.06);
+}
+
+.step .num {
+  transition:
+    transform var(--motion-medium) var(--ease-spring),
+    box-shadow var(--motion-medium) var(--ease-smooth);
+}
+
+/* Dash icons */
+.dash-card:hover .dash-icon {
+  transform: translate3d(0, -3px, 0) scale(1.06) rotate(-3deg);
+}
+
+.dash-icon {
+  transition: transform var(--motion-medium) var(--ease-spring);
+}
+
+/* Nav links — flowing underline reveal */
+.nav-links a::after {
+  height: 1.5px;
+  transition:
+    width 450ms var(--ease-out-smooth),
+    opacity 250ms ease;
+}
+
+/* Chips — bouncy lift */
+.chip {
+  transition:
+    transform var(--motion-medium) var(--ease-out-smooth),
+    box-shadow var(--motion-medium) var(--ease-smooth),
+    border-color var(--motion-gentle) ease;
+}
+
+.chip:hover {
+  transform: translate3d(0, -4px, 0);
+  box-shadow:
+    0 14px 28px -14px rgba(99, 102, 241, 0.28),
+    0 0 18px rgba(99, 102, 241, 0.06);
+}
+
+/* FAQ items — smooth expand glow */
+.faq-item {
+  transition:
+    box-shadow var(--motion-medium) var(--ease-smooth),
+    border-color var(--motion-gentle) ease,
+    transform var(--motion-medium) var(--ease-out-smooth);
+}
+
+.faq-item:hover {
+  transform: translate3d(0, -2px, 0);
+  box-shadow:
+    0 14px 34px -18px rgba(99, 102, 241, 0.26),
+    0 0 16px rgba(99, 102, 241, 0.05);
+}
+
+/* Icon buttons — spring pop */
+.icon-btn {
+  transition:
+    transform var(--motion-medium) var(--ease-spring),
+    box-shadow var(--motion-medium) var(--ease-smooth);
+}
+
+.icon-btn:hover {
+  transform: translate3d(0, -2px, 0) scale(1.05);
+  box-shadow:
+    0 10px 22px -12px rgba(99, 102, 241, 0.32),
+    0 0 16px rgba(99, 102, 241, 0.06);
+}
+
+/* Search focus glow — breathing ring */
+.search-field {
+  transition:
+    border-color var(--motion-gentle) ease,
+    box-shadow var(--motion-medium) var(--ease-smooth);
+}
+
+.search-field:focus-within {
+  box-shadow:
+    0 0 0 3px rgba(99, 102, 241, 0.12),
+    0 10px 24px -14px rgba(99, 102, 241, 0.32),
+    0 0 22px rgba(99, 102, 241, 0.06);
+}
+
+/* Input focus glow */
+.auth-card input,
+.review-form textarea,
+.review-form select,
+.review-form input {
+  transition:
+    border-color var(--motion-gentle) ease,
+    box-shadow var(--motion-medium) var(--ease-smooth);
+}
+
+.auth-card input:focus,
+.review-form textarea:focus,
+.review-form select:focus,
+.review-form input:focus {
+  box-shadow:
+    0 0 0 3px rgba(99, 102, 241, 0.12),
+    0 0 18px rgba(99, 102, 241, 0.06);
+}
+
+/* Sort select */
+.sort-select {
+  transition:
+    border-color var(--motion-gentle) ease,
+    box-shadow var(--motion-medium) var(--ease-smooth);
+}
+
+.sort-select:hover,
+.sort-select:focus {
+  box-shadow:
+    0 0 16px rgba(99, 102, 241, 0.08),
+    0 6px 14px rgba(99, 102, 241, 0.1);
+}
+
+/* Facility pills/items — micro-bounce */
+.fac-pill,
+.fac-item {
+  transition:
+    transform var(--motion-gentle) var(--ease-spring),
+    box-shadow var(--motion-gentle) var(--ease-smooth);
+}
+
+.fac-pill:hover,
+.fac-item:hover {
+  transform: translate3d(0, -2px, 0);
+  box-shadow: 0 8px 18px -10px rgba(99, 102, 241, 0.3);
+}
+
+/* Heart button — love pop */
+.heart-btn {
+  transition:
+    transform var(--motion-gentle) var(--ease-spring),
+    box-shadow var(--motion-gentle) var(--ease-smooth);
+}
+
+.heart-btn:hover {
+  transform: translate3d(0, -2px, 0) scale(1.1);
+  box-shadow: 0 10px 22px -10px rgba(239, 68, 68, 0.35);
+}
+
+/* Tags — gentle pop */
+.tag {
+  transition:
+    transform var(--motion-gentle) var(--ease-spring),
+    box-shadow var(--motion-gentle) var(--ease-smooth);
+}
+
+.tag:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.18);
+}
+
+/* CTA band — dramatic lift */
+.cta-band {
+  transition:
+    transform var(--motion-medium) var(--ease-out-smooth),
+    box-shadow var(--motion-medium) var(--ease-smooth);
+}
+
+.cta-band:hover {
+  transform: translate3d(0, -3px, 0);
+  box-shadow:
+    0 26px 56px -20px rgba(124, 58, 237, 0.42),
+    0 0 32px rgba(99, 102, 241, 0.08);
+}
+
+.cta-band .btn:hover {
+  transform: translate3d(0, -3px, 0);
+  box-shadow: 0 16px 32px -12px rgba(255, 255, 255, 0.48);
+}
+
+/* Stats band — glowing lift */
+.stats-band {
+  transition:
+    box-shadow var(--motion-medium) var(--ease-smooth),
+    transform var(--motion-medium) var(--ease-out-smooth);
+}
+
+.stats-band:hover {
+  transform: translate3d(0, -2px, 0);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 22px 56px -24px rgba(99, 102, 241, 0.26),
+    0 0 24px rgba(99, 102, 241, 0.06);
+}
+
+/* Footer links — smooth color shift */
+footer ul a {
+  transition:
+    color var(--motion-gentle) var(--ease-smooth),
+    transform var(--motion-gentle) var(--ease-out-smooth);
+}
+
+footer ul a:hover {
+  color: var(--brand);
+  transform: translate3d(2px, 0, 0);
+}
+
+/* Logo hover — premium float */
+.logo:hover .logo-mark {
+  transform: translate3d(0, -2px, 0) scale(1.05);
+  box-shadow: 0 10px 24px -8px rgba(124, 58, 237, 0.4);
+}
+
+/* ============================================================
+   9. SMOOTHER CARD IMAGE ZOOMS
+   ============================================================ */
+.lc-media img {
+  transition:
+    transform var(--motion-slow) var(--ease-liquid),
+    filter var(--motion-slow) var(--ease-smooth);
+}
+
+/* Lazy image entrance */
+.lc-media img,
+img[loading="lazy"] {
+  opacity: 0;
+  transform: translate3d(0, 8px, 0) scale(1.002);
+}
+.lc-media img.in,
+img[loading="lazy"].in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition:
+    opacity 700ms var(--ease-out-smooth),
+    transform 700ms var(--ease-out-smooth);
+}
+
+.listing-card:hover .lc-media img {
+  transform: scale(1.06);
+  filter: saturate(1.03) brightness(1.02);
+}
+
+.gallery img {
+  transition:
+    transform var(--motion-slow) var(--ease-liquid),
+    filter var(--motion-slow) var(--ease-smooth);
+}
+
+.gallery img:hover {
+  transform: scale(1.05);
+  filter: brightness(1.04) saturate(1.03);
+}
+
+/* ============================================================
+   10. REVEAL ANIMATION — Rich flowing entry
+   More travel distance, longer duration, beautiful stagger.
+   ============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 40px, 0) scale(0.97);
+  transition:
+    opacity 900ms var(--ease-smooth),
+    transform 900ms var(--ease-out-smooth);
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* Wide stagger cascade for flowing content */
+.reveal-d1 {
+  transition-delay: 120ms;
+}
+.reveal-d2 {
+  transition-delay: 240ms;
+}
+.reveal-d3 {
+  transition-delay: 360ms;
+}
+
+/* JS-driven per-item stagger (set via CSS custom property) */
+.reveal[style*="--stagger"] {
+  transition-delay: calc(var(--stagger, 0) * 100ms);
+}
+
+/* Directional reveals (set by JS on grid children) */
+.reveal-up {
+  opacity: 0;
+  transform: translate3d(0, 50px, 0) scale(0.96);
+  transition:
+    opacity 800ms var(--ease-smooth),
+    transform 800ms var(--ease-out-smooth);
+}
+
+.reveal-up.in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translate3d(-30px, 20px, 0) scale(0.98);
+  transition:
+    opacity 800ms var(--ease-smooth),
+    transform 800ms var(--ease-out-smooth);
+}
+
+.reveal-left.in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translate3d(30px, 20px, 0) scale(0.98);
+  transition:
+    opacity 800ms var(--ease-smooth),
+    transform 800ms var(--ease-out-smooth);
+}
+
+.reveal-right.in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* Scale-in (for stats, badges, icons) */
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 700ms var(--ease-smooth),
+    transform 700ms var(--ease-spring);
+}
+
+.reveal-scale.in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================================
+   10b. SECTION SCROLL PARALLAX (driven by JS)
+   Sections fade and float subtly based on scroll position.
+   ============================================================ */
+.section-flow {
+  transition:
+    opacity 100ms linear,
+    transform 100ms linear;
+  will-change: opacity, transform;
+}
+
+/* ============================================================
+   11. WORD REVEAL — GSAP controls animation; CSS safe default
+   ============================================================ */
+.reveal-word {
+  display: inline-block;
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* ============================================================
+   12. PAGE TRANSITIONS — Safe fallback
+   ============================================================ */
+body {
+  opacity: 1;
+}
+
+/* ============================================================
+   13. GLASSMORPHISM, TOASTS, TOOLTIP AND 3D UTILITIES
+   Lightweight, high-performance variants used throughout.
+   ============================================================ */
+
+/* Glass surface base */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.35)
+  );
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 12px;
+}
+
+[data-theme="dark"] .glass {
+  background: linear-gradient(
+    180deg,
+    rgba(18, 18, 18, 0.44),
+    rgba(18, 18, 18, 0.28)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%) translateY(18px);
+  bottom: 18px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px -16px rgba(10, 15, 40, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 320ms var(--ease-out-smooth),
+    opacity 260ms var(--ease-smooth);
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+/* Tooltip */
+.custom-tooltip {
+  position: fixed;
+  transform: translate(-50%, -8px) scale(0.98);
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  border-radius: 8px;
+  box-shadow: 0 8px 28px rgba(10, 15, 40, 0.5);
+  opacity: 0;
+  transition:
+    opacity 200ms var(--ease-out-smooth),
+    transform 220ms var(--ease-out-smooth);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 9998;
+}
+.custom-tooltip.show {
+  opacity: 1;
+  transform: translate(-50%, -12px) scale(1);
+}
+
+/* 3D card container utility */
+.card-3d {
+  transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+.card-3d:not([data-gsap-tilt-bound]) {
+  transition: transform 450ms var(--ease-out-smooth);
+}
+.card-3d .card-surface {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Parallax helper (3d layers inside) */
+.parallax {
+  transition: transform 160ms linear;
+}
+
+/* Page exit animation class applied by JS */
+.page-exit {
+  animation: pageOut 420ms var(--ease-smooth) forwards;
+}
+@keyframes pageOut {
+  to {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0) scale(0.998);
+  }
+}
+
+/* Accessibility: reduce motion respects */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-gentle: 1ms;
+    --motion-medium: 1ms;
+    --motion-slow: 1ms;
+    --motion-flow: 1ms;
+  }
+  .reveal,
+  .reveal-up,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    transition-duration: 1ms !important;
+  }
+  .card-3d,
+  .parallax {
+    transition-duration: 1ms !important;
+    transform: none !important;
+  }
+}
+
+/* Performance hints */
+.reveal,
+.card-3d,
+.parallax,
+.lc-media img {
+  will-change: transform, opacity;
+}
+
+body.cs-leaving {
+  transform: translate3d(0, -6px, 0) scale(0.998);
+  opacity: 0;
+  transition:
+    opacity 0.35s var(--ease-smooth),
+    transform 0.4s var(--ease-smooth);
+}
+
+/* ============================================================
+   13. TILT CARDS — Fluid 3D response
+   ============================================================ */
+.tilt {
+  transform-style: preserve-3d;
+  transition: box-shadow 450ms var(--ease-smooth);
+  will-change: transform;
+}
+.tilt:not([data-gsap-tilt-bound]) {
+  transition:
+    transform 450ms var(--ease-out-smooth),
+    box-shadow 450ms var(--ease-smooth);
+}
+
+.tilt:hover {
+  transform: translate3d(0, -8px, 0) scale(1.006);
+  box-shadow:
+    0 26px 56px -20px rgba(10, 15, 40, 0.18),
+    0 0 24px rgba(99, 102, 241, 0.04);
+}
+
+.tilt .tilt-glow {
+  background: radial-gradient(
+    280px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.13),
+    transparent 62%
+  );
+  transition: opacity 450ms var(--ease-smooth);
+}
+
+/* ============================================================
+   14. SHOWCASE SLIDE — Cinematic cross-fade
+   ============================================================ */
+.showcase-slide {
+  transition: opacity 1.2s var(--ease-liquid);
+}
+
+.showcase-slide .img {
+  transition: transform 10s var(--ease-smooth);
+  will-change: transform;
+}
+
+.showcase-slide.active .img {
+  transform: scale(1.18);
+}
+
+/* ============================================================
+   15. CURSOR GLOW — Premium luminous trail
+   ============================================================ */
+.cursor-glow {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.06) 0%,
+    transparent 55%
+  );
+  mix-blend-mode: screen;
+  transition:
+    opacity 500ms var(--ease-smooth),
+    width 800ms var(--ease-out-smooth),
+    height 800ms var(--ease-out-smooth);
+}
+
+[data-theme="dark"] .cursor-glow {
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.09) 0%,
+    transparent 55%
+  );
+}
+
+/* Grow when over interactive elements */
+.cursor-glow.glow-active {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.09) 0%,
+    transparent 50%
+  );
+}
+
+[data-theme="dark"] .cursor-glow.glow-active {
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.14) 0%,
+    transparent 50%
+  );
+}
+
+/* ============================================================
+   16. GLASS PANELS — Rich reflections with more shimmer
+   ============================================================ */
+.glass::before {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.65),
+    rgba(255, 255, 255, 0.08) 30%,
+    transparent 55%,
+    rgba(255, 255, 255, 0.12)
+  );
+  opacity: 0.7;
+  transition: opacity var(--motion-medium) var(--ease-smooth);
+}
+
+.glass:hover::before {
+  opacity: 0.85;
+}
+
+.glass::after,
+.cat-card::after,
+.listing-card::after {
+  background:
+    linear-gradient(
+      110deg,
+      transparent 18%,
+      rgba(255, 255, 255, 0.16) 40%,
+      transparent 58%
+    ),
+    radial-gradient(
+      220px circle at var(--gx) var(--gy),
+      rgba(255, 255, 255, 0.14),
+      transparent 58%
+    );
+  transform: translate3d(-10%, 0, 0);
+  transition:
+    opacity 500ms var(--ease-smooth),
+    transform 800ms var(--ease-out-smooth);
+}
+
+.glass:hover::after,
+.cat-card:hover::after,
+.listing-card:hover::after {
+  opacity: 0.75;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ============================================================
+   17. SCROLL PROGRESS BAR
+   ============================================================ */
+.scroll-progress {
+  height: 2.5px;
+  box-shadow: 0 1px 10px rgba(124, 58, 237, 0.22);
+  transition: box-shadow 300ms ease;
+}
+
+/* ============================================================
+   18. TOAST — smooth slide
+   ============================================================ */
+.toast {
+  font-weight: 500;
+  font-size: 0.88rem;
+  transition: all 500ms var(--ease-out-smooth);
+}
+
+/* ============================================================
+   19. KENBURNS — cinematic slow drift
+   ============================================================ */
+@keyframes kenburns {
+  from {
+    transform: scale(1.06) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.16) translate3d(-1.5%, -1.5%, 0);
+  }
+}
+
+.cinema-bg .ph {
+  animation-duration: 28s;
+}
+
+/* ============================================================
+   20. ORBS — flowing drift with more travel
+   ============================================================ */
+@keyframes drift {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(55px, -45px) scale(1.12);
+  }
+}
+
+.orb {
+  animation-duration: 22s;
+}
+
+/* New: subtle orb pulse */
+@keyframes orbPulse {
+  0%,
+  100% {
+    opacity: var(--orb-opacity);
+  }
+  50% {
+    opacity: calc(var(--orb-opacity) * 0.7);
+  }
+}
+
+.orb-1 {
+  animation:
+    drift 22s var(--ease-smooth) infinite alternate,
+    orbPulse 8s ease-in-out infinite;
+}
+.orb-2 {
+  animation:
+    drift 22s var(--ease-smooth) infinite alternate,
+    orbPulse 10s ease-in-out infinite 2s;
+  animation-delay: -6s, 0s;
+}
+.orb-3 {
+  animation:
+    drift 22s var(--ease-smooth) infinite alternate,
+    orbPulse 12s ease-in-out infinite 4s;
+  animation-delay: -12s, 0s;
+}
+
+/* ============================================================
+   21. AUTH TABS — spring switch
+   ============================================================ */
+.auth-tabs button {
+  transition: all var(--motion-medium) var(--ease-out-smooth);
+}
+
+.auth-tabs button.active {
+  box-shadow:
+    0 0 18px var(--glow-primary),
+    0 6px 18px rgba(124, 58, 237, 0.32);
+}
+
+/* ============================================================
+   22. FILTER CHECKBOXES
+   ============================================================ */
+.f-check {
+  font-size: 0.88rem;
+  font-weight: 400;
+  transition: color var(--motion-gentle) var(--ease-smooth);
+}
+
+.f-check:hover {
+  color: var(--text);
+}
+
+/* ============================================================
+   23. MARQUEE — flowing elegance
+   ============================================================ */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.trust-track {
+  animation-duration: 30s;
+  animation-timing-function: linear;
+}
+
+.trust-strip {
+  transition: opacity var(--motion-medium) var(--ease-smooth);
+}
+
+/* ============================================================
+   24. FAQ ACCORDION — smooth content reveal
+   ============================================================ */
+.faq-a {
+  transition: max-height 550ms var(--ease-out-smooth);
+}
+
+.faq-q .chev {
+  transition: transform 400ms var(--ease-spring);
+}
+
+/* ============================================================
+   25. HERO ELEMENTS — staggered cinematic entry
+   ============================================================ */
+.cinema-hero .badge-pill {
+  animation: fadeUp 900ms var(--ease-out-smooth) both;
+}
+
+.cinema-hero .search-card {
+  animation: fadeUp 900ms 350ms var(--ease-out-smooth) both;
+}
+
+.cinema-hero .hero-stats {
+  animation: fadeUp 900ms 500ms var(--ease-out-smooth) both;
+}
+
+.cinema-hero .scroll-cue {
+  animation:
+    fadeUpScrollCue 900ms 700ms var(--ease-out-smooth) both,
+    scrollCueBounce 2.5s var(--ease-out-smooth) infinite 1600ms;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeUpScrollCue {
+  from {
+    opacity: 0;
+    transform: translate3d(-50%, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* ============================================================
+   26. HEARTBEAT — smoother love pulse
+   ============================================================ */
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.25);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  75% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ============================================================
+   27. SCROLL CUE — gentle bounce
+   ============================================================ */
+.scroll-cue {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  transform: translate3d(-50%, 0, 0);
+  animation: scrollCueBounce 2.5s var(--ease-out-smooth) infinite;
+}
+
+@keyframes scrollCueBounce {
+  0%,
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  50% {
+    transform: translate3d(-50%, 6px, 0);
+  }
+}
+
+/* ============================================================
+   28. COUNTER ANIMATION ENHANCEMENT
+   ============================================================ */
+.stat b,
+.hero-stats .hs b {
+  transition: transform 300ms var(--ease-spring);
+}
+
+/* ============================================================
+   29. NAVBAR GLASS — flowing backdrop
+   ============================================================ */
+.navbar {
+  transition:
+    box-shadow var(--motion-medium) var(--ease-smooth),
+    background var(--motion-medium) var(--ease-smooth),
+    transform var(--motion-medium) var(--ease-out-smooth),
+    width var(--motion-medium) var(--ease-smooth);
+}
+
+/* ============================================================
+   30. MOBILE REFINEMENTS
+   ============================================================ */
+@media (max-width: 640px) {
+  .cinema-hero h1 {
+    font-size: clamp(1.8rem, 7vw, 2.6rem);
+    font-weight: 600;
+  }
+
+  .sec-head h2 {
+    font-size: clamp(1.35rem, 5vw, 1.7rem);
+  }
+
+  .reveal {
+    transform: translate3d(0, 30px, 0) scale(0.98);
+  }
+
+  /* Reduce hover lifts on touch */
+  .cat-card:hover,
+  .listing-card:hover,
+  .step:hover,
+  .testi:hover,
+  .dash-card:hover {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+/* ============================================================
+   31. REDUCED MOTION — respect system preferences
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .cursor-glow {
+    display: none;
+  }
+
+  .reveal,
+  .reveal.in,
+  .reveal-up,
+  .reveal-up.in,
+  .reveal-left,
+  .reveal-left.in,
+  .reveal-right,
+  .reveal-right.in,
+  .reveal-scale,
+  .reveal-scale.in,
+  .reveal-word,
+  body.cs-leaving {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .section-flow {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ============================================================
+   32. APPLE iOS 26 LIQUID GLASS BUTTON SYSTEM
+   ============================================================ */
+:root {
+  --lgb-blur: 10px;
+  --lgb-bg: rgba(255, 255, 255, 0.09);
+  --lgb-bg-hover: rgba(255, 255, 255, 0.16);
+  --lgb-border: rgba(255, 255, 255, 0.35);
+  --lgb-border-hover: rgba(255, 255, 255, 0.55);
+  --lgb-text: #ffffff;
+  --lgb-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+  --lgb-shadow:
+    0 4px 16px rgba(10, 15, 40, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  --lgb-shadow-hover:
+    0 8px 24px rgba(99, 102, 241, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  --lgb-glow: rgba(99, 102, 241, 0.4);
+  --lgb-spring-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="dark"] {
+  --lgb-bg: rgba(255, 255, 255, 0.04);
+  --lgb-bg-hover: rgba(255, 255, 255, 0.1);
+  --lgb-border: rgba(255, 255, 255, 0.15);
+  --lgb-border-hover: rgba(255, 255, 255, 0.25);
+  --lgb-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+  --lgb-shadow-hover:
+    0 8px 24px rgba(99, 102, 241, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* 1. Base Liquid Glass Component Shape */
+.liquid-glass-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px !important;
+  padding: 0.85rem 1.85rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: inherit;
+  background: var(--lgb-bg);
+  -webkit-backdrop-filter: blur(var(--lgb-blur)) saturate(160%) brightness(1.05);
+  backdrop-filter: blur(var(--lgb-blur)) saturate(160%) brightness(1.05);
+  border: 1px solid var(--lgb-border);
+  box-shadow: var(--lgb-shadow);
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.4s var(--lgb-spring-ease),
+    box-shadow 0.4s var(--ease-smooth),
+    border-color 0.4s var(--ease-smooth),
+    background-color 0.4s var(--ease-smooth);
+  will-change: transform;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.liquid-glass-btn.btn-primary,
+.liquid-glass-btn.btn-call,
+.liquid-glass-btn.btn-wa,
+.liquid-glass-btn.auth-submit {
+  color: #ffffff !important;
+}
+
+/* Small Button */
+.liquid-glass-btn.btn-sm {
+  padding: 0.5rem 1.15rem !important;
+  font-size: 0.82rem !important;
+}
+
+/* Block Button */
+.liquid-glass-btn.btn-block {
+  width: 100% !important;
+  display: flex !important;
+}
+
+/* Small Circle Action Buttons */
+.liquid-glass-btn.icon-btn,
+.liquid-glass-btn.heart-btn {
+  padding: 0 !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+/* Specific heart button position overrides */
+.liquid-glass-btn.heart-btn {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+}
+
+/* Menu Toggle/Hamburger placement */
+.liquid-glass-btn.hamburger {
+  display: none !important;
+}
+@media (max-width: 1024px) {
+  .liquid-glass-btn.hamburger {
+    display: grid !important;
+  }
+}
+
+/* 2. Text Label Layer (z-index 2) */
+.btn-label {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  -webkit-font-smoothing: antialiased;
+  color: inherit;
+}
+
+.btn-primary .btn-label,
+.btn-call .btn-label,
+.btn-wa .btn-label,
+.auth-submit .btn-label {
+  color: #ffffff !important;
+  text-shadow: var(--lgb-text-shadow);
+}
+
+/* In Light Mode, keep text readable on lighter buttons */
+[data-theme="light"] .liquid-glass-btn:not(.btn-primary):not(.btn-call):not(.btn-wa):not(.auth-submit) .btn-label,
+[data-theme="light"] .liquid-glass-btn.btn-ghost .btn-label,
+[data-theme="light"] .liquid-glass-btn.icon-btn .btn-label,
+[data-theme="light"] .liquid-glass-btn.faq-q .btn-label,
+[data-theme="light"] .liquid-glass-btn.auth-tabs button:not(.active) .btn-label,
+[data-theme="light"] .liquid-glass-btn#mode-toggle .btn-label,
+[data-theme="light"] .liquid-glass-btn#clear-filters .btn-label {
+  color: var(--text-2) !important;
+  text-shadow: none;
+}
+
+/* 3. Specular Reflection Layer (z-index 3) */
+.btn-reflection {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(
+    70px circle at var(--btn-mx, 50%) var(--btn-my, 50%),
+    rgba(255, 255, 255, 0.42),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.liquid-glass-btn:hover .btn-reflection {
+  opacity: 1;
+}
+
+/* 4. Blobs Container (z-index 0) */
+.btn-blobs-container {
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  filter: url(#liquid-gooey);
+  opacity: 0.72;
+  transition: opacity 0.4s ease;
+}
+.liquid-glass-btn:hover .btn-blobs-container {
+  opacity: 0.92;
+}
+
+/* 5. Liquid Blobs & Color Gradients */
+.btn-blob {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--lgb-glow);
+  opacity: 0.75;
+  will-change: transform, left, top;
+  animation: blob-morph 8s infinite ease-in-out alternate;
+}
+
+.btn-blob.blob-1 {
+  width: 70%;
+  height: 70%;
+  left: -10%;
+  top: -10%;
+  animation-duration: 8s;
+  animation-delay: 0s;
+}
+.btn-blob.blob-2 {
+  width: 60%;
+  height: 60%;
+  right: -5%;
+  bottom: -5%;
+  animation-duration: 9s;
+  animation-delay: -2s;
+}
+.btn-blob.blob-3 {
+  width: 50%;
+  height: 50%;
+  left: 40%;
+  bottom: -15%;
+  animation-duration: 7s;
+  animation-delay: -4s;
+}
+.btn-blob.blob-4 {
+  width: 45%;
+  height: 45%;
+  right: 35%;
+  top: -10%;
+  animation-duration: 10s;
+  animation-delay: -6s;
+}
+
+/* Color Mapping for Blobs */
+.btn-primary .btn-blob.blob-1 {
+  background: #6366f1;
+}
+.btn-primary .btn-blob.blob-2 {
+  background: #8b5cf6;
+}
+.btn-primary .btn-blob.blob-3 {
+  background: #ec4899;
+}
+.btn-primary .btn-blob.blob-4 {
+  background: #7c3aed;
+}
+
+.btn-call .btn-blob.blob-1 {
+  background: #3b82f6;
+}
+.btn-call .btn-blob.blob-2 {
+  background: #2563eb;
+}
+.btn-call .btn-blob.blob-3 {
+  background: #1d4ed8;
+}
+.btn-call .btn-blob.blob-4 {
+  background: #60a5fa;
+}
+
+.btn-wa .btn-blob.blob-1 {
+  background: #22c55e;
+}
+.btn-wa .btn-blob.blob-2 {
+  background: #16a34a;
+}
+.btn-wa .btn-blob.blob-3 {
+  background: #15803d;
+}
+.btn-wa .btn-blob.blob-4 {
+  background: #4ade80;
+}
+
+.btn-ghost .btn-blob,
+#clear-filters .btn-blob,
+#mode-toggle .btn-blob {
+  background: rgba(148, 163, 184, 0.25);
+}
+[data-theme="dark"] .btn-ghost .btn-blob,
+[data-theme="dark"] #clear-filters .btn-blob,
+[data-theme="dark"] #mode-toggle .btn-blob {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.heart-btn .btn-blob.blob-1 {
+  background: #f43f5e;
+}
+.heart-btn .btn-blob.blob-2 {
+  background: #ef4444;
+}
+.heart-btn .btn-blob.blob-3 {
+  background: #fda4af;
+}
+.heart-btn .btn-blob.blob-4 {
+  background: #e11d48;
+}
+
+.auth-tabs button.active .btn-blob.blob-1 {
+  background: #8b5cf6;
+}
+.auth-tabs button.active .btn-blob.blob-2 {
+  background: #6366f1;
+}
+.auth-tabs button.active .btn-blob.blob-3 {
+  background: #7c3aed;
+}
+.auth-tabs button.active .btn-blob.blob-4 {
+  background: #a78bfa;
+}
+
+.icon-btn .btn-blob,
+.auth-tabs button:not(.active) .btn-blob,
+.faq-q .btn-blob {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+/* Blob Morph Keyframes */
+@keyframes blob-morph {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  }
+  33% {
+    transform: translate(12px, -15px) scale(1.12) rotate(120deg);
+    border-radius: 70% 30% 52% 48% / 60% 40% 60% 40%;
+  }
+  66% {
+    transform: translate(-15px, 10px) scale(0.92) rotate(240deg);
+    border-radius: 30% 70% 70% 30% / 50% 60% 40% 50%;
+  }
+  100% {
+    transform: translate(0, 0) scale(1) rotate(360deg);
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+  }
+}
+
+/* 6. Liquid Ripple Click Effect */
+.btn-ripple {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(1);
+  animation: ripple-expand 0.9s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  z-index: 1;
+}
+
+.btn-primary .btn-ripple,
+.btn-call .btn-ripple,
+.btn-wa .btn-ripple {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+@keyframes ripple-expand {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(14);
+    opacity: 0;
+  }
+}
+
+.btn-ripple.fade-out {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* 7. Hover Glow and Dynamic Shadows */
+.liquid-glass-btn:hover {
+  border-color: var(--lgb-border-hover) !important;
+  background-color: var(--lgb-bg-hover) !important;
+  box-shadow: var(--lgb-shadow-hover) !important;
+}
+
+.liquid-glass-btn.btn-primary:hover {
+  box-shadow:
+    0 12px 36px rgba(99, 102, 241, 0.42),
+    0 0 20px rgba(99, 102, 241, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+}
+
+.liquid-glass-btn.btn-call:hover {
+  box-shadow:
+    0 12px 36px rgba(59, 130, 246, 0.42),
+    0 0 20px rgba(59, 130, 246, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+}
+
+.liquid-glass-btn.btn-wa:hover {
+  box-shadow:
+    0 12px 36px rgba(34, 197, 94, 0.42),
+    0 0 20px rgba(34, 197, 94, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+}
+
+.liquid-glass-btn.btn-ghost:hover,
+.liquid-glass-btn.icon-btn:hover,
+.liquid-glass-btn.heart-btn:hover {
+  box-shadow:
+    0 10px 24px rgba(99, 102, 241, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 8. Active/Press-down State */
+.liquid-glass-btn:active {
+  transform: scale(0.96) !important;
+  transition: transform 0.08s ease !important;
+  box-shadow:
+    0 2px 8px rgba(10, 15, 40, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* 9. Entrance Animation Stagger */
+.btn-entrance {
+  opacity: 0;
+  transform: scale(0.92) translateY(10px);
+  animation: lgb-entrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes lgb-entrance {
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 10. Focus Outline Accessibility */
+.liquid-glass-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(99, 102, 241, 0.5),
+    0 0 20px rgba(99, 102, 241, 0.2) !important;
+}
+
+/* ============================================================
+   33. LOCKED CATEGORIES & CUSTOM TOOLTIPS
+   ============================================================ */
+.cat-card.locked {
+  position: relative;
+  cursor: not-allowed !important;
+}
+
+.cat-card.locked .cat-lock-icon {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-size: 1rem;
+  opacity: 0.8;
+  z-index: 5;
+}
+
+.cat-card.locked .coming-soon-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--brand);
+  background: var(--grad-soft);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 999px;
+  z-index: 5;
+}
+
+/* Custom Tooltip */
+.custom-tooltip {
+  position: fixed;
+  z-index: 99999;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--glass-strong);
+  backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -120%) scale(0.95);
+  transition:
+    opacity 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+}
+
+.custom-tooltip.show {
+  opacity: 1;
+  transform: translate(-50%, -100%) scale(1);
+}

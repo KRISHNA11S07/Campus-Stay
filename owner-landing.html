@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>List Your Property — CampusStay</title>
+  <meta name="description" content="List your room, PG, hostel or flat on CampusStay and reach students faster.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/account.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+  <style>
+    .owner-landing-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 8rem 1.25rem 4rem;
+    }
+    .owner-landing-hero {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+    .owner-landing-hero .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .4rem .9rem;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--brand);
+      background: var(--grad-soft);
+      border: 1px solid rgba(99,102,241,.2);
+      margin-bottom: 1.2rem;
+    }
+    .owner-landing-hero h1 {
+      font: 800 clamp(2rem, 4.5vw, 3.2rem)/1.08 var(--font-display);
+      letter-spacing: -.06em;
+      margin: 0 0 1rem;
+    }
+    .owner-landing-hero h1 span {
+      background: var(--grad-brand);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .owner-landing-hero p {
+      max-width: 540px;
+      margin: 0 auto;
+      color: var(--text-2);
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+    .owner-type-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .owner-type-card {
+      position: relative;
+      display: grid;
+      gap: .65rem;
+      padding: 1.5rem 1.25rem;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      cursor: pointer;
+      transition: transform .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease);
+      text-decoration: none;
+      color: inherit;
+    }
+    .owner-type-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(99,102,241,.4);
+      box-shadow: 0 16px 40px rgba(99,102,241,.12);
+    }
+    .owner-type-card .type-icon {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--grad-brand);
+      color: #fff;
+      font-size: 1.4rem;
+      box-shadow: 0 8px 20px rgba(99,102,241,.3);
+      transition: transform .3s var(--ease);
+    }
+    .owner-type-card:hover .type-icon { transform: scale(1.08) rotate(-4deg); }
+    .owner-type-card b {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+    .owner-type-card small {
+      color: var(--text-2);
+      font-size: .8rem;
+      line-height: 1.45;
+    }
+    .owner-type-card i {
+      position: absolute;
+      right: .8rem;
+      top: .8rem;
+      color: var(--brand);
+      font-style: normal;
+      font-size: 1rem;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity .2s, transform .2s;
+    }
+    .owner-type-card:hover i { opacity: 1; transform: none; }
+    .owner-landing-footer {
+      text-align: center;
+      padding: 2rem 0;
+    }
+    .owner-landing-footer p {
+      color: var(--text-3);
+      font-size: .82rem;
+      margin-top: .8rem;
+    }
+    @media (max-width: 640px) {
+      .owner-type-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 400px) {
+      .owner-type-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Dark mode fixes */
+    [data-theme="dark"] .owner-type-card {
+      border-color: rgba(148,163,184,.14);
+      background: rgba(20,24,42,.5);
+    }
+    [data-theme="dark"] .owner-type-card:hover {
+      border-color: rgba(99,102,241,.5);
+      background: rgba(99,102,241,.1);
+    }
+    [data-theme="dark"] .owner-type-card b { color: #f1f5f9; }
+    [data-theme="dark"] .owner-type-card small { color: #9dafc8; }
+  </style>
+</head>
+<body class="account-page" data-require-auth="owner">
+  <nav class="navbar">
+    <a href="index.html" class="logo"><span class="logo-mark">🏠</span><span>Campus<em>Stay</em></span></a>
+    <div class="nav-actions">
+      <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">🌙</button>
+      <a href="#" class="btn btn-primary btn-sm" data-auth-cta>Account</a>
+    </div>
+  </nav>
+
+  <main class="owner-landing-shell">
+    <div class="owner-landing-hero">
+      <span class="kicker"><span style="width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.15)"></span> Property Owner</span>
+      <h1>List your property.<br><span>Reach students faster.</span></h1>
+      <p>Join CampusStay to list your rooms, PGs, hostels or flats for students near top Maharashtra colleges. Verified listings, direct enquiries, zero brokerage.</p>
+    </div>
+
+    <div class="owner-type-grid">
+      <a class="owner-type-card" href="owner-onboarding.html?type=room">
+        <div class="type-icon">🏠</div>
+        <b>Room</b>
+        <small>Independent rooms for students who want privacy and flexibility.</small>
+        <i>→</i>
+      </a>
+      <a class="owner-type-card" href="owner-onboarding.html?type=pg">
+        <div class="type-icon">🏢</div>
+        <b>PG</b>
+        <small>Paying guest accommodation with meals and housekeeping.</small>
+        <i>→</i>
+      </a>
+      <a class="owner-type-card" href="owner-onboarding.html?type=hostel">
+        <div class="type-icon">🏨</div>
+        <b>Hostel</b>
+        <small>Community living with study spaces, mess and shared facilities.</small>
+        <i>→</i>
+      </a>
+      <a class="owner-type-card" href="owner-onboarding.html?type=flat">
+        <div class="type-icon">🏬</div>
+        <b>Flat</b>
+        <small>Shared or full flats for students who want more space.</small>
+        <i>→</i>
+      </a>
+    </div>
+
+    <div class="owner-landing-footer">
+      <a href="owner-dashboard.html" class="btn btn-ghost">Go to Owner Dashboard →</a>
+      <p>Already listed? Manage your properties from the dashboard.</p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/runtime-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth-guard.js"></script>
+</body>
+</html>

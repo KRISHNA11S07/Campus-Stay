@@ -1,0 +1,657 @@
+/* ============================================================
+   CampusStay — Ultra Premium Liquid Glass CSS
+   
+   Stripe/Apple-level glassmorphism, featuring:
+   1. Multi-channel chromatic dispersion simulations
+   2. Specular cursor-tracked lighting spot
+   3. Dynamic rotating edge highlights (angle tracks cursor)
+   4. High-fidelity micro-grain noise overlay
+   5. Morphing compact layout for floating navbar
+   6. Buttery smooth spring-like animation easings
+   ============================================================ */
+
+:root {
+  /* Premium Glass Palettes */
+  --lg-surface-light: rgba(255, 255, 255, 0.48);
+  --lg-surface-dark: rgba(13, 17, 28, 0.45);
+  
+  /* Soft color dispersion fringe (chromatic aberration rim) */
+  --lg-chroma-light: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.08) 0%,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0) 70%,
+    rgba(236, 72, 153, 0.06) 100%
+  );
+  --lg-chroma-dark: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.08) 0%,
+    rgba(0, 0, 0, 0) 40%,
+    rgba(0, 0, 0, 0) 75%,
+    rgba(244, 63, 94, 0.06) 100%
+  );
+  
+  /* High-end Specular Light Reflection */
+  --lg-specular-color: rgba(255, 255, 255, 0.32);
+  --lg-specular-size: 220px;
+  
+  /* Dual-tone structural border highlights (rim lighting) */
+  --lg-border-light: rgba(255, 255, 255, 0.68);
+  --lg-border-dark: rgba(255, 255, 255, 0.15);
+  
+  /* Dimensional inner shadows */
+  --lg-inset-light: inset 0 1px 1px rgba(255, 255, 255, 0.50),
+                    inset 0 -1px 1px rgba(255, 255, 255, 0.15),
+                    inset 0 12px 24px -10px rgba(255, 255, 255, 0.30);
+  --lg-inset-dark: inset 0 1.5px 0.5px rgba(255, 255, 255, 0.14),
+                   inset 0 -1px 0.5px rgba(255, 255, 255, 0.04),
+                   inset 0 16px 28px -12px rgba(255, 255, 255, 0.05);
+
+  /* Deep layered outer drop-shadows */
+  --lg-shadow-light: 0 16px 44px -14px rgba(15, 23, 42, 0.09),
+                     0 1px 0 rgba(255, 255, 255, 0.60);
+  --lg-shadow-dark: 0 24px 60px -16px rgba(0, 0, 0, 0.55),
+                    0 1px 0 rgba(255, 255, 255, 0.05);
+                    
+  /* Apple Easing (linear-spring approximation) */
+  --lg-ease-spring: cubic-bezier(0.25, 1, 0.2, 1);
+  --lg-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================================
+   1. CORE GLASS SURFACE (LIQUID REFRACTION)
+   ============================================================ */
+.liquid-glass-surface {
+  position: relative;
+  isolation: isolate;
+  
+  /* 3D layer promotion to guarantee 60fps hardware-accelerated animations */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  /* Backdrop-filter layers are expensive to promote en masse. Reserve GPU
+     promotion for the properties that actually animate every interaction. */
+  will-change: transform, border-radius;
+  
+  /* Frosted Glass + Refraction SVG Displacement Map Reference */
+  -webkit-backdrop-filter: url(#liquid-glass-refract) blur(var(--lg-blur, 18px)) saturate(185%) brightness(1.04);
+  backdrop-filter: url(#liquid-glass-refract) blur(var(--lg-blur, 18px)) saturate(185%) brightness(1.04);
+  
+  background-color: var(--lg-surface-light);
+  background-image: var(--lg-chroma-light);
+  border: 1px solid var(--lg-border-light);
+  box-shadow: var(--lg-inset-light), var(--lg-shadow-light);
+  
+  /* Beautifully fluid transitions */
+  transition:
+    transform 0.5s var(--lg-ease-spring),
+    border-radius 0.65s var(--lg-ease-spring),
+    background-color 0.5s var(--lg-ease-spring),
+    border-color 0.5s var(--lg-ease-spring),
+    box-shadow 0.5s var(--lg-ease-spring),
+    backdrop-filter 0.5s var(--lg-ease-spring);
+}
+
+/* Dark Mode Surface overrides */
+[data-theme="dark"] .liquid-glass-surface {
+  background-color: var(--lg-surface-dark);
+  background-image: var(--lg-chroma-dark);
+  border-color: var(--lg-border-dark);
+  box-shadow: var(--lg-inset-dark), var(--lg-shadow-dark);
+}
+
+/* ============================================================
+   2. DYNAMIC CHROMATIC EDGE HIGHLIGHT (Rotates with cursor)
+   ============================================================ */
+.liquid-glass-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 2;
+  pointer-events: none;
+  
+  /* Dynamic gradient edge lighting that follows the light source angle */
+  background: linear-gradient(
+    var(--lg-light-angle, 135deg),
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(255, 255, 255, 0.10) 30%,
+    transparent 60%,
+    rgba(99, 102, 241, 0.16) 100%
+  );
+  
+  /* Sharp 1px border perimeter masking */
+  padding: 1px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  
+  opacity: 0.85;
+  mix-blend-mode: overlay;
+  transition: opacity 0.4s var(--lg-ease-spring);
+}
+
+[data-theme="dark"] .liquid-glass-surface::before {
+  background: linear-gradient(
+    var(--lg-light-angle, 135deg),
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    transparent 65%,
+    rgba(168, 85, 247, 0.16) 100%
+  );
+  opacity: 0.7;
+}
+
+.liquid-glass-surface:hover::before {
+  opacity: 1;
+}
+
+/* ============================================================
+   3. SPECULAR SPOT LIGHT & MICRO-GRAIN NOISE OVERLAY
+   ============================================================ */
+.liquid-glass-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 1;
+  pointer-events: none;
+  
+  /* Dual-purpose layer: Specular tracking light + premium WWDC frosted micro-noise */
+  background-image: 
+    radial-gradient(
+      var(--lg-specular-size) circle at var(--lg-spec-x, 50%) var(--lg-spec-y, 50%),
+      var(--lg-specular-color),
+      transparent 70%
+    ),
+    linear-gradient(
+      118deg,
+      transparent 32%,
+      rgba(255, 255, 255, 0.05) 42%,
+      rgba(255, 255, 255, 0.40) 50%,
+      rgba(191, 219, 254, 0.10) 58%,
+      transparent 68%
+    ),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.024'/%3E%3C/svg%3E");
+  background-size: auto, 185% 220%, 200px 200px;
+  background-position: var(--lg-spec-x, 50%) var(--lg-spec-y, 50%), var(--lg-reflect-x, 50%) var(--lg-reflect-y, -20%), 0 0;
+  opacity: max(var(--lg-spec-opacity, 0), var(--lg-scroll-opacity, 0));
+  mix-blend-mode: overlay;
+  transition: opacity 0.35s var(--lg-ease-spring);
+}
+
+[data-theme="dark"] .liquid-glass-surface::after {
+  background-image: 
+    radial-gradient(
+      var(--lg-specular-size) circle at var(--lg-spec-x, 50%) var(--lg-spec-y, 50%),
+      rgba(255, 255, 255, 0.18),
+      transparent 70%
+    ),
+    linear-gradient(
+      118deg,
+      transparent 32%,
+      rgba(196, 181, 253, 0.04) 42%,
+      rgba(255, 255, 255, 0.24) 50%,
+      rgba(147, 197, 253, 0.08) 58%,
+      transparent 68%
+    ),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.024'/%3E%3C/svg%3E");
+}
+
+/* Only floating panels morph their corners. This keeps the refraction tactile
+   while leaving dense controls and content surfaces visually stable. */
+@media (hover: hover) and (pointer: fine) {
+  .cat-card.liquid-glass-surface,
+  .step.liquid-glass-surface,
+  .testi.liquid-glass-surface,
+  .dash-card.liquid-glass-surface,
+  .listing-card.liquid-glass-surface {
+    --lg-blur: 17px;
+  }
+
+  .cat-card.liquid-glass-surface:hover,
+  .step.liquid-glass-surface:hover,
+  .testi.liquid-glass-surface:hover,
+  .dash-card.liquid-glass-surface:hover {
+    --lg-blur: 21px;
+    border-radius: 24px;
+  }
+}
+
+/* ============================================================
+   4. INTERACTIVE HOVER FLOATING & SPRING REACTIONS
+   ============================================================ */
+.cat-card.liquid-glass-surface:hover,
+.step.liquid-glass-surface:hover,
+.testi.liquid-glass-surface:hover,
+.dash-card.liquid-glass-surface:hover,
+.faq-item.liquid-glass-surface:hover {
+  transform: translateY(-8px) scale(1.015) translateZ(0);
+  box-shadow: 
+    var(--lg-inset-light),
+    0 32px 70px -16px rgba(10, 15, 40, 0.18),
+    0 0 24px rgba(99, 102, 241, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.65);
+}
+
+[data-theme="dark"] .cat-card.liquid-glass-surface:hover,
+[data-theme="dark"] .step.liquid-glass-surface:hover,
+[data-theme="dark"] .testi.liquid-glass-surface:hover,
+[data-theme="dark"] .dash-card.liquid-glass-surface:hover,
+[data-theme="dark"] .faq-item.liquid-glass-surface:hover {
+  box-shadow:
+    var(--lg-inset-dark),
+    0 38px 84px -16px rgba(0, 0, 0, 0.65),
+    0 0 28px rgba(99, 102, 241, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================
+   5. SPECIAL MORPHING NAVBAR LAYOUT
+   ============================================================ */
+.navbar.liquid-glass-surface {
+  -webkit-backdrop-filter: url(#liquid-glass-refract) blur(22px) saturate(190%) brightness(1.05);
+  backdrop-filter: url(#liquid-glass-refract) blur(22px) saturate(190%) brightness(1.05);
+  background-color: rgba(255, 255, 255, 0.54);
+  box-shadow: 
+    var(--lg-inset-light),
+    0 10px 40px -10px rgba(10, 15, 40, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.65);
+  
+  /* Morphing transition rules */
+  transition: 
+    background-color 0.35s var(--lg-ease-spring),
+    box-shadow 0.35s var(--lg-ease-spring),
+    border-color 0.35s var(--lg-ease-spring);
+}
+
+[data-theme="dark"] .navbar.liquid-glass-surface {
+  background-color: rgba(10, 13, 22, 0.52);
+  box-shadow:
+    var(--lg-inset-dark),
+    0 12px 46px -12px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* Navbar morphs upon scrolling */
+.navbar.liquid-glass-surface.scrolled {
+  background-color: rgba(255, 255, 255, 0.72);
+  box-shadow: 
+    var(--lg-inset-light),
+    0 20px 48px -10px rgba(99, 102, 241, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.70);
+}
+
+[data-theme="dark"] .navbar.liquid-glass-surface.scrolled {
+  background-color: rgba(13, 17, 28, 0.75);
+  box-shadow: 
+    var(--lg-inset-dark),
+    0 24px 56px -12px rgba(0, 0, 0, 0.60),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Reflective light bar at bottom margin */
+.navbar.liquid-glass-surface::after {
+  content: '';
+  inset: auto 15% -1px 15%;
+  height: 1px;
+  border-radius: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  opacity: 1;
+}
+
+[data-theme="dark"] .navbar.liquid-glass-surface::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+}
+
+/* ============================================================
+   6. PREMIUM PROPERTY & LISTING CARDS TILT INTERACT
+   ============================================================ */
+.listing-card.liquid-glass-surface {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background-color: transparent;
+  box-shadow: none;
+  border: none;
+  overflow: visible !important;
+}
+
+.listing-card.liquid-glass-surface::before {
+  display: none; /* No outer rim highlight on master container */
+}
+
+/* Apply Liquid Glass directly inside card body */
+.listing-card.liquid-glass-surface .lc-body {
+  -webkit-backdrop-filter: url(#liquid-glass-refract) blur(18px) saturate(180%) brightness(1.03);
+  backdrop-filter: url(#liquid-glass-refract) blur(18px) saturate(180%) brightness(1.03);
+  background-color: var(--lg-surface-light);
+  background-image: var(--lg-chroma-light);
+  border: 1px solid var(--lg-border-light);
+  border-top: none;
+  border-radius: 0 0 20px 20px;
+  box-shadow: var(--lg-inset-light), var(--lg-shadow-light);
+  transition: 
+    background-color 0.4s var(--lg-ease-spring),
+    box-shadow 0.4s var(--lg-ease-spring),
+    border-color 0.4s var(--lg-ease-spring);
+}
+
+[data-theme="dark"] .listing-card.liquid-glass-surface .lc-body {
+  background-color: var(--lg-surface-dark);
+  background-image: var(--lg-chroma-dark);
+  border-color: var(--lg-border-dark);
+  box-shadow: var(--lg-inset-dark), var(--lg-shadow-dark);
+}
+
+.listing-card.liquid-glass-surface:hover .lc-body {
+  background-color: rgba(255, 255, 255, 0.60);
+  box-shadow: 
+    var(--lg-inset-light),
+    0 24px 56px -16px rgba(10, 15, 40, 0.22),
+    0 0 20px rgba(99, 102, 241, 0.08);
+}
+
+[data-theme="dark"] .listing-card.liquid-glass-surface:hover .lc-body {
+  background-color: rgba(20, 24, 38, 0.60);
+  box-shadow: 
+    var(--lg-inset-dark),
+    0 28px 64px -16px rgba(0, 0, 0, 0.65),
+    0 0 24px rgba(99, 102, 241, 0.12);
+}
+
+/* ============================================================
+   7. SKELETON LOADING VIEW (Apple Frost Glass shimmer)
+   ============================================================ */
+.skeleton-glass {
+  background: var(--lg-surface-light);
+  border: 1px solid var(--lg-border-light);
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+}
+
+.skeleton-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.24) 40%,
+    rgba(255, 255, 255, 0.44) 50%,
+    rgba(255, 255, 255, 0.24) 60%,
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: lg-shimmer 1.8s infinite linear;
+}
+
+[data-theme="dark"] .skeleton-glass {
+  background: var(--lg-surface-dark);
+  border-color: var(--lg-border-dark);
+}
+
+[data-theme="dark"] .skeleton-glass::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.04) 40%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.04) 60%,
+    transparent
+  );
+}
+
+@keyframes lg-shimmer {
+  to { transform: translateX(100%); }
+}
+
+/* ============================================================
+   8. COMPREHENSIVE GRACEFUL BLUR FALLBACK
+   ============================================================ */
+.liquid-glass-fallback .liquid-glass-surface {
+  -webkit-backdrop-filter: blur(18px) saturate(185%) brightness(1.04) !important;
+  backdrop-filter: blur(18px) saturate(185%) brightness(1.04) !important;
+}
+
+.liquid-glass-fallback .navbar.liquid-glass-surface {
+  -webkit-backdrop-filter: blur(22px) saturate(190%) brightness(1.05) !important;
+  backdrop-filter: blur(22px) saturate(190%) brightness(1.05) !important;
+}
+
+.liquid-glass-fallback .listing-card.liquid-glass-surface .lc-body {
+  -webkit-backdrop-filter: blur(18px) saturate(180%) brightness(1.03) !important;
+  backdrop-filter: blur(18px) saturate(180%) brightness(1.03) !important;
+}
+
+/* ============================================================
+   9. MOBILE RENDERING OPTIMIZATIONS (High Performance)
+   ============================================================ */
+@media (max-width: 767px) {
+  .liquid-glass-surface {
+    /* Slightly less blur depth for mobile GPU performance */
+    -webkit-backdrop-filter: url(#liquid-glass-refract) blur(12px) saturate(160%);
+    backdrop-filter: url(#liquid-glass-refract) blur(12px) saturate(160%);
+  }
+  
+  .liquid-glass-surface::after {
+    display: none !important; /* Disable heavy cursor tracking reflections */
+  }
+  
+  .navbar.liquid-glass-surface {
+    -webkit-backdrop-filter: url(#liquid-glass-refract) blur(14px) saturate(170%);
+    backdrop-filter: url(#liquid-glass-refract) blur(14px) saturate(170%);
+  }
+}
+
+/* ============================================================
+   10. REGRESSION SAFEGUARDS
+   Keep the original composition stable while retaining the glass polish.
+   ============================================================ */
+
+/* The original navbar width and padding remain constant before and after
+   scrolling, so its contents never reflow or drift out of alignment. */
+.navbar.liquid-glass-surface,
+.navbar.liquid-glass-surface.scrolled {
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1180px, 94vw);
+  padding: .7rem 1.6rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Keep logo fixed and let nav-links shrink to fit available space */
+.navbar.liquid-glass-surface .logo {
+  flex-shrink: 0;
+}
+
+.navbar.liquid-glass-surface .nav-links {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+  gap: clamp(0.6rem, 1.8vw, 1.6rem);
+}
+
+.navbar.liquid-glass-surface .nav-actions {
+  flex-shrink: 0;
+}
+
+.navbar.liquid-glass-surface {
+  will-change: transform;
+  transition: box-shadow .35s var(--lg-ease-spring), background-color .35s var(--lg-ease-spring);
+}
+
+.navbar.liquid-glass-surface.scrolled {
+  box-shadow: var(--lg-inset-light), 0 14px 36px -18px rgba(10, 15, 40, .18);
+}
+
+[data-theme="dark"] .navbar.liquid-glass-surface.scrolled {
+  box-shadow: var(--lg-inset-dark), 0 14px 36px -18px rgba(0, 0, 0, .52);
+}
+
+/* SVG-backed backdrop filters are expensive on a grid of cards. Reserve the
+   refractive filter for the few surfaces users focus on; other glass keeps the
+   same frosted appearance with the faster native blur path. */
+.liquid-glass-surface {
+  -webkit-backdrop-filter: blur(14px) saturate(165%) brightness(1.03);
+  backdrop-filter: blur(14px) saturate(165%) brightness(1.03);
+}
+
+.navbar.liquid-glass-surface,
+.search-card.liquid-glass-surface,
+.stats-band.liquid-glass-surface {
+  -webkit-backdrop-filter: url(#liquid-glass-refract) blur(16px) saturate(175%) brightness(1.03);
+  backdrop-filter: url(#liquid-glass-refract) blur(16px) saturate(175%) brightness(1.03);
+}
+
+.listing-card.liquid-glass-surface .lc-body {
+  -webkit-backdrop-filter: blur(14px) saturate(165%) brightness(1.03);
+  backdrop-filter: blur(14px) saturate(165%) brightness(1.03);
+}
+
+/* Make every layered surface share the outer contour and clip the reflection
+   inside it. Listing cards use a dedicated body surface, so their outer
+   reflection is intentionally disabled. */
+.liquid-glass-surface:not(.listing-card):not(.navbar) {
+  overflow: hidden;
+}
+
+.liquid-glass-surface::before,
+.liquid-glass-surface::after {
+  border-radius: inherit;
+}
+
+.listing-card.liquid-glass-surface::after {
+  display: none;
+}
+
+/* Restore a comfortable, naturally flowing four-card section. It remains a
+   grid on desktop and keeps the existing responsive columns below 1025px. */
+@media (min-width: 1025px) {
+  #how {
+    height: auto !important;
+    padding: clamp(64px, 9vw, 104px) 0 !important;
+  }
+
+  #how .container {
+    position: static !important;
+    top: auto !important;
+    height: auto !important;
+    display: block !important;
+  }
+
+  #how .step {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+#how .steps-grid {
+  gap: clamp(1.25rem, 2vw, 1.8rem);
+  align-items: stretch;
+}
+
+#how .step {
+  min-height: 270px;
+  padding: clamp(2rem, 3vw, 2.5rem) clamp(1.5rem, 2.25vw, 2rem);
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  transition: border-color .3s var(--lg-ease-spring), box-shadow .3s var(--lg-ease-spring), background-color .3s var(--lg-ease-spring);
+}
+
+#how .step h3 {
+  font-size: 1.13rem;
+  line-height: 1.25;
+  margin-bottom: .6rem;
+}
+
+#how .step p {
+  font-size: .92rem;
+  line-height: 1.7;
+}
+
+#how .step .num::after {
+  animation: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #how .step.liquid-glass-surface:hover {
+    border-color: rgba(255, 255, 255, .78);
+    box-shadow: var(--lg-inset-light), 0 24px 52px -26px rgba(10, 15, 40, .23);
+  }
+
+  [data-theme="dark"] #how .step.liquid-glass-surface:hover {
+    border-color: rgba(255, 255, 255, .18);
+    box-shadow: var(--lg-inset-dark), 0 24px 52px -26px rgba(0, 0, 0, .6);
+  }
+}
+
+/* One continuous FAQ capsule: clipping, border, blur and reflection all use
+   the identical fully-rounded outline, including while an answer is open. */
+.faq-item.liquid-glass-surface,
+.faq-item.liquid-glass-surface.open,
+.faq-item.liquid-glass-surface::before,
+.faq-item.liquid-glass-surface::after {
+  border-radius: 999px;
+}
+
+.faq-item.liquid-glass-surface {
+  overflow: hidden;
+  border-left-width: 1px;
+}
+
+.faq-item.liquid-glass-surface.open {
+  border-left-width: 1px;
+}
+
+.faq-item.liquid-glass-surface .faq-q {
+  min-height: 64px;
+}
+
+.faq-item.liquid-glass-surface .faq-a p {
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+
+@media (max-width: 1024px) {
+  #how .step {
+    min-height: 0;
+    border-radius: 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  .navbar.liquid-glass-surface,
+  .search-card.liquid-glass-surface,
+  .stats-band.liquid-glass-surface {
+    -webkit-backdrop-filter: blur(12px) saturate(155%) brightness(1.02);
+    backdrop-filter: blur(12px) saturate(155%) brightness(1.02);
+  }
+}
+
+/* GSAP already owns the hero's scroll movement; keeping a second infinite
+   transform animation on the same image causes unnecessary compositing work. */
+.cinema-bg .ph {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-glass-surface::after {
+    opacity: 0 !important;
+  }
+}

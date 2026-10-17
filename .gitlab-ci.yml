@@ -1,0 +1,20 @@
+# Deploy the CampusStay static site to GitLab Pages
+stages:
+  - deploy
+
+pages:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - mkdir -p public
+    - cp -r index.html listings.html property.html auth.html css js public/
+    # SPA-style fallback so deep links resolve on Pages
+    - cp index.html public/404.html
+    - echo "CampusStay published to GitLab Pages"
+  pages:
+    publish: public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — CampusStay</title>
+  <meta name="description" content="Manage your CampusStay account settings, profile, preferences, and security.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/premium.css">
+  <link rel="stylesheet" href="css/ultra.css">
+  <link rel="stylesheet" href="css/apple-polish.css">
+  <link rel="stylesheet" href="css/luxe.css">
+  <link rel="stylesheet" href="css/liquid-glass.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/settings.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+</head>
+<body data-require-auth="any">
+  <div class="orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="main-nav">
+    <a href="index.html" class="logo"><span class="logo-mark">🏠</span><span>Campus<em>Stay</em></span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="listings.html">Browse</a>
+      <a href="settings.html" class="active">Settings</a>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">🌙</button>
+      <a href="auth.html" class="btn btn-primary btn-sm" data-auth-cta>Sign In</a>
+    </div>
+  </nav>
+
+  <main class="container settings-wrap">
+    <div class="settings-layout">
+
+      <!-- Sidebar Navigation -->
+      <aside class="settings-nav" id="settings-nav" role="tablist">
+        <button class="settings-nav-item active" data-section="profile" role="tab" aria-selected="true">
+          <span class="nav-icon">👤</span> Profile
+        </button>
+        <button class="settings-nav-item" data-section="password" role="tab">
+          <span class="nav-icon">🔒</span> Password
+        </button>
+        <button class="settings-nav-item" data-section="preferences" role="tab">
+          <span class="nav-icon">⚙️</span> Preferences
+        </button>
+        <button class="settings-nav-item" data-section="notifications" role="tab">
+          <span class="nav-icon">🔔</span> Notifications
+        </button>
+        <button class="settings-nav-item" data-section="saved" role="tab" data-role-show="student">
+          <span class="nav-icon">❤️</span> Saved
+        </button>
+        <button class="settings-nav-item" data-section="listings" role="tab" data-role-show="owner">
+          <span class="nav-icon">🏘️</span> Listings
+        </button>
+        <button class="settings-nav-item" data-section="signout" role="tab">
+          <span class="nav-icon">🚪</span> Sign Out
+        </button>
+        <button class="settings-nav-item danger" data-section="danger" role="tab">
+          <span class="nav-icon">⚠️</span> Delete Account
+        </button>
+      </aside>
+
+      <!-- Content Panels -->
+      <div class="settings-content">
+
+        <!-- Profile Section -->
+        <section class="settings-section active" id="sec-profile" role="tabpanel">
+          <div class="settings-card">
+            <h2>Profile</h2>
+            <p class="card-sub">Manage your personal information.</p>
+
+            <div id="profile-msg" class="settings-msg"></div>
+
+            <div class="avatar-section">
+              <div class="avatar-preview" id="avatar-preview">?</div>
+              <div class="avatar-info">
+                <h3 id="avatar-name">Loading...</h3>
+                <p id="avatar-role">—</p>
+              </div>
+            </div>
+
+            <form class="settings-form" id="profile-form">
+              <div class="s-field">
+                <label for="s-name">Full Name</label>
+                <input type="text" id="s-name" placeholder="Your full name" autocomplete="name">
+              </div>
+              <div class="s-row">
+                <div class="s-field">
+                  <label for="s-occupation">Occupation</label>
+                  <input type="text" id="s-occupation" placeholder="e.g. Student, Engineer">
+                </div>
+                <div class="s-field">
+                  <label for="s-age">Age</label>
+                  <input type="number" id="s-age" min="16" max="100" placeholder="Age">
+                </div>
+              </div>
+              <div class="s-row">
+                <div class="s-field">
+                  <label for="s-gender">Gender</label>
+                  <select id="s-gender">
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="s-field">
+                  <label for="s-phone">Phone</label>
+                  <input type="tel" id="s-phone" disabled placeholder="Synced from account">
+                  <span class="field-hint">Phone is managed by your authentication provider.</span>
+                </div>
+              </div>
+              <div class="s-field">
+                <label for="s-email">Email</label>
+                <input type="email" id="s-email" disabled placeholder="Your email address">
+                <span class="field-hint">Email is managed by your authentication provider.</span>
+              </div>
+              <div class="settings-actions">
+                <button type="submit" class="btn-save" id="btn-save-profile">Save Changes</button>
+                <button type="button" class="btn-cancel" id="btn-cancel-profile">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Password Section -->
+        <section class="settings-section" id="sec-password" role="tabpanel">
+          <div class="settings-card">
+            <h2>Change Password</h2>
+            <p class="card-sub">Update your account password.</p>
+
+            <div id="password-msg" class="settings-msg"></div>
+
+            <form class="settings-form" id="password-form">
+              <div class="s-field">
+                <label for="s-new-pw">New Password</label>
+                <input type="password" id="s-new-pw" placeholder="Minimum 6 characters" minlength="6" autocomplete="new-password">
+                <div class="password-strength" id="pw-strength">
+                  <div class="strength-bar" id="str-1"></div>
+                  <div class="strength-bar" id="str-2"></div>
+                  <div class="strength-bar" id="str-3"></div>
+                  <div class="strength-bar" id="str-4"></div>
+                </div>
+              </div>
+              <div class="s-field">
+                <label for="s-confirm-pw">Confirm New Password</label>
+                <input type="password" id="s-confirm-pw" placeholder="Re-enter new password" autocomplete="new-password">
+              </div>
+              <div class="settings-actions">
+                <button type="submit" class="btn-save" id="btn-save-pw">Update Password</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Preferences Section -->
+        <section class="settings-section" id="sec-preferences" role="tabpanel">
+          <div class="settings-card">
+            <h2>Preferences</h2>
+            <p class="card-sub">Customize your experience.</p>
+
+            <div id="prefs-msg" class="settings-msg"></div>
+
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <span>Dark Mode</span>
+                <small>Switch between light and dark theme.</small>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="pref-dark-mode">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row" data-role-show="owner">
+              <div class="toggle-label">
+                <span>Default Property Type</span>
+                <small>Pre-select property type when creating listings.</small>
+              </div>
+              <select id="pref-default-type" style="padding:.5rem .8rem;border-radius:10px;border:1px solid var(--line);background:var(--bg-2);font-size:.85rem;">
+                <option value="">None</option>
+                <option value="pg">PG</option>
+                <option value="hostel">Hostel</option>
+                <option value="room">Room</option>
+                <option value="flat">Flat</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Notifications Section -->
+        <section class="settings-section" id="sec-notifications" role="tabpanel">
+          <div class="settings-card">
+            <h2>Notifications</h2>
+            <p class="card-sub">Control how you receive updates.</p>
+
+            <div id="notif-msg" class="settings-msg"></div>
+
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <span>Email Notifications</span>
+                <small>Receive booking updates and new listings via email.</small>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="pref-email-notif" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row" data-role-show="owner">
+              <div class="toggle-label">
+                <span>Booking Requests</span>
+                <small>Get notified when students request a booking.</small>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="pref-booking-notif" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-row" data-role-show="student">
+              <div class="toggle-label">
+                <span>New Listings</span>
+                <small>Get notified when new properties match your preferences.</small>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="pref-listing-notif" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="settings-actions">
+              <button type="button" class="btn-save" id="btn-save-notif">Save Preferences</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Saved Properties (Student only) -->
+        <section class="settings-section" id="sec-saved" role="tabpanel" data-role-show="student">
+          <div class="settings-card">
+            <h2>Saved Properties</h2>
+            <p class="card-sub">Your favorited rooms and stays.</p>
+            <div id="saved-list" style="margin-top:1rem;">
+              <div class="skeleton" style="height:60px;border-radius:12px;"></div>
+            </div>
+            <div style="margin-top:1.2rem;">
+              <a href="listings.html?view=wishlist" class="btn-save" style="display:inline-block;text-decoration:none;text-align:center;">Browse Saved Properties →</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Listing Preferences (Owner only) -->
+        <section class="settings-section" id="sec-listings" role="tabpanel" data-role-show="owner">
+          <div class="settings-card">
+            <h2>Listing Management</h2>
+            <p class="card-sub">Quick access to your property listings.</p>
+            <div style="margin-top:1rem;">
+              <a href="owner-dashboard.html" class="btn-save" style="display:inline-block;text-decoration:none;text-align:center;">Go to Dashboard →</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sign Out Section -->
+        <section class="settings-section" id="sec-signout" role="tabpanel">
+          <div class="settings-card">
+            <h2>Sign Out</h2>
+            <p class="card-sub">Sign out of your CampusStay account on this device.</p>
+            <div style="margin-top:1rem;">
+              <button type="button" class="btn-save" id="btn-signout" style="background:var(--text);box-shadow:0 8px 20px rgba(0,0,0,.15);">
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Danger Zone -->
+        <section class="settings-section" id="sec-danger" role="tabpanel">
+          <div class="settings-card danger-zone">
+            <h2>Delete Account</h2>
+            <p class="card-sub">Permanently delete your CampusStay account and all associated data. This action cannot be undone.</p>
+            <div style="margin-top:1rem;">
+              <button type="button" class="btn-danger" id="btn-delete-account">
+                Delete My Account
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Delete Account Confirmation Modal -->
+  <div class="modal-overlay" id="delete-modal">
+    <div class="modal-card">
+      <div class="modal-icon">⚠️</div>
+      <h3>Delete your account?</h3>
+      <p>This will permanently delete your account, profile, and all data. This action <strong>cannot be undone</strong>.<br><br>Type <strong>DELETE</strong> below to confirm.</p>
+      <input type="text" class="confirm-input" id="delete-confirm-input" placeholder='Type "DELETE" to confirm' autocomplete="off">
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-cancel" id="btn-modal-cancel">Cancel</button>
+        <button type="button" class="btn-modal-confirm" id="btn-modal-confirm" disabled>Delete Account</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container footer-bottom">
+      <span>© 2026 CampusStay. Made with ❤️ for Maharashtra students.</span>
+      <a href="index.html">← Back to home</a>
+    </div>
+  </footer>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/runtime-config.js"></script>
+
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="js/liquid-glass/displacement.js"></script>
+  <script src="js/liquid-glass/filters.js"></script>
+  <script src="js/liquid-glass/liquid-glass.js"></script>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/fx.js"></script>
+</body>
+</html>

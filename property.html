@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Property Details — CampusStay</title>
+  <meta name="description" content="View photos, rent, facilities, reviews, map location and owner contact for this student accommodation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/premium.css">
+  <link rel="stylesheet" href="css/ultra.css">
+  <link rel="stylesheet" href="css/apple-polish.css">
+  <link rel="stylesheet" href="css/luxe.css">
+  <link rel="stylesheet" href="css/liquid-glass.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+</head>
+<body>
+  <div class="orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo"><span class="logo-mark">🏠</span><span>Campus<em>Stay</em></span></a>
+    <div class="nav-links">
+      <a href="index.html#explore">Explore</a>
+      <a href="listings.html">Browse</a>
+      <a href="listings.html?view=wishlist">Wishlist</a>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">🌙</button>
+      <a href="auth.html" class="btn btn-primary btn-sm" data-auth-cta>Sign in</a>
+      <button class="icon-btn hamburger" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+  <div class="mobile-menu glass">
+    <a href="listings.html">Browse</a>
+    <a href="listings.html?view=wishlist">Wishlist</a>
+    <a href="auth.html" class="btn btn-primary" data-auth-cta>Sign in</a>
+  </div>
+
+  <main class="container prop-wrap" id="prop-root">
+    <div class="skeleton" style="height:440px;"></div>
+  </main>
+
+  <footer>
+    <div class="container footer-bottom">
+      <div class="copyright-notice">
+        <p>© 2026 Campus Stay. All Rights Reserved.</p>
+        <p>The original source code, content, graphics, and other original materials on this website are protected by applicable copyright laws.</p>
+        <p>Unauthorized copying, reproduction, or redistribution of protected materials is prohibited.</p>
+      </div>
+      <a href="listings.html">← Back to listings</a>
+    </div>
+  </footer>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/runtime-config.js"></script>
+
+  <!-- Lenis, GSAP & ScrollTrigger for Premium Scroll Animations -->
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Liquid Glass Refraction Engine -->
+  <script src="js/liquid-glass/displacement.js"></script>
+  <script src="js/liquid-glass/filters.js"></script>
+  <script src="js/liquid-glass/liquid-glass.js"></script>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/property.js"></script>
+  <script src="js/fx.js"></script>
+</body>
+</html>

@@ -1,0 +1,1283 @@
+/* ============================================================
+   CampusStay — Experience refinement layer
+   This file intentionally loads last. It keeps existing selectors and
+   behavior intact while centralising the visual system and quiet motion.
+   ============================================================ */
+
+:root {
+
+  --cs-ink: #202a44;
+  --cs-muted: #65708a;
+  --cs-glass: rgba(255, 255, 255, 0.54);
+  --cs-glass-strong: rgba(255, 255, 255, 0.76);
+  --cs-glass-edge: rgba(255, 255, 255, 0.8);
+  --cs-glass-edge-soft: rgba(123, 139, 188, 0.14);
+  --cs-shadow-float: 0 24px 60px rgba(101, 113, 157, 0.13),
+    0 2px 10px rgba(96, 104, 138, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.68);
+  --cs-shadow-raised: 0 34px 80px rgba(98, 109, 151, 0.18),
+    0 6px 18px rgba(88, 96, 130, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.84);
+  --cs-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cs-ease-gentle: cubic-bezier(0.16, 1, 0.3, 1);
+  --cs-motion-ui: 600ms;
+
+  --cs-focus-ring: 0 0 0 4px rgba(117, 133, 226, 0.17),
+    0 16px 40px rgba(109, 124, 192, 0.14);
+  --cs-glass-image: linear-gradient(135deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.14) 48%, rgba(225, 232, 255, 0.18));
+}
+
+[data-theme="dark"] {
+  --cs-ink: #f1f5f9;
+  --cs-muted: #b0bdd4;
+  --cs-glass: rgba(20, 24, 42, 0.55);
+  --cs-glass-strong: rgba(20, 24, 42, 0.78);
+  --cs-glass-edge: rgba(148, 163, 184, 0.18);
+  --cs-glass-edge-soft: rgba(148, 163, 184, 0.12);
+  --cs-shadow-float: 0 24px 60px rgba(0, 0, 0, 0.45),
+    0 2px 10px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --cs-shadow-raised: 0 34px 80px rgba(0, 0, 0, 0.55),
+    0 6px 18px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --cs-focus-ring: 0 0 0 4px rgba(117, 133, 226, 0.25),
+    0 16px 40px rgba(0, 0, 0, 0.35);
+  --cs-glass-image: linear-gradient(135deg, rgba(40, 50, 80, 0.4), rgba(20, 24, 42, 0.2) 48%, rgba(30, 28, 50, 0.3));
+}
+
+html {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  color: var(--cs-ink);
+}
+
+
+
+/* A soft, repeatable glass primitive without adding DOM wrappers. */
+.glass,
+.navbar,
+.sort-select,
+.search-field {
+  background-color: var(--cs-glass);
+  background-image: var(--cs-glass-image, linear-gradient(135deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.14) 48%, rgba(225, 232, 255, 0.18)));
+  border-color: var(--cs-glass-edge-soft);
+  box-shadow: var(--cs-shadow-float);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(18px) saturate(145%);
+}
+
+.glass {
+  position: relative;
+}
+
+.cat-card,
+.listing-card,
+.step,
+.testi,
+.dash-card,
+.auth-card,
+.price-box,
+.filters,
+.stats-band,
+.faq-item {
+  border-color: var(--cs-glass-edge-soft);
+  box-shadow: var(--cs-shadow-float);
+  transition: border-color 400ms var(--cs-ease), box-shadow 500ms var(--cs-ease), background-color 500ms var(--cs-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cat-card:hover,
+  .listing-card:hover,
+  .step:hover,
+  .testi:hover,
+  .dash-card:hover,
+  .auth-card:hover,
+  .price-box:hover,
+  .faq-item:hover {
+    border-color: rgba(113, 131, 193, 0.24);
+    box-shadow: var(--cs-shadow-raised);
+  }
+}
+
+/* The home hero deliberately uses the same light mesh language as the rest
+   of the product instead of a dark, image-led scene. GSAP retains ownership
+   of the light parallax transform. */
+[data-theme="light"] .cinema-bg .ph,
+.cinema-bg .ph {
+  background-image:
+    radial-gradient(ellipse 68% 82% at 9% 20%, rgba(191, 220, 255, 0.82), transparent 69%),
+    radial-gradient(ellipse 70% 82% at 92% 24%, rgba(232, 220, 255, 0.8), transparent 68%),
+    radial-gradient(ellipse 75% 76% at 54% 102%, rgba(255, 218, 208, 0.76), transparent 69%),
+    linear-gradient(135deg, #f9fbff, #fdfcff 52%, #fffafa);
+  filter: none;
+}
+
+[data-theme="dark"] .cinema-bg .ph {
+  background-image:
+    radial-gradient(ellipse 68% 82% at 9% 20%, rgba(99, 102, 241, 0.22), transparent 69%),
+    radial-gradient(ellipse 70% 82% at 92% 24%, rgba(139, 92, 236, 0.18), transparent 68%),
+    radial-gradient(ellipse 75% 76% at 54% 102%, rgba(236, 72, 153, 0.14), transparent 69%),
+    linear-gradient(135deg, #0b0f1c, #0d1019 52%, #0a0c14);
+  filter: none;
+}
+
+[data-theme="light"] .cinema-bg .scrim,
+.cinema-bg .scrim {
+  background: linear-gradient(180deg, rgba(251, 252, 255, 0.08), rgba(251, 252, 255, 0.38));
+}
+
+[data-theme="dark"] .cinema-bg .scrim {
+  background: linear-gradient(180deg, rgba(7, 9, 15, 0.08), rgba(7, 9, 15, 0.38));
+}
+
+.cinema-hero h1,
+[data-theme="light"] .cinema-hero h1 {
+  color: var(--cs-ink);
+  text-shadow: none;
+}
+
+.cinema-hero .lead,
+[data-theme="light"] .cinema-hero .lead {
+  color: var(--cs-muted);
+}
+
+.cinema-hero .badge-pill {
+  color: #4c5ba2;
+  background: rgba(255, 255, 255, 0.48);
+  border-color: rgba(123, 138, 197, 0.16);
+  box-shadow: 0 12px 32px rgba(116, 130, 184, 0.09);
+}
+
+[data-theme="dark"] .cinema-hero .badge-pill {
+  color: #a5b4fc;
+  background: rgba(30, 36, 60, 0.75);
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.cinema-hero .hero-stats .hs b,
+[data-theme="light"] .cinema-hero .hero-stats .hs b { color: var(--cs-ink); }
+.cinema-hero .hero-stats .hs span,
+[data-theme="light"] .cinema-hero .hero-stats .hs span { color: var(--cs-muted); }
+
+.grad-text {
+  background-image: linear-gradient(105deg, #6579d4 4%, #956fca 50%, #d88e89 96%) !important;
+  background-size: 100% auto !important;
+}
+
+/* Navigation and interactive controls */
+.navbar {
+  top: 0;
+  border-color: rgba(255, 255, 255, 0.72);
+  transition: background-color 300ms var(--cs-ease),
+    box-shadow 300ms var(--cs-ease),
+    border-color 300ms var(--cs-ease);
+}
+
+.navbar.scrolled {
+  background-color: var(--cs-glass-strong);
+  border-color: rgba(127, 143, 192, 0.16);
+  box-shadow: 0 18px 44px rgba(94, 105, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.84);
+}
+
+.btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 360ms var(--cs-ease), box-shadow 420ms var(--cs-ease), filter 420ms var(--cs-ease);
+}
+
+.btn-primary {
+  background: linear-gradient(115deg, #6c80d7 0%, #8873c9 50%, #c98291 100%);
+  box-shadow: 0 14px 28px rgba(107, 121, 194, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover {
+    transform: translate3d(0, -2px, 0) scale(1.012);
+    box-shadow: 0 19px 36px rgba(107, 121, 194, 0.31), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    filter: saturate(1.06);
+  }
+
+  .btn-ghost:hover,
+  .icon-btn:hover {
+    transform: translate3d(0, -2px, 0);
+    box-shadow: 0 14px 30px rgba(95, 106, 148, 0.14);
+  }
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #697cd2;
+  outline-offset: 3px;
+}
+
+.search-field,
+.auth-card input,
+.sort-select,
+.filters input:not([type="checkbox"]):not([type="radio"]) {
+  border-color: var(--cs-glass-edge-soft);
+  box-shadow: var(--cs-shadow-float);
+  transition: border-color 300ms var(--cs-ease), box-shadow 350ms var(--cs-ease), background-color 350ms var(--cs-ease);
+}
+
+.search-field:focus-within,
+.auth-card input:focus,
+.sort-select:focus,
+.filters input:not([type="checkbox"]):not([type="radio"]):focus {
+  border-color: rgba(103, 123, 210, 0.58);
+  box-shadow: var(--cs-focus-ring);
+}
+
+.auth-card input {
+  background: var(--cs-glass);
+  background-image: var(--cs-glass-image);
+  color: var(--text);
+}
+
+.floating-field {
+  position: relative;
+}
+
+.floating-field:has(> input[style*="display: none"]) {
+  display: none;
+}
+
+.floating-field input {
+  width: 100%;
+  min-height: 3.42rem;
+  padding: 1.34rem 1.1rem 0.58rem;
+}
+
+.floating-field label {
+  position: absolute;
+  top: 50%;
+  left: 1.1rem;
+  color: var(--cs-muted);
+  font-size: 0.94rem;
+  line-height: 1;
+  pointer-events: none;
+  transform: translate3d(0, -50%, 0);
+  transform-origin: left center;
+  transition: transform 240ms var(--cs-ease), color 240ms var(--cs-ease);
+}
+
+.floating-field input:focus + label,
+.floating-field input:not(:placeholder-shown) + label {
+  color: #596dc5;
+  transform: translate3d(0, -1rem, 0) scale(0.76);
+}
+
+.lc-media,
+.listing-card img {
+  background: linear-gradient(115deg, #e2eaff, #f3eaff 50%, #ffe9e1);
+}
+
+.listing-card img {
+  filter: saturate(0.94);
+  transition: transform 900ms var(--cs-ease), filter 700ms var(--cs-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .listing-card:hover img {
+    transform: scale(1.035);
+    filter: saturate(1.03);
+  }
+}
+
+.skeleton,
+.skeleton-glass {
+  background: linear-gradient(100deg, rgba(228, 235, 255, 0.72) 14%, rgba(255, 255, 255, 0.9) 42%, rgba(239, 228, 255, 0.72) 68%);
+  background-size: 220% 100%;
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  box-shadow: 0 12px 30px rgba(104, 116, 160, 0.08);
+}
+
+/* First-visit loader. It remains CSS-only once it has been shown, avoiding
+   runtime work during the transition into the homepage. */
+.preloader {
+  background:
+    radial-gradient(ellipse 75% 80% at 12% 18%, rgba(198, 222, 255, 0.88), transparent 68%),
+    radial-gradient(ellipse 70% 80% at 86% 16%, rgba(231, 220, 255, 0.84), transparent 67%),
+    radial-gradient(ellipse 74% 70% at 54% 100%, rgba(255, 220, 210, 0.8), transparent 65%),
+    #fbfcff;
+  overflow: hidden;
+  isolation: isolate;
+  transition: opacity 620ms var(--cs-ease), visibility 620ms var(--cs-ease);
+}
+
+[data-theme="dark"] .preloader {
+  background:
+    radial-gradient(ellipse 75% 80% at 12% 18%, rgba(99, 102, 241, 0.18), transparent 68%),
+    radial-gradient(ellipse 70% 80% at 86% 16%, rgba(139, 92, 236, 0.14), transparent 67%),
+    radial-gradient(ellipse 74% 70% at 54% 100%, rgba(236, 72, 153, 0.1), transparent 65%),
+    rgba(11, 13, 24, 0.92);
+}
+
+.preloader::before {
+  content: "";
+  position: absolute;
+  width: 150vmax;
+  height: 50vmax;
+  left: -25vmax;
+  bottom: -37vmax;
+  z-index: -1;
+  border-radius: 47% 53% 0 0 / 25% 25% 0 0;
+  background: linear-gradient(105deg, rgba(162, 197, 255, 0.36), rgba(212, 190, 255, 0.3) 50%, rgba(255, 205, 191, 0.35));
+  filter: blur(20px);
+  transform: translate3d(0, 0, 0) rotate(-4deg);
+  animation: cs-loader-wave 3.4s var(--cs-ease-gentle) infinite alternate;
+  will-change: transform;
+}
+
+.preloader .preloader-inner {
+  width: min(27rem, 88vw);
+  height: auto;
+  padding: 1rem;
+  display: grid;
+  justify-items: center;
+  gap: 1.15rem;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.preloader-brand {
+  width: 4.5rem;
+  height: 4.5rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.84);
+  border-radius: 1.45rem;
+  color: #5265bd;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.84), rgba(237, 231, 255, 0.5));
+  box-shadow: 0 20px 44px rgba(102, 114, 162, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.98);
+  font-family: var(--font-display);
+  font-size: 1.42rem;
+  font-weight: 800;
+  letter-spacing: -0.08em;
+  animation: cs-loader-mark 1600ms var(--cs-ease) both;
+  will-change: transform, opacity;
+}
+
+.preloader-copy {
+  color: #59647f;
+  font-size: 0.94rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.preloader-line {
+  width: min(14rem, 64vw);
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(107, 124, 181, 0.15);
+}
+
+.preloader-line span {
+  display: block;
+  width: 45%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #82a4df, #9c89d5 55%, #dfa0a0);
+  transform: translate3d(-125%, 0, 0);
+  animation: cs-loader-line 1800ms var(--cs-ease-gentle) both;
+  will-change: transform;
+}
+
+.preloader--returning .preloader-brand,
+.preloader--returning .preloader-line span { animation-duration: 260ms; }
+
+@keyframes cs-loader-mark {
+  from { opacity: 0; transform: translate3d(0, 12px, 0) scale(0.9); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes cs-loader-line {
+  0% { transform: translate3d(-125%, 0, 0); }
+  55%, 100% { transform: translate3d(225%, 0, 0); }
+}
+
+@keyframes cs-loader-wave {
+  from { transform: translate3d(-2%, 0, 0) rotate(-4deg) scale(1); }
+  to { transform: translate3d(3%, -3%, 0) rotate(3deg) scale(1.05); }
+}
+
+.page-veil {
+  background:
+    radial-gradient(ellipse 70% 80% at 18% 8%, rgba(208, 226, 255, 0.78), transparent 67%),
+    radial-gradient(ellipse 70% 75% at 92% 100%, rgba(255, 224, 216, 0.72), transparent 66%),
+    #fbfcff;
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+}
+
+[data-theme="dark"] .page-veil {
+  background:
+    radial-gradient(ellipse 70% 80% at 18% 8%, rgba(99, 102, 241, 0.12), transparent 67%),
+    radial-gradient(ellipse 70% 75% at 92% 100%, rgba(139, 92, 236, 0.1), transparent 66%),
+    rgba(11, 13, 24, 0.85);
+}
+
+/* Mobile keeps the material language while reducing blur and animation cost. */
+@media (max-width: 700px) {
+  .glass,
+  .navbar,
+  .sort-select,
+  .search-field {
+    -webkit-backdrop-filter: blur(11px) saturate(132%);
+    backdrop-filter: blur(11px) saturate(132%);
+  }
+  .cinema-hero { min-height: 88svh; }
+  .preloader::before { filter: blur(12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader::before,
+  .preloader-brand,
+  .preloader-line span,
+  .listing-card img {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
+
+  .preloader-line span { transform: translate3d(0, 0, 0); }
+}
+
+[data-theme="dark"] body { color: var(--text); }
+
+
+/* Keep dark-mode footer copy comfortably above AA contrast while preserving
+   its existing structure, spacing, and visual treatment. */
+[data-theme="dark"] footer {
+  --cs-footer-heading: #f8fafc;
+  --cs-footer-body: #d6deeb;
+  --cs-footer-meta: #c0cadd;
+}
+
+[data-theme="dark"] footer h4 { color: var(--cs-footer-heading); }
+[data-theme="dark"] .footer-grid p { color: var(--cs-footer-body); }
+[data-theme="dark"] footer ul { color: var(--cs-footer-body); }
+[data-theme="dark"] footer ul a { color: var(--cs-footer-body); }
+[data-theme="dark"] footer ul a:hover,
+[data-theme="dark"] footer ul a:focus-visible { color: #ffffff; }
+[data-theme="dark"] .footer-bottom { color: var(--cs-footer-meta); }
+
+/* Smooth only the paint properties affected by a theme change. */
+body,
+footer,
+footer h4,
+.footer-grid p,
+footer ul,
+footer ul a,
+.footer-bottom {
+  transition: color 300ms var(--cs-ease), background-color 300ms var(--cs-ease),
+    border-color 300ms var(--cs-ease), box-shadow 300ms var(--cs-ease);
+}
+
+/* ============================================================
+   Homepage scroll experience — the additions below are deliberately scoped
+   to the home page so marketplace and account screens keep their native flow.
+   ============================================================ */
+
+.home-page #webgl-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: soft-light;
+  transition: opacity 900ms var(--cs-ease);
+}
+
+.home-page.cs-webgl-active #webgl-canvas { opacity: 0.22; }
+
+.home-page .cinema-hero,
+.home-page .trust-strip,
+.home-page section,
+.home-page footer {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.hero-owner-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.72rem 0.25rem;
+  color: var(--cs-ink);
+  font-size: 0.92rem;
+  font-weight: 720;
+  text-decoration: none;
+  transition: color 220ms var(--cs-ease), transform 220ms var(--cs-ease);
+}
+
+.hero-owner-link span { transition: transform 220ms var(--cs-ease); }
+
+@media (hover: hover) and (pointer: fine) {
+  .hero-owner-link:hover { color: #6579d4; transform: translateY(-1px); }
+  .hero-owner-link:hover span { transform: translateX(3px); }
+}
+
+/* ============================================================
+   Accommodation Explorer — premium card grid with expand-X image reveal
+   ============================================================ */
+
+.stay-explorer {
+  padding: clamp(4.5rem, 9vw, 7.5rem) 0;
+  overflow: hidden;
+}
+
+/* ---- Explorer Intro: Cohesive single content block ---- */
+.explorer-intro {
+  display: block;
+  max-width: 680px;
+  margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.explorer-intro__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.explorer-intro .kicker {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brand, #6366f1);
+  opacity: 0.9;
+}
+
+.explorer-intro h2 {
+  max-width: none;
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: var(--cs-ink);
+}
+
+[data-theme="dark"] .explorer-intro h2 {
+  color: #f1f5f9;
+}
+
+.explorer-intro__desc {
+  max-width: 52ch;
+  margin: 0;
+  font-size: clamp(0.88rem, 1.2vw, 1rem);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--cs-muted);
+}
+
+.explorer-viewport { overflow: visible; }
+
+.explorer-track {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(.85rem, 1.8vw, 1.35rem);
+  width: min(1180px, calc(100vw - 2.5rem));
+  margin: 0 auto;
+}
+
+/* ---- Individual panel card ---- */
+.explorer-panel {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: clamp(18rem, 30vw, 24rem);
+  overflow: hidden;
+  isolation: isolate;
+  padding: clamp(1.4rem, 2.8vw, 2.2rem);
+  border: 1px solid rgba(126, 144, 194, 0.18);
+  border-radius: clamp(1.5rem, 3vw, 2.5rem);
+  color: #f8f9ff;
+  background: linear-gradient(138deg, #10172e 0%, #1b2245 54%, #322254 100%);
+  box-shadow: 0 20px 45px rgba(9, 12, 35, .22);
+  text-decoration: none;
+  transition: transform 450ms var(--cs-ease),
+              border-color 450ms var(--cs-ease),
+              box-shadow 450ms var(--cs-ease);
+
+  /* Staggered entrance animation */
+  opacity: 0;
+  transform: translateY(28px);
+  animation: cs-explorer-entrance 700ms var(--cs-ease) forwards;
+}
+
+.explorer-panel:nth-child(1) { animation-delay: 0ms; }
+.explorer-panel:nth-child(2) { animation-delay: 100ms; }
+.explorer-panel:nth-child(3) { animation-delay: 200ms; }
+.explorer-panel:nth-child(4) { animation-delay: 300ms; }
+
+@keyframes cs-explorer-entrance {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Liquid Glass overlay for explorer panels */
+.explorer-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 30%,
+    transparent 60%,
+    rgba(139, 92, 246, 0.04) 100%
+  );
+  opacity: 0.8;
+  transition: opacity 400ms var(--cs-ease);
+}
+
+/* Scrim overlay for text readability */
+.explorer-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg,
+    rgba(9, 12, 32, .08) 0%,
+    rgba(9, 12, 32, .12) 40%,
+    rgba(9, 12, 32, .42) 100%);
+  pointer-events: none;
+  transition: background 450ms var(--cs-ease);
+}
+
+/* ---- Card top bar: number + category ---- */
+.explorer-panel .explorer-number,
+.explorer-panel .explorer-type {
+  position: relative;
+  z-index: 3;
+}
+
+.explorer-number {
+  display: block;
+  color: rgba(206, 216, 255, .55);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  margin-bottom: 0.25rem;
+}
+
+.explorer-type {
+  display: block;
+  color: rgba(220, 230, 255, 0.95);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+/* ---- Card content: title, description, price ---- */
+.explorer-content {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  gap: .45rem;
+  align-self: end;
+  max-width: 22rem;
+  transition: transform 550ms var(--cs-ease), text-shadow 550ms var(--cs-ease);
+}
+
+.explorer-content b {
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 3vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: -.045em;
+  line-height: 1.05;
+  color: #ffffff;
+}
+
+.explorer-content small {
+  display: block;
+  color: rgba(236, 240, 255, .82);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+.explorer-content em {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-top: 0.3rem;
+  color: #d9d8ff;
+  font-size: .8rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.explorer-content i {
+  font-size: 1.1rem;
+  font-style: normal;
+  transition: transform 350ms var(--cs-ease);
+}
+
+/* ---- Image art container: expand-X reveal ---- */
+.explorer-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: 0;
+  transform: scaleX(0.001);
+  transform-origin: center;
+  clip-path: inset(0 50% 0 50% round inherit);
+  background: #252b50;
+  box-shadow: none;
+  transition: transform 650ms cubic-bezier(.25, 1, .5, 1),
+              opacity 180ms linear,
+              clip-path 650ms cubic-bezier(.25, 1, .5, 1);
+  will-change: transform, clip-path, opacity;
+}
+
+/* Gradient overlay on art for text contrast */
+.explorer-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(100deg,
+    rgba(8, 10, 30, .56),
+    rgba(8, 10, 30, .06) 50%,
+    rgba(8, 10, 30, .34) 100%);
+  pointer-events: none;
+}
+
+.explorer-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  transform: scale(1.12);
+  filter: saturate(1.04) contrast(1.04) brightness(.78);
+  transition: transform 900ms var(--cs-ease), filter 550ms var(--cs-ease);
+}
+
+/* Category-specific image cropping */
+.explorer-panel[data-category="room"] .explorer-art img { object-position: center 35%; }
+.explorer-panel[data-category="pg"] .explorer-art img { object-position: center center; }
+.explorer-panel[data-category="hostel"] .explorer-art img { object-position: center 25%; }
+.explorer-panel[data-category="flat"] .explorer-art img { object-position: center 40%; }
+
+.explorer-panel:focus-visible {
+  outline: none;
+  box-shadow: var(--cs-focus-ring);
+}
+
+/* ---- Desktop hover: expand-X image reveal + glass highlight ---- */
+@media (hover: hover) and (pointer: fine) {
+  .explorer-panel:hover,
+  .explorer-panel:focus-visible {
+    transform: translateY(-6px) scale(1.008);
+    border-color: rgba(162, 174, 255, .45);
+    box-shadow:
+      0 28px 60px rgba(12, 14, 44, .35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 0 1px rgba(162, 174, 255, .15);
+  }
+
+  .explorer-panel:hover::before,
+  .explorer-panel:focus-visible::before {
+    opacity: 1;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.04) 30%,
+      transparent 50%,
+      rgba(139, 92, 246, 0.08) 100%
+    );
+  }
+
+  .explorer-panel:hover::after,
+  .explorer-panel:focus-visible::after {
+    background: linear-gradient(180deg,
+      rgba(9, 12, 32, .25) 0%,
+      rgba(9, 12, 32, .30) 40%,
+      rgba(9, 12, 32, .65) 100%);
+  }
+
+  .explorer-panel:hover .explorer-art,
+  .explorer-panel:focus-visible .explorer-art {
+    opacity: 1;
+    transform: scaleX(1);
+    clip-path: inset(0 0 0 0 round inherit);
+  }
+
+  .explorer-panel:hover .explorer-art img,
+  .explorer-panel:focus-visible .explorer-art img {
+    transform: scale(1.03);
+    filter: saturate(1.1) contrast(1.04) brightness(.85);
+  }
+
+  .explorer-panel:hover .explorer-content,
+  .explorer-panel:focus-visible .explorer-content {
+    transform: translateX(.3rem);
+    text-shadow: 0 3px 20px rgba(0, 0, 0, .48);
+  }
+
+  .explorer-panel:hover .explorer-content i,
+  .explorer-panel:focus-visible .explorer-content i {
+    transform: translateX(.3rem);
+  }
+}
+
+/* ---- Touch/mobile: tap-to-expand ---- */
+@media (pointer: coarse) {
+  .explorer-panel.is-expanded .explorer-art {
+    opacity: 1;
+    transform: scaleX(1);
+    clip-path: inset(0 0 0 0 round inherit);
+  }
+  .explorer-panel.is-expanded .explorer-art img { transform: scale(1.03); }
+  .explorer-panel.is-expanded::after {
+    background: linear-gradient(180deg,
+      rgba(9, 12, 32, .25) 0%,
+      rgba(9, 12, 32, .30) 40%,
+      rgba(9, 12, 32, .65) 100%);
+  }
+  .explorer-panel.is-expanded .explorer-content { text-shadow: 0 3px 20px rgba(0, 0, 0, .48); }
+}
+
+/* ---- Responsive: mobile single-column ---- */
+@media (max-width: 760px) {
+  .hero-actions { gap: 0.6rem 0.9rem; }
+  .hero-actions .btn { padding: 0.68rem 0.88rem; }
+  .hero-owner-link { padding-block: 0.5rem; }
+  .explorer-intro { max-width: none; }
+  .explorer-track { grid-template-columns: 1fr; }
+  .explorer-panel { min-height: 16rem; }
+  .explorer-content { max-width: 18rem; }
+  .explorer-intro h2 { font-size: clamp(1.7rem, 6vw, 2.2rem); }
+  .explorer-intro h2 br { display: none; }
+}
+
+@media (max-width: 420px) {
+  .explorer-panel { min-height: 14.5rem; padding: 1rem; border-radius: 1.35rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explorer-art,
+  .explorer-art img,
+  .explorer-content,
+  .explorer-panel {
+    transition-duration: 1ms !important;
+  }
+  .home-page #webgl-canvas { display: none; }
+}
+
+/* ============================================================
+   Fluid jelly glass interactions — adapted from the iOS dock
+   reference. Uses transform-only animations for performance.
+   ============================================================ */
+
+/* Spring easing for primary buttons */
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary {
+    transition: transform 420ms cubic-bezier(0.34, 1.45, 0.64, 1),
+      box-shadow 420ms var(--cs-ease),
+      filter 420ms var(--cs-ease);
+  }
+
+  .btn-primary:active {
+    transform: translate3d(0, 0, 0) scale(0.95);
+    transition: transform 0.1s ease-out;
+  }
+
+  .btn-ghost:active,
+  .icon-btn:active {
+    transform: translate3d(0, 0, 0) scale(0.94);
+    transition: transform 0.1s ease-out;
+  }
+}
+
+/* Jelly squish keyframe for tab switching */
+@keyframes cs-jelly-squish {
+  0%   { transform: scale(1, 1); }
+  30%  { transform: scale(1.06, 0.94); }
+  55%  { transform: scale(0.97, 1.03); }
+  75%  { transform: scale(1.01, 0.99); }
+  100% { transform: scale(1, 1); }
+}
+
+/* Auth tab spring switching */
+.auth-tabs button {
+  transition: all 380ms cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+.auth-tabs button:active {
+  transform: scale(0.95);
+}
+
+.auth-tabs button.active {
+  animation: cs-jelly-squish 0.45s cubic-bezier(0.25, 1.35, 0.4, 1);
+}
+
+/* Navbar glass enhancement — layered shadow with inner highlight */
+.navbar {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.03),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.navbar.scrolled {
+  box-shadow:
+    0 18px 44px rgba(94, 105, 143, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.84),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.12);
+}
+
+/* Spring hover for interactive cards */
+@media (hover: hover) and (pointer: fine) {
+  .cat-card:active,
+  .listing-card:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease-out;
+  }
+}
+
+/* Reduced motion: disable jelly animations */
+@media (prefers-reduced-motion: reduce) {
+  .auth-tabs button.active {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   Dark theme — comprehensive typography and contrast fixes
+   ============================================================ */
+
+/* Navbar in dark mode */
+[data-theme="dark"] .navbar {
+  border-color: rgba(148, 163, 184, 0.14);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .navbar.scrolled {
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .nav-links { color: #b8c5dc; }
+[data-theme="dark"] .nav-links a:hover { color: #f1f5f9; }
+[data-theme="dark"] .user-menu-name { color: #e2e8f0; }
+
+/* Headings in dark mode — always high contrast */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4 { color: #f1f5f9; }
+
+/* Section kicker / eyebrow labels */
+[data-theme="dark"] .kicker { color: #a5b4fc; }
+[data-theme="dark"] .sec-head p { color: #b0bdd4; }
+
+/* Steps, testimonials, dashboards */
+[data-theme="dark"] .step p,
+[data-theme="dark"] .testi p,
+[data-theme="dark"] .dash-card p { color: #b0bdd4; }
+
+/* Search related */
+[data-theme="dark"] .search-field input { color: #e2e8f0; }
+[data-theme="dark"] .search-field input::placeholder { color: #7889a8; }
+[data-theme="dark"] .search-hint { color: #8896b3; }
+[data-theme="dark"] .search-title-label { color: #c9d5ea; }
+
+/* Price text */
+[data-theme="dark"] .price { color: #f1f5f9; }
+[data-theme="dark"] .price small { color: #8896b3; }
+
+/* Listing cards */
+[data-theme="dark"] .lc-loc { color: #9dafc8; }
+[data-theme="dark"] .lc-body h3 a { color: #f1f5f9; }
+
+/* FAQ in dark mode */
+[data-theme="dark"] .faq-q { color: #e2e8f0; }
+
+/* CTA band */
+[data-theme="dark"] .cta-band { color: #fff; }
+
+/* Stats */
+[data-theme="dark"] .stat span { color: #b0bdd4; }
+
+/* College chips */
+[data-theme="dark"] .chip { color: #c9d5ea; border-color: rgba(148, 163, 184, 0.16); }
+[data-theme="dark"] .chip:hover { color: #a5b4fc; border-color: rgba(99, 102, 241, 0.4); }
+
+/* Dashboard cards */
+[data-theme="dark"] .dash-card h3 { color: #f1f5f9; }
+
+/* Hero stats in dark mode */
+[data-theme="dark"] .hero-stats .hs b { color: #f1f5f9; }
+[data-theme="dark"] .hero-stats .hs span { color: #9dafc8; }
+
+/* Account/onboarding pages dark mode */
+[data-theme="dark"] .account-page {
+  background: radial-gradient(circle at 8% 12%, rgba(99, 102, 241, 0.15), transparent 24%),
+              radial-gradient(circle at 96% 80%, rgba(236, 72, 153, 0.1), transparent 25%),
+              var(--bg);
+}
+[data-theme="dark"] .account-surface {
+  border-color: rgba(148, 163, 184, 0.12);
+  background: rgba(20, 24, 42, 0.6);
+  box-shadow: 0 23px 58px rgba(0, 0, 0, 0.3);
+}
+[data-theme="dark"] .onboarding-head h1,
+[data-theme="dark"] .account-hero h1 { color: #f1f5f9; }
+[data-theme="dark"] .onboarding-head p,
+[data-theme="dark"] .account-hero p { color: #b0bdd4; }
+[data-theme="dark"] .onboarding-note { color: #8896b3; }
+
+/* Wizard / owner onboarding dark mode */
+[data-theme="dark"] .wizard-field { color: #b0bdd4; }
+[data-theme="dark"] .wizard-field input,
+[data-theme="dark"] .wizard-field select,
+[data-theme="dark"] .wizard-field textarea {
+  color: #e2e8f0;
+  background: rgba(20, 24, 42, 0.55);
+  border-color: rgba(148, 163, 184, 0.16);
+}
+[data-theme="dark"] .wizard-field input:focus,
+[data-theme="dark"] .wizard-field select:focus,
+[data-theme="dark"] .wizard-field textarea:focus {
+  background: rgba(25, 30, 52, 0.75);
+}
+[data-theme="dark"] .wizard-copy h2 { color: #f1f5f9; }
+[data-theme="dark"] .wizard-copy p { color: #b0bdd4; }
+[data-theme="dark"] .owner-wizard-top h1 { color: #f1f5f9; }
+[data-theme="dark"] .owner-wizard-top p { color: #b0bdd4; }
+
+/* Role choice cards dark mode */
+[data-theme="dark"] .role-choice-card {
+  border-color: rgba(148, 163, 184, 0.14);
+  background: rgba(20, 24, 42, 0.45);
+  color: #e2e8f0;
+}
+[data-theme="dark"] .role-choice-card b { color: #f1f5f9; }
+[data-theme="dark"] .role-choice-card small { color: #9dafc8; }
+[data-theme="dark"] .role-choice-card:hover:not(:disabled) {
+  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(99, 102, 241, 0.12);
+}
+
+/* Profile menu dark mode */
+[data-theme="dark"] .user-dropdown {
+  background: rgba(20, 24, 42, 0.92);
+  border-color: rgba(148, 163, 184, 0.14);
+}
+[data-theme="dark"] .user-dropdown a,
+[data-theme="dark"] .user-dropdown button { color: #c9d5ea; }
+[data-theme="dark"] .user-dropdown a:hover,
+[data-theme="dark"] .user-dropdown button:hover { color: #a5b4fc; }
+[data-theme="dark"] .ud-info b { color: #f1f5f9; }
+[data-theme="dark"] .ud-info span { color: #8896b3; }
+
+/* Settings and preference pages dark mode */
+[data-theme="dark"] .preference-chip {
+  border-color: rgba(148, 163, 184, 0.14);
+  background: rgba(20, 24, 42, 0.4);
+  color: #b0bdd4;
+}
+[data-theme="dark"] .preference-chip.active {
+  color: #c4b5fd;
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.12);
+}
+
+/* Location choice dark mode */
+[data-theme="dark"] .location-choice-card {
+  border-color: rgba(148, 163, 184, 0.14);
+  background: rgba(20, 24, 42, 0.4);
+  color: #e2e8f0;
+}
+[data-theme="dark"] .location-choice-card:hover,
+[data-theme="dark"] .location-choice-card.active {
+  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* Privacy and amenity dark mode */
+[data-theme="dark"] .privacy-choice {
+  border-color: rgba(148, 163, 184, 0.14);
+  background: rgba(20, 24, 42, 0.35);
+  color: #b0bdd4;
+}
+[data-theme="dark"] .privacy-choice > span { color: #e2e8f0; }
+[data-theme="dark"] .amenity-option {
+  border-color: rgba(148, 163, 184, 0.14);
+  background: rgba(20, 24, 42, 0.35);
+  color: #b0bdd4;
+}
+
+/* Cookie consent dark mode */
+[data-theme="dark"] .cookie-banner {
+  background: rgba(20, 24, 42, 0.88);
+  border-color: rgba(148, 163, 184, 0.14);
+}
+[data-theme="dark"] .cookie-copy strong { color: #f1f5f9; }
+[data-theme="dark"] .cookie-copy p { color: #b0bdd4; }
+
+/* ============================================================
+   NAVBAR LIQUID GLASS — Reference Implementation
+   Layers: glass-filter + glass-overlay + glass-specular
+   Uses SVG #lg-dist displacement filter for real distortion.
+   All classes prefixed with .navbar-lg- to avoid global conflicts.
+   ============================================================ */
+
+/* Container: the navbar needs position:relative and overflow:hidden
+   to clip the glass layers. The existing navbar already has these. */
+.navbar {
+  position: fixed;
+  overflow: hidden;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+}
+
+[data-theme="dark"] .navbar {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Layer 1: Glass Distortion Filter */
+.navbar-lg-filter {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  filter: url(#lg-dist);
+  isolation: isolate;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Layer 2: Translucent Glass Overlay */
+.navbar-lg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+  border-radius: inherit;
+  transition: background 350ms var(--cs-ease);
+}
+
+[data-theme="dark"] .navbar-lg-overlay {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+/* Scrolled state: slightly enhanced presence */
+.navbar.scrolled .navbar-lg-overlay {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+[data-theme="dark"] .navbar.scrolled .navbar-lg-overlay {
+  background: rgba(15, 23, 42, 0.65);
+}
+
+/* Layer 3: Specular Highlight / Inner Glass Reflection */
+.navbar-lg-specular {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 0 5px rgba(255, 255, 255, 0.75);
+  transition: box-shadow 350ms var(--cs-ease);
+}
+
+[data-theme="dark"] .navbar-lg-specular {
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 5px rgba(255, 255, 255, 0.12);
+}
+
+.navbar.scrolled .navbar-lg-specular {
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 0 6px rgba(255, 255, 255, 0.65);
+}
+
+[data-theme="dark"] .navbar.scrolled .navbar-lg-specular {
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 0 6px rgba(255, 255, 255, 0.18);
+}
+
+/* Ensure all navbar content sits ABOVE the glass layers */
+.navbar > .logo,
+.navbar > .nav-links,
+.navbar > .nav-actions {
+  position: relative;
+  z-index: 5;
+}
+
+/* ============================================================
+   Additional responsive polish for explorer section
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .explorer-intro .kicker {
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+  }
+
+  .explorer-intro__desc {
+    font-size: 0.86rem;
+    line-height: 1.6;
+  }
+
+  .explorer-panel {
+    min-height: 13.5rem;
+    padding: 1rem;
+    border-radius: 1.35rem;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1024px) {
+  .explorer-intro {
+    max-width: 560px;
+  }
+  
+  .explorer-intro h2 {
+    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  }
+}
