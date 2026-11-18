@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inquiries — Owner Dashboard — CampusStay</title>
+  <meta name="description" content="Manage student inquiries for your properties.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/premium.css">
+  <link rel="stylesheet" href="css/ultra.css">
+  <link rel="stylesheet" href="css/apple-polish.css">
+  <link rel="stylesheet" href="css/luxe.css">
+  <link rel="stylesheet" href="css/liquid-glass.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+</head>
+<body data-require-auth="owner">
+  <div class="orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+
+  <nav class="navbar" id="main-nav">
+    <a href="index.html" class="logo"><span class="logo-mark">🏠</span><span>Campus<em>Stay</em></span></a>
+    <div class="nav-links">
+      <a href="owner-dashboard.html">Dashboard</a>
+      <a href="my-listings.html">My Properties</a>
+      <a href="owner-onboarding.html?new=1">Add Property</a>
+      <a href="inquiries.html">Inquiries</a>
+      <a href="analytics.html">Analytics</a>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">🌙</button>
+      <a href="#" class="btn btn-primary btn-sm" data-auth-cta>Owner</a>
+    </div>
+  </nav>
+
+  <main class="container dash-wrap">
+    <div class="dash-header">
+      <p class="account-eyebrow">Owner workspace</p>
+      <h1>Student Inquiries</h1>
+      <p class="sub">View and respond to inquiries from interested students.</p>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="inquiry-filters glass" style="display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:1.5rem; padding:1rem; border-radius:16px;">
+      <button class="filter-tab active" data-filter="all">All</button>
+      <button class="filter-tab" data-filter="new">New</button>
+      <button class="filter-tab" data-filter="contacted">Contacted</button>
+      <button class="filter-tab" data-filter="responded">Responded</button>
+      <button class="filter-tab" data-filter="closed">Closed</button>
+    </div>
+
+    <!-- Inquiries List -->
+    <div class="inquiries-list" id="inquiries-list">
+      <div class="skeleton" style="height:120px;"></div>
+      <div class="skeleton" style="height:120px;"></div>
+      <div class="skeleton" style="height:120px;"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state glass" id="empty-state" hidden style="padding:3rem; text-align:center;">
+      <div class="big">💬</div>
+      <h3>No inquiries yet</h3>
+      <p style="color:var(--text-2); margin:.5rem 0 1.2rem;">When students show interest in your properties, they'll appear here.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination glass" id="pagination" hidden style="display:flex; gap:.5rem; justify-content:center; margin-top:1.5rem; padding:1rem; border-radius:16px;">
+      <button class="btn btn-ghost btn-sm" id="prev-page">← Previous</button>
+      <span class="page-info" id="page-info"></span>
+      <button class="btn btn-ghost btn-sm" id="next-page">Next →</button>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-bottom">
+      <span>© 2026 CampusStay.</span>
+      <a href="owner-dashboard.html">← Back to dashboard</a>
+    </div>
+  </footer>
+
+  <!-- Inquiry Detail Modal -->
+  <dialog id="inquiry-modal" class="inquiry-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Inquiry Details</h2>
+        <button class="modal-close" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="modal-close-btn">Close</button>
+        <button class="btn btn-primary" id="modal-contact-student" hidden>Contact Student</button>
+        <select class="status-select" id="modal-status-select" style="padding:.6rem 1rem; border-radius:10px; border:1px solid var(--line); background:var(--bg-2); font-size:.9rem;">
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="responded">Responded</option>
+          <option value="closed">Closed</option>
+        </select>
+        <button class="btn btn-primary" id="modal-update-status">Update Status</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/runtime-config.js"></script>
+
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="js/liquid-glass/displacement.js"></script>
+  <script src="js/liquid-glass/filters.js"></script>
+  <script src="js/liquid-glass/liquid-glass.js"></script>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth-guard.js"></script>
+  <script src="js/inquiries.js"></script>
+  <script src="js/fx.js"></script>
+</body>
+</html>

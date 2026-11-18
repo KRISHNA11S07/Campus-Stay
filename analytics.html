@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics — Owner Dashboard — CampusStay</title>
+  <meta name="description" content="Track your property views, inquiries and performance.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/premium.css">
+  <link rel="stylesheet" href="css/ultra.css">
+  <link rel="stylesheet" href="css/apple-polish.css">
+  <link rel="stylesheet" href="css/luxe.css">
+  <link rel="stylesheet" href="css/liquid-glass.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+</head>
+<body data-require-auth="owner">
+  <div class="orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+
+  <nav class="navbar" id="main-nav">
+    <a href="index.html" class="logo"><span class="logo-mark">🏠</span><span>Campus<em>Stay</em></span></a>
+    <div class="nav-links">
+      <a href="owner-dashboard.html">Dashboard</a>
+      <a href="my-listings.html">My Properties</a>
+      <a href="owner-onboarding.html?new=1">Add Property</a>
+      <a href="inquiries.html">Inquiries</a>
+      <a href="analytics.html">Analytics</a>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">🌙</button>
+      <a href="#" class="btn btn-primary btn-sm" data-auth-cta>Owner</a>
+    </div>
+  </nav>
+
+  <main class="container dash-wrap">
+    <div class="dash-header">
+      <p class="account-eyebrow">Owner workspace</p>
+      <h1>Analytics Dashboard</h1>
+      <p class="sub">Track property views, inquiry volume and report activity over time.</p>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stat-cards" id="stat-cards">
+      <div class="stat-card glass account-surface">
+        <div class="stat-icon">👁</div>
+        <div class="stat-value" id="stat-views">—</div>
+        <div class="stat-label">Total Property Views</div>
+      </div>
+      <div class="stat-card glass account-surface">
+        <div class="stat-icon">💬</div>
+        <div class="stat-value" id="stat-inquiries">—</div>
+        <div class="stat-label">Total Inquiries</div>
+      </div>
+      <div class="stat-card glass account-surface">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-value" id="stat-reports">—</div>
+        <div class="stat-label">Reports Filed</div>
+      </div>
+      <div class="stat-card glass account-surface">
+        <div class="stat-icon">🏡</div>
+        <div class="stat-value" id="stat-listings">—</div>
+        <div class="stat-label">Active Listings</div>
+      </div>
+    </div>
+
+    <!-- Date range filter -->
+    <div class="glass" style="display:flex; gap:.6rem; align-items:center; justify-content:flex-end; margin-top:1.5rem; padding:1rem 1.2rem; border-radius:16px;">
+      <span style="font-size:.85rem; color:var(--text-2); font-weight:500;">Range:</span>
+      <select id="date-range" style="padding:.5rem 1rem; border-radius:10px; border:1px solid var(--line); background:var(--bg-2); font-size:.85rem; cursor:pointer;">
+        <option value="7d">Last 7 days</option>
+        <option value="30d">Last 30 days</option>
+        <option value="90d">Last 90 days</option>
+        <option value="all">All time</option>
+      </select>
+    </div>
+
+    <!-- Charts row -->
+    <div class="charts-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-top:1.5rem;">
+      <div class="chart-wrapper glass account-surface" style="padding:1.2rem; border-radius:16px;">
+        <canvas id="views-bar" width="800" height="350" style="max-width:100%; width:100%;"></canvas>
+      </div>
+      <div class="chart-wrapper glass account-surface" style="padding:1.2rem; border-radius:16px;">
+        <canvas id="inquiries-line" width="800" height="350" style="max-width:100%; width:100%;"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-wrapper glass account-surface" style="padding:1.2rem; border-radius:16px; margin-top:1rem;">
+      <div style="display:flex; align-items:center; gap:.5rem; margin-bottom:1rem;">
+        <h3 style="margin:0; font-size:1.05rem;">Status Breakdown</h3>
+      </div>
+      <canvas id="status-doughnut" width="800" height="320" style="max-width:100%; width:100%;"></canvas>
+    </div>
+
+    <!-- Export buttons -->
+    <div class="glass" style="display:flex; gap:.8rem; justify-content:center; margin-top:1.5rem; padding:1rem; border-radius:16px;">
+      <button type="button" class="btn btn-ghost btn-sm" id="export-csv">📥 Export CSV</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="export-json">📥 Export JSON</button>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-bottom">
+      <span>© 2026 CampusStay.</span>
+      <a href="owner-dashboard.html" style="color:var(--brand); text-decoration:none;">← Back to dashboard</a>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/runtime-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/analytics.js"></script>
+</body>
+</html>
