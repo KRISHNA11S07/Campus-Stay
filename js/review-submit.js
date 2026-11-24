@@ -58,9 +58,9 @@ document.addEventListener('cs:auth-ready', async () => {
     <div class="confirm-section">
       <h3>👤 Owner Information</h3>
       <dl class="confirm-kv">
-        <dt>Name</dt><dd>${profile?.full_name || 'Not set'}</dd>
-        <dt>Phone</dt><dd>${profile?.phone || 'Not set'}</dd>
-        <dt>Occupation</dt><dd>${profile?.occupation || 'Not set'}</dd>
+        <dt>Name</dt><dd>${CS.escapeHTML(profile?.full_name || 'Not set')}</dd>
+        <dt>Phone</dt><dd>${CS.escapeHTML(profile?.phone || 'Not set')}</dd>
+        <dt>Occupation</dt><dd>${CS.escapeHTML(profile?.occupation || 'Not set')}</dd>
       </dl>
     </div>
 
@@ -68,16 +68,16 @@ document.addEventListener('cs:auth-ready', async () => {
     <div class="confirm-section">
       <h3>🏠 Property Details <span class="edit-link" onclick="location.href='add-property.html?edit=${propertyId}'">Edit</span></h3>
       <dl class="confirm-kv">
-        <dt>Title</dt><dd>${property.title}</dd>
+        <dt>Title</dt><dd>${CS.escapeHTML(property.title)}</dd>
         <dt>Type</dt><dd style="text-transform:uppercase;">${property.type}</dd>
-        <dt>Area</dt><dd>${property.area || 'Not set'}</dd>
+        <dt>Area</dt><dd>${CS.escapeHTML(property.area || 'Not set')}</dd>
         <dt>College</dt><dd>${college ? college.name : 'Not set'}</dd>
-        <dt>Rent</dt><dd>₹${property.rent?.toLocaleString('en-IN')}/year</dd>
+        <dt>Rent</dt><dd>₹${property.rent?.toLocaleString('en-IN')}${property.rent_period ? "/"+property.rent_period : " (confirm period)"}</dd>
         <dt>Deposit</dt><dd>₹${property.deposit?.toLocaleString('en-IN')}</dd>
         <dt>For</dt><dd>${property.gender === 'any' ? 'Everyone' : property.gender === 'female' ? 'Girls Only' : 'Boys Only'}</dd>
         <dt>Location</dt><dd>${property.lat ? `${property.lat}, ${property.lng}` : 'Not set'}</dd>
       </dl>
-      <p style="margin-top:.8rem; color:var(--text-2); font-size:.9rem;">${property.description || 'No description provided.'}</p>
+      <p style="margin-top:.8rem; color:var(--text-2); font-size:.9rem;">${CS.escapeHTML(property.description || 'No description provided.')}</p>
     </div>
 
     <!-- Media -->
@@ -86,8 +86,8 @@ document.addEventListener('cs:auth-ready', async () => {
       ${resolvedMedia.length > 0 ? `
         <div class="confirm-media-grid">
           ${resolvedMedia.map(m => m.file_type === 'video'
-            ? `<video src="${m.file_url}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;" muted></video>`
-            : `<img src="${m.file_url}" alt="Property photo" loading="lazy">`
+            ? `<video src="${CS.escapeHTML(CS.safeImageUrl(m.file_url))}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;" muted></video>`
+            : `<img src="${CS.escapeHTML(CS.safeImageUrl(m.file_url))}" alt="Property photo" loading="lazy">`
           ).join('')}
         </div>
       ` : '<p style="color:var(--text-3);">No media uploaded.</p>'}
@@ -98,7 +98,7 @@ document.addEventListener('cs:auth-ready', async () => {
       <h3>✨ Facilities (${facRows?.length || 0}) <span class="edit-link" onclick="location.href='facilities.html?property=${propertyId}'">Edit</span></h3>
       ${facRows && facRows.length > 0 ? `
         <div class="confirm-fac-list">
-          ${facRows.map(f => `<span class="fac-pill">${f.facilities.icon} ${f.facilities.label}</span>`).join('')}
+          ${facRows.map(f => `<span class="fac-pill">${CS.escapeHTML(f.facilities.icon)} ${CS.escapeHTML(f.facilities.label)}</span>`).join('')}
         </div>
       ` : '<p style="color:var(--text-3);">No facilities selected.</p>'}
     </div>
@@ -108,7 +108,7 @@ document.addEventListener('cs:auth-ready', async () => {
       <h3>📋 Rules (${rules?.length || 0}) <span class="edit-link" onclick="location.href='rules.html?property=${propertyId}'">Edit</span></h3>
       ${rules && rules.length > 0 ? `
         <ul class="confirm-rules-list">
-          ${rules.map(r => `<li>${r.rule_text}</li>`).join('')}
+          ${rules.map(r => `<li>${CS.escapeHTML(r.rule_text)}</li>`).join('')}
         </ul>
       ` : '<p style="color:var(--text-3);">No rules added.</p>'}
     </div>
@@ -125,11 +125,11 @@ document.addEventListener('cs:auth-ready', async () => {
       const { error } = await sb
         .from('properties')
         .update({
-          verification_status: 'pending',
+          listing_status: 'pending',
           updated_at: new Date().toISOString()
         })
         .eq('id', propertyId)
-        .eq('owner_id', user.id);
+        .eq('owner_id', user.id).select('id').single();
 
       if (error) throw error;
 
@@ -139,7 +139,7 @@ document.addEventListener('cs:auth-ready', async () => {
       sessionStorage.removeItem('cs:property-facilities');
       sessionStorage.removeItem('cs:property-rules');
 
-      CS.toast('🎉 Property submitted for review! Our team will verify it within 48 hours.');
+      CS.toast('🎉 Property submitted for review!');
       setTimeout(() => { location.href = 'owner-dashboard.html'; }, 1500);
     } catch (err) {
       console.error('Submit error:', err);

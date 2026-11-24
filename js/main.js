@@ -73,23 +73,45 @@ const CS = {
     const escapeHTML = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
 
     const renderRoleLinks = (user) => {
-      // Keep the primary information architecture stable after sign-in. Only
-      // the dashboard destination changes with the verified database role.
-      const dashboard = user.role === 'owner' ? 'owner-dashboard.html' : 'matches.html';
-      const links = [
-        ['index.html#explore', 'Explore'],
-        ['index.html#showcase', 'Showcase'],
-        ['index.html#how', 'How it works'],
-        [user.role === 'owner' ? 'my-listings.html' : 'saved.html', 'Wishlist'],
-        [dashboard, 'Dashboard']
-      ];
+      let links = [];
+      if (!user) {
+        links = [
+          ['index.html#explore', 'Explore'],
+          ['index.html#featured', 'Showcase'],
+          ['index.html#how', 'How it works'],
+          ['listings.html?view=wishlist', 'Wishlist'],
+          ['auth.html?next=matches.html', 'Dashboard']
+        ];
+      } else if (user.role === 'admin') {
+        links = [
+          ['admin-dashboard.html', 'Admin Dashboard'],
+          ['index.html#explore', 'Explore'],
+          ['index.html#featured', 'Showcase']
+        ];
+      } else if (user.role === 'owner') {
+        links = [
+          ['owner-dashboard.html', 'Owner Dashboard'],
+          ['my-listings.html', 'My Properties'],
+          ['add-property.html', 'Add Property'],
+          ['inquiries.html', 'Enquiries']
+        ];
+      } else {
+        links = [
+          ['index.html#explore', 'Explore'],
+          ['index.html#featured', 'Showcase'],
+          ['index.html#how', 'How it works'],
+          ['saved.html', 'Wishlist'],
+          ['inquiries.html', 'My Enquiries'],
+          ['matches.html', 'Student Dashboard']
+        ];
+      }
       document.querySelectorAll('.navbar .nav-links').forEach((container) => {
         container.innerHTML = links.map(([href, label]) => `<a href="${href}">${label}</a>`).join('');
       });
       document.querySelectorAll('.mobile-menu').forEach((container) => {
         const existingFooter = container.querySelector('.mobile-menu-footer');
         container.innerHTML = links.map(([href, label]) => `<a href="${href}">${label}</a>`).join('')
-          + '<a href="profile.html" class="btn btn-primary" data-auth-cta>Account</a>';
+          + (user ? '<a href="profile.html" class="btn btn-primary" data-auth-cta>Account</a>' : '<a href="auth.html" class="btn btn-primary" data-auth-cta>Sign in</a>');
         if (existingFooter) container.appendChild(existingFooter);
       });
     };
@@ -103,17 +125,39 @@ const CS = {
           ? `<img src="${escapeHTML(user.avatarUrl)}" alt="">`
           : escapeHTML(initials(user.name));
         const isOwner = user.role === 'owner';
-        const routes = [
-          ['profile.html', 'My profile'],
-          [isOwner ? 'settings.html' : 'preferences.html', isOwner ? 'Account preferences' : 'My preferences'],
-          [isOwner ? 'my-listings.html' : 'saved.html', isOwner ? 'My listings' : 'Saved rooms'],
-          ['notifications.html', 'Notifications'],
-          ['settings.html', 'Settings'],
-          ['help.html', 'Help & support']
-        ];
+        const isAdmin = user.role === 'admin';
+        const routes = isAdmin
+          ? [
+              ['admin-dashboard.html', 'Admin dashboard'],
+              ['profile.html', 'My profile'],
+              ['notifications.html', 'Notifications'],
+              ['settings.html', 'Settings'],
+              ['help.html', 'Help & support']
+            ]
+          : isOwner
+          ? [
+              ['profile.html', 'My profile'],
+              ['owner-dashboard.html', 'Owner dashboard'],
+              ['my-listings.html', 'My properties'],
+              ['add-property.html', 'Add property'],
+              ['inquiries.html', 'Enquiries'],
+              ['notifications.html', 'Notifications'],
+              ['settings.html', 'Settings'],
+              ['help.html', 'Help & support']
+            ]
+          : [
+              ['profile.html', 'My profile'],
+              ['preferences.html', 'My preferences'],
+              ['saved.html', 'Saved rooms'],
+              ['inquiries.html', 'My enquiries'],
+              ['notifications.html', 'Notifications'],
+              ['settings.html', 'Settings'],
+              ['help.html', 'Help & support']
+            ];
         const wrap = document.createElement('div');
         wrap.className = 'user-menu-wrap';
         wrap.dataset.userMenuMounted = 'true';
+        const roleLabel = isAdmin ? 'Administrator' : isOwner ? 'Property owner' : 'Student';
         wrap.innerHTML = `
           <button class="user-menu-trigger" type="button" aria-label="Open account menu" aria-expanded="false" aria-haspopup="menu">
             <span class="user-menu-avatar">${avatar}</span><span class="user-menu-name">${escapeHTML(firstName)}</span>
@@ -121,7 +165,7 @@ const CS = {
           <div class="user-dropdown" role="menu">
             <div class="user-dropdown-header">
               <span class="ud-avatar">${avatar}</span>
-              <div class="ud-info"><b>Hi, ${escapeHTML(firstName)}</b><span>${isOwner ? 'Property owner' : 'Student'}</span></div>
+              <div class="ud-info"><b>Hi, ${escapeHTML(firstName)}</b><span>${roleLabel}</span></div>
             </div>
             ${routes.map(([href, label]) => `<a href="${href}" role="menuitem"><span class="dd-icon" aria-hidden="true">${label === 'Notifications' ? '◌' : '›'}</span>${label}</a>`).join('')}
             <hr><button class="dd-danger" type="button" data-logout><span class="dd-icon" aria-hidden="true">←</span>Log out</button>
@@ -150,16 +194,27 @@ const CS = {
           if (event.key === 'Escape' && dropdown.classList.contains('open')) { close(); trigger.focus(); }
         });
         wrap.querySelector('[data-logout]').addEventListener('click', async () => {
-          try { if (typeof signOut === 'function') await signOut(); } catch (error) { console.warn('[CampusStay] Sign out failed', error); }
+          try { if (typeof signOut === 'function') await signOut(); } catch { CS.toast('Sign out failed. Please try again.'); return; }
           CS.toast('Signed out successfully.');
           window.setTimeout(() => { window.location.href = 'index.html'; }, 350);
         });
       });
     };
 
-    // The persistent Supabase session, rather than browser storage, controls
-    // what authenticated navigation is rendered.
-    if (typeof getAuthContext === 'function') {
+    document.addEventListener('cs:auth-ready', (event) => {
+      const { user, profile } = event.detail || {};
+      if (profile && user) {
+        mountUserMenu({
+          name: profile.full_name || user.user_metadata?.full_name || 'Member',
+          role: profile.role,
+          avatarUrl: profile.avatar_url || user.user_metadata?.avatar_url || ''
+        });
+      }
+    });
+
+    const initAuthNav = () => {
+      if (typeof getAuthContext !== 'function') return false;
+
       const renderAuthenticatedState = async (session = null) => {
         const context = session
           ? { session, user: session.user, profile: await waitForProfile(session) }
@@ -171,13 +226,15 @@ const CS = {
             role: profile.role,
             avatarUrl: profile.avatar_url || user.user_metadata?.avatar_url || ''
           });
+        } else {
+          restoreSignInButton();
         }
         document.body.classList.remove('cs-auth-pending');
         document.body.classList.add('cs-auth-ready');
       };
 
       const restoreSignInButton = () => {
-        // Remove any user menus and restore the Sign in link
+        renderRoleLinks(null);
         document.querySelectorAll('.user-menu-wrap').forEach((wrap) => {
           const link = document.createElement('a');
           link.href = 'auth.html';
@@ -186,7 +243,6 @@ const CS = {
           link.textContent = 'Sign in';
           wrap.replaceWith(link);
         });
-        // Also restore mobile menu auth CTAs
         document.querySelectorAll('.mobile-menu [data-auth-cta]').forEach((el) => {
           if (el.tagName === 'A') {
             el.href = 'auth.html';
@@ -197,7 +253,6 @@ const CS = {
         document.body.classList.add('cs-auth-ready');
       };
 
-      // Try instant rendering from cached user data to avoid flicker
       const cached = CS.read('user');
       if (cached && cached.name) {
         mountUserMenu({
@@ -220,9 +275,8 @@ const CS = {
         onAuthStateChange((event, session) => {
           if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') {
             if (session) {
-              renderAuthenticatedState(session).catch(() => {});
+              setTimeout(() => renderAuthenticatedState(session).catch(() => {}), 0);
             } else if (event === 'INITIAL_SESSION') {
-              // No session on initial check — user is logged out
               restoreSignInButton();
             }
           }
@@ -232,6 +286,11 @@ const CS = {
           }
         });
       }
+      return true;
+    };
+
+    if (!initAuthNav()) {
+      window.addEventListener('DOMContentLoaded', () => { initAuthNav(); });
     }
   },
 
@@ -511,20 +570,32 @@ const CS = {
   },
 
   /* ---------- wishlist ---------- */
-  wishlist: () => CS.read("wishlist", []),
-  inWishlist: (id) => CS.wishlist().includes(id),
-  toggleWishlist(id) {
-    const list = CS.wishlist();
-    const i = list.indexOf(id);
-    if (i >= 0) {
-      list.splice(i, 1);
-      CS.toast("Removed from wishlist");
-    } else {
-      list.push(id);
-      CS.toast("❤️ Saved to wishlist");
+  savedIds: [],
+  wishlist() { return this.savedIds; },
+  inWishlist(id) { return this.savedIds.includes(id); },
+  async loadWishlist() {
+    this.savedIds = [];
+    const user = await getCurrentUser();
+    if (!user) return;
+    const {data,error} = await getSupabase().from('favorites').select('property_id').eq('student_id',user.id);
+    if (error) throw error;
+    this.savedIds = data.map(row => row.property_id);
+  },
+  async toggleWishlist(id) {
+    const {user,profile} = await getAuthContext();
+    if (!user) {
+      location.assign('auth.html?next='+encodeURIComponent(location.pathname.split('/').pop()+location.search));
+      return;
     }
-    CS.store("wishlist", list);
-    return i < 0;
+    if (profile?.role !== 'student') { CS.toast('Saving stays is available to student accounts.'); return; }
+    const exists = this.inWishlist(id);
+    const table = getSupabase().from('favorites');
+    const result = exists ? await table.delete().eq('student_id',user.id).eq('property_id',id)
+      : await table.insert({student_id:user.id,property_id:id});
+    if (result.error && result.error.code !== '23505') throw result.error;
+    this.savedIds = exists ? this.savedIds.filter(value => value !== id) : [...this.savedIds,id];
+    CS.toast(exists ? 'Removed from saved stays.' : 'Stay saved.');
+    return !exists;
   },
 
   /* ---------- geo + formatting ---------- */
@@ -550,10 +621,9 @@ const CS = {
     );
   },
   avgRating(l) {
-    if (!l) return 4.5;
-    const extra = CS.read("reviews:" + l.id, []);
-    const all = [...(l.reviews || []), ...extra];
-    if (!all.length) return Number(l.rating) || 4.5;
+    if (!l) return 0;
+    const all = l.reviews || [];
+    if (!all.length) return Number(l.rating) || 0;
     return (
       Math.round(
         (all.reduce((s, r) => s + Number(r.rating || 5), 0) / all.length) * 10,
@@ -562,13 +632,14 @@ const CS = {
   },
   reviewCount(l) {
     if (!l) return 0;
-    return (l.reviews || []).length + CS.read("reviews:" + l.id, []).length;
+    return (l.reviews || []).length;
   },
 
   escapeHTML(value = "") {
     return String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[char]));
   },
   safeImageUrl(value) {
+    if (!value) return "";
     try {
       const url = new URL(String(value || ""), window.location.href);
       return ["https:", "blob:"].includes(url.protocol) ? url.href : "";
@@ -599,12 +670,12 @@ const CS = {
     const title = CS.escapeHTML(l.title || "Accommodation");
     const area = CS.escapeHTML(l.area || "Near campus");
     const type = CS.escapeHTML(String(l.type || "stay").toUpperCase());
-    const imgUrl = CS.escapeHTML(CS.safeImageUrl(l.images && l.images[0]) || "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1100&auto=format&fit=crop");
+    const imgUrl = CS.escapeHTML(CS.safeImageUrl(l.images && l.images[0]) || "");
 
     return `
     <article class="listing-card glass reveal in tilt card-3d">
       <a href="property.html?id=${id}" class="lc-media">
-        <img src="${imgUrl}" alt="${title}" loading="lazy">
+        ${imgUrl ? `<img src="${imgUrl}" alt="${title}" loading="lazy">` : '<span>No photo available</span>'}
         <span class="lc-badges">
           <span class="tag type">${type}</span>
           ${l.verified ? '<span class="tag verified">✓ Verified</span>' : ""}
@@ -615,12 +686,12 @@ const CS = {
       <div class="lc-body">
         <div class="lc-top">
           <a href="property.html?id=${id}"><h3>${title}</h3></a>
-          <span class="rating-chip">★ ${rating}</span>
+          <span class="rating-chip">${rating ? "★ "+rating : "Unrated"}</span>
         </div>
         <div class="lc-loc">📍 ${area} · ${CS.reviewCount(l)} reviews</div>
         <div class="lc-facilities">${facs}${more}</div>
         <div class="lc-foot">
-          <span class="price">${CS.inr(l.rent)}<small>/month</small></span>
+          <span class="price">${CS.inr(l.rent)}<small>${l.rent_period ? '/'+l.rent_period : ' (confirm period)'}</small></span>
           <span class="dist">${distanceKm != null ? "📏 " + distanceKm.toFixed(1) + " km away" : ""}</span>
         </div>
       </div>
@@ -628,9 +699,14 @@ const CS = {
   },
   bindWishlistButtons(scope = document) {
     scope.querySelectorAll("[data-wish]").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", async (e) => {
         e.preventDefault();
-        const added = CS.toggleWishlist(btn.dataset.wish);
+        btn.disabled = true;
+        let added;
+        try { added = await CS.toggleWishlist(btn.dataset.wish); }
+        catch { CS.toast('Could not confirm saved stays. Refresh to retry.'); }
+        finally { btn.disabled = false; }
+        if (typeof added !== 'boolean') return;
         btn.classList.toggle("active", added);
         btn.textContent = added ? "♥" : "♡";
       });

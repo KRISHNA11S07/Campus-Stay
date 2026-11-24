@@ -1,6 +1,10 @@
 /* ============================================================
    CampusStay — authentication screen
    ============================================================ */
+// Read the callback result before the SDK clears the URL during initialization.
+const googleCallback = new URLSearchParams(location.search).has('google_callback');
+const providerError = new URLSearchParams(location.search).get('error') ||
+  new URLSearchParams(location.hash.slice(1)).get('error');
 document.addEventListener('DOMContentLoaded', () => {
   let role = 'student';
   let mode = 'signin';
@@ -8,8 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const $ = (id) => document.getElementById(id);
   const authCard = $('auth-card');
 
-  if (!isSupabaseConfigured()) {
-    $('auth-config-notice').hidden = false;
+  const authUnavailable = getSupabaseConfigurationError() ||
+    (!getSupabase()?.auth && 'The sign-in service could not load. Reload the page to try again.');
+  if (authUnavailable) {
+    const notice = $('auth-config-notice');
+    notice.textContent = authUnavailable;
+    notice.hidden = false;
+  } else {
+    for (const id of ['btn-signin', 'btn-signup', 'btn-google-login']) $(id).disabled = false;
   }
 
   function setBusy(button, busy, label) {
@@ -68,23 +78,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateUI() {
     const signingUp = mode === 'signup';
-    const owner = role === 'owner';
     document.documentElement.dataset.authMode = mode;
     document.documentElement.dataset.authRole = role;
 
-    $('auth-title').textContent = signingUp
-      ? (owner ? 'Start listing with confidence' : 'Find a place that feels right')
-      : (owner ? 'Welcome back, owner' : 'Welcome back');
-    $('auth-sub').textContent = signingUp
-      ? (owner ? 'Create your account, then build your first listing step by step.' : 'Create your student account in a few calm, simple steps.')
-      : (owner ? 'Manage listings, enquiries and your property setup.' : 'Pick up your rental search exactly where you left it.');
-    $('signup-form').hidden = !signingUp;
-    $('signin-form').hidden = signingUp;
-    $('auth-role-copy').textContent = owner ? 'You are continuing as an Owner' : 'You are continuing as a Student';
-    $('btn-signup').textContent = owner ? 'Create owner account' : 'Create student account';
-    $('btn-signin').textContent = 'Sign in as ' + (owner ? 'Owner' : 'Student');
-    $('btn-switch-mode').textContent = signingUp ? 'Sign in instead' : 'Create an account';
-    $('auth-switch-copy').textContent = signingUp ? 'Already have an account?' : 'New to CampusStay?';
+    const titleEl = $('auth-title');
+    if (titleEl) {
+      titleEl.textContent = signingUp ? 'Create your account' : 'Welcome back';
+    }
+    const subEl = $('auth-sub');
+    if (subEl) {
+      subEl.textContent = signingUp
+        ? 'Join CampusStay to discover verified student accommodation near KIT Kolhapur.'
+        : 'Sign in to access your saved stays, enquiries, and dashboard.';
+    }
+    if ($('signup-form')) $('signup-form').hidden = !signingUp;
+    if ($('signin-form')) $('signin-form').hidden = signingUp;
+    if ($('auth-role-copy')) {
+      $('auth-role-copy').textContent = role === 'owner' ? 'You are continuing as an Owner' : 'You are continuing as a Student';
+    }
+    if ($('btn-signup')) $('btn-signup').textContent = 'Create account';
+    if ($('btn-signin')) $('btn-signin').textContent = 'Sign in';
+    if ($('btn-switch-mode')) $('btn-switch-mode').textContent = signingUp ? 'Sign in instead' : 'Create an account';
+    if ($('auth-switch-copy')) $('auth-switch-copy').textContent = signingUp ? 'Already have an account?' : 'New to CampusStay?';
     clearErrors();
     hideMessage();
   }
@@ -133,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   $('signup-form').addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (authUnavailable) return;
     clearErrors();
     hideMessage();
 
@@ -163,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const submit = $('btn-signup');
     setBusy(submit, true, 'Creating your account…');
     try {
-      const { data } = await signUpWithEmail(email, password, {
+      const data = await signUpWithEmail(email, password, {
         full_name: name,
         phone: '+91' + phone
       });
@@ -172,10 +188,8 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error('already registered');
       }
       if (!data.session) {
-        // No client code can create a session when Supabase Confirm email is on.
-        // Keep the user out of an email-confirmation dead end and surface the
-        // exact deployment setting that must be changed for the requested UX.
-        throw new Error('instant session unavailable');
+        showMessage('Check your email for the confirmation link, then sign in.', 'success');
+        return;
       }
 
       const profile = await completeProfileFromAuth(data.session, {
@@ -190,20 +204,15 @@ document.addEventListener('DOMContentLoaded', () => {
       redirecting = true;
       redirectAfterAuth(profile, role, 650);
     } catch (error) {
-      const instantSession = String(error?.message || '').includes('instant session');
-      showMessage(
-        instantSession
-          ? 'This project still requires email confirmation. Disable “Confirm email” in Supabase Auth settings to enable the direct sign-up flow.'
-          : friendlyAuthError(error, 'We could not create your account. Please try again.'),
-        'error'
-      );
+      showMessage(friendlyAuthError(error, 'We could not create your account. Please try again.'), 'error');
     } finally {
-      if (!redirecting) setBusy(submit, false, role === 'owner' ? 'Create owner account' : 'Create student account');
+      if (!redirecting) setBusy(submit, false, 'Create account');
     }
   });
 
   $('signin-form').addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (authUnavailable) return;
     clearErrors();
     hideMessage();
     const email = $('signin-email').value.trim().toLowerCase();
@@ -222,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const submit = $('btn-signin');
     setBusy(submit, true, 'Signing you in…');
     try {
-      const { data } = await signInWithEmail(email, password);
+      const data = await signInWithEmail(email, password);
       const profile = await waitForProfile(data.session);
       if (!profile) throw new Error('profile unavailable');
       cacheAuthenticatedUser(profile, data.user);
@@ -235,11 +244,12 @@ document.addEventListener('DOMContentLoaded', () => {
         'error'
       );
     } finally {
-      if (!redirecting) setBusy(submit, false, 'Sign in as ' + (role === 'owner' ? 'Owner' : 'Student'));
+      if (!redirecting) setBusy(submit, false, 'Sign in');
     }
   });
 
   $('btn-google-login').addEventListener('click', async () => {
+    if (authUnavailable) return;
     hideMessage();
     const button = $('btn-google-login');
     setBusy(button, true, 'Opening Google…');
@@ -253,17 +263,24 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   async function restoreSession() {
+    if (authUnavailable) return;
+    if (googleCallback && providerError) {
+      history.replaceState({}, '', location.pathname);
+      showMessage(providerError === 'access_denied' ? 'Google sign-in was canceled. You can try again.' : 'Google sign-in could not be completed. Please try again.');
+      return;
+    }
     try {
       const { session, user, profile } = await getAuthContext();
-      if (!session || redirecting) return;
+      if (redirecting) return;
+      if (!session) {
+        if (googleCallback) showMessage('Your sign-in session is missing or expired. Start sign-in again.');
+        return;
+      }
 
-      const callback = new URLSearchParams(location.search).has('google_callback');
-      if (callback) {
+      if (googleCallback) {
         const next = sessionStorage.getItem('cs:auth-next') || '';
         let resolvedProfile = profile;
         const googleName = user.user_metadata?.full_name || user.user_metadata?.name || '';
-        // An incomplete profile is created by the database trigger on a first
-        // Google login. Existing profiles keep their database role.
         if (!resolvedProfile?.full_name) {
           resolvedProfile = await completeProfileFromAuth(session, {
             name: googleName,
@@ -287,8 +304,10 @@ document.addEventListener('DOMContentLoaded', () => {
         redirectAfterAuth(profile, profile.role, 0);
       }
     } catch (error) {
-      console.warn('[Auth] Session restoration failed:', error.message);
-      showMessage('We could not restore that session. Please sign in again.', 'error');
+      console.warn('[Auth] Session restoration failed:', error?.message || error);
+      if (googleCallback) {
+        showMessage('We could not restore that session. Please sign in again.', 'error');
+      }
     }
   }
 

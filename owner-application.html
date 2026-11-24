@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Owner verification · CampusStay</title><link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/account.css"></head>
+<body class="account-page" data-require-auth="any"><nav class="navbar"><a class="logo" href="index.html">Campus<em>Stay</em></a><div class="nav-actions"><a href="help.html">Help</a><a data-auth-cta href="auth.html">Account</a></div></nav>
+<main class="owner-wizard-shell"><h1>Owner verification</h1><p id="status" role="status">Loading your account…</p><section class="account-surface wizard-panel active" aria-label="Application">
+<p id="feedback"></p><form hidden id="application" class="wizard-fields">
+<label class="wizard-field">Full name<input name="full_name" maxlength="100" autocomplete="name" required></label>
+<label class="wizard-field">Relationship to the accommodation<select name="relationship"><option value="owner">Property owner</option><option value="manager">Authorized manager</option></select></label>
+<label class="wizard-field">Property address and locality<textarea name="property_address" maxlength="500" required></textarea></label>
+<label class="wizard-field">Authority to list<textarea name="authority_evidence" maxlength="2000" required aria-describedby="evidence-help"></textarea></label>
+<small id="evidence-help">Give a reference the reviewer can check independently. Leave out identity numbers, financial details and documents. Your confirmed account email or phone accompanies the application.</small>
+<button type="submit" class="btn btn-primary">Submit for review</button><button type="submit" value="draft" formnovalidate class="btn btn-ghost">Save draft</button></form>
+<a href="index.html">Return to CampusStay</a></section></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js" integrity="sha384-iLddHTLokph6Omwoyid4XKxHaWa6w41BnoEj0q5oOrzmYPpHIKt1wyjReA7s//pP" crossorigin="anonymous"></script><script src="js/runtime-config.js"></script><script src="js/supabase-config.js"></script><script src="js/data.js"></script><script src="js/main.js"></script><script src="js/auth-guard.js"></script><script src="js/owner-application.js"></script></body></html>

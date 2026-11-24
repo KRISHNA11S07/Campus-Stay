@@ -5,7 +5,7 @@ document.addEventListener('cs:auth-ready', async (event) => {
   const status = document.getElementById('role-choice-status');
   const buttons = [...document.querySelectorAll('[data-role-choice]')];
 
-  if (!profileNeedsRoleSelection(profile)) {
+  if (profile.ownerStatus || profile.role==='admin' || !profileNeedsRoleSelection(profile)) {
     window.location.replace(getPostAuthDestination(profile));
     return;
   }
@@ -17,35 +17,18 @@ document.addEventListener('cs:auth-ready', async (event) => {
       const sb = getSupabase();
       if (!sb) throw new Error('Supabase is not configured.');
 
-      let resolved = profile;
-
-      /* Promote student → owner through the secure database RPC */
-      if (role === 'owner' && profile.role !== 'owner') {
-        const rpcResult = await sb.rpc('promote_to_owner');
-        if (rpcResult.error) throw rpcResult.error;
-        /* Re-fetch profile to get the updated role */
-        resolved = await waitForProfile(session);
+      if (role === 'owner') {
+        window.location.assign('owner-application.html');
+        return;
       }
-
-      if (!resolved) throw new Error('Your profile is still being prepared.');
-
-      /* Mark the onboarding step as completed */
-      const preferences = resolved.preferences || {};
-      const nextPreferences = {
-        ...preferences,
-        onboarding: {
-          ...(preferences.onboarding || {}),
-          role_selected: true,
-          ...(role === 'owner' ? { owner_complete: false } : { student_complete: false })
-        }
-      };
-
-      const updateResult = await sb.from('profiles').update({ preferences: nextPreferences }).eq('id', user.id);
+      const preferences=profile.preferences || {};
+      const nextPreferences={...preferences,onboarding:{...preferences.onboarding,role_selected:true,student_complete:false}};
+      const updateResult = await sb.from('profiles').update({ preferences: nextPreferences }).eq('id', user.id).select('id').single();
       if (updateResult.error) throw updateResult.error;
 
-      resolved = { ...resolved, preferences: nextPreferences, role: role === 'owner' ? 'owner' : resolved.role };
+      const resolved = { ...profile, preferences: nextPreferences };
       cacheAuthenticatedUser(resolved, user);
-      window.location.assign(role === 'owner' ? 'owner-onboarding.html' : 'student-onboarding.html');
+      window.location.assign('student-onboarding.html');
     } catch (error) {
       console.warn('[CampusStay] Role selection failed:', error.message || error);
       status.textContent = 'We could not save that choice. Please try again.';

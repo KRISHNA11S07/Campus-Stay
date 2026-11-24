@@ -53,7 +53,7 @@ document.addEventListener('cs:auth-ready', async () => {
         <div class="empty-state glass" style="padding:2rem; text-align:center;">
           <div class="big">⚠️</div>
           <h3>Error loading inquiries</h3>
-          <p style="color:var(--text-2);">${err.message}</p>
+          <p style="color:var(--text-2);">Please refresh to retry.</p>
         </div>`;
     }
   }
@@ -87,7 +87,7 @@ document.addEventListener('cs:auth-ready', async () => {
     listEl.innerHTML = pageItems.map((inq) => {
       const prop = inq.properties || {};
       const statusClass = `status-${inq.status}`;
-      const contactBtn = inq.status === 'new' || inq.status === 'contacted'
+      const contactBtn = inq.student_phone && (inq.status === 'new' || inq.status === 'contacted')
         ? `<button class="btn btn-ghost btn-sm contact-student-btn" data-inquiry-id="${inq.id}" data-student-name="${escapeHTML(inq.student_name || 'Student')}" data-student-phone="${escapeHTML(inq.student_phone || '')}" title="Contact student">💬 Contact</button>`
         : '';
 
@@ -156,7 +156,7 @@ document.addEventListener('cs:auth-ready', async () => {
       </div>
       <div class="detail-row">
         <label>Contact</label>
-        <span>${inq.student_phone || 'Not provided'}</span>
+        <span>${escapeHTML(inq.student_phone || 'Not provided')}</span>
       </div>
       <div class="detail-row">
         <label>Message</label>
@@ -172,7 +172,7 @@ document.addEventListener('cs:auth-ready', async () => {
       </div>
     `;
 
-    modalContactStudent.hidden = false;
+    modalContactStudent.hidden = !inq.student_phone;
     modalContactStudent.onclick = () => {
       if (inq.student_phone) {
         const waMessage = encodeURIComponent(`Hi ${inq.student_name}, I'm responding to your inquiry on CampusStay about "${inq.properties?.title || 'a property'}". Is it still available?`);
@@ -194,7 +194,7 @@ document.addEventListener('cs:auth-ready', async () => {
       const { error } = await sb
         .from('inquiries')
         .update({ status: newStatus })
-        .eq('id', currentInquiryId);
+        .eq('id', currentInquiryId).select('id').single();
 
       if (error) throw error;
 

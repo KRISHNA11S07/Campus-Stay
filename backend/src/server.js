@@ -1,6 +1,6 @@
 const { createApp } = require('./app.js');
 const dbModule = require('./config/database.js');
-const logger = require('./utils/logger.js').createLogger;
+const logger = require('./utils/logger.js').createLogger();
 
 async function main() {
   try {

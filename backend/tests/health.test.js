@@ -1,71 +1,42 @@
+const { after, before, describe, it } = require('node:test');
+const assert = require('node:assert/strict');
+const { once } = require('node:events');
 const { createApp } = require('../src/app.js');
-const { createErrorMiddleware } = require('../src/middleware/error.middleware.js');
-const { createNotFoundMiddleware } = require('../src/middleware/not-found.middleware.js');
+const { connectDatabase } = require('../src/config/database.js');
 
-const assert = require('assert');
+describe('CampusStay API', () => {
+  let server, base;
+  const origin = 'https://campusstay.example.test';
+  before(async () => {
+    process.env.NODE_ENV = 'test';
+    process.env.CLIENT_URL = origin;
+    server = createApp().listen(0, '127.0.0.1');
+    await once(server, 'listening');
+    base = 'http://127.0.0.1:' + server.address().port + '/api/v1';
+  });
+  after(() => new Promise(resolve => server.close(resolve)));
 
-describe('Campus Stay API health tests', () => {
-  let app;
-
-  before(() => {
-    app = createApp();
+  it('reports healthy with a disconnected database', async () => {
+    const res = await fetch(base + '/health');
+    assert.equal(res.status, 200);
+    const result = await res.json();
+    assert.equal(result.success, true);
+    assert.equal(result.data.database, false);
+    assert.ok(result.data.timestamp);
+    assert.deepEqual(await connectDatabase({}), {connected:false, status:'disconnected'});
   });
 
-  test('Express app initializes without error', () => {
-    assert(app instanceof Function || app !== undefined);
+  it('returns 404 for an unknown API route', async () => {
+    const res = await fetch(base + '/nonexistent');
+    assert.equal(res.status, 404);
+    assert.equal((await res.json()).success, false);
   });
 
-  test('Health endpoint returns success status', async () => {
-    const req = new (require('http').request)({
-      method: 'GET',
-      hostname: '127.0.0.1',
-      port: process.env.PORT || 5000,
-      path: '/api/v1/health'
-    }, (res) => {
-      let body = '';
-      res.on('data', (chunk) => body += chunk);
-      res.on('end', () => {
-        assert(res.statusCode === 200);
-        const json = JSON.parse(body);
-        assert.strictEqual(json.success, true);
-        assert.strictEqual(typeof json.data.name, 'string');
-        assert.ok(json.data.timestamp);
-      });
-    });
-    req.on('error', (err) => assert.fail(err));
-    req.end();
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  });
-
-  test('Invalid route returns 404', async () => {
-    const req = new (require('http').request)({
-      method: 'GET',
-      hostname: '127.0.0.1',
-      port: process.env.PORT || 5000,
-      path: '/api/v1/nonexistent'
-    }, (res) => {
-      let body = '';
-      res.on('data', (chunk) => body += chunk);
-      res.on('end', () => {
-        assert(res.statusCode === 404);
-        const json = JSON.parse(body);
-        assert.strictEqual(json.success, false);
-      });
-    });
-    req.on('error', (err) => assert.fail(err));
-    req.end();
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  });
-
-  test('Health endpoint does not report MongoDB connected when unconfigured', () => {
-    const app = createApp();
-    const mockRes = {
-      status(code) { this.statusCode = code; return this; },
-      json(payload) { this.payload = payload; return this; }
-    };
-    const notfound = createNotFoundMiddleware();
-    notfound({}, mockRes, () => {});
-    // The real health endpoint is registered in createApp via router layer.
-    // Tests below only cover the handler shape.
+  it('allows credentialed CORS only for the configured frontend', async () => {
+    const allowed = await fetch(base + '/health', {headers:{Origin:origin}});
+    assert.equal(allowed.headers.get('access-control-allow-origin'), origin);
+    assert.equal(allowed.headers.get('access-control-allow-credentials'), 'true');
+    const other = await fetch(base + '/health', {headers:{Origin:'https://other.example.test'}});
+    assert.equal(other.headers.get('access-control-allow-origin'), null);
   });
 });

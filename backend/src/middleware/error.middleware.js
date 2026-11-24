@@ -1,4 +1,4 @@
-const logger = require('../utils/logger.js').createLogger;
+const logger = require('../utils/logger.js').createLogger();
 
 function createErrorMiddleware(options) {
   return function errorMiddleware(err, req, res, next) {

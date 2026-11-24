@@ -31,6 +31,9 @@
       // reason to silently loop them back to the sign-in screen.
       if (!profile) {
         body.classList.add('auth-ready');
+        const status = document.querySelector('[role=status]') || body.appendChild(document.createElement('p'));
+        document.querySelectorAll('[data-role-choice]').forEach(button=>button.disabled=true);
+        status.textContent = 'Your account could not be loaded. Refresh to retry or contact support.';
         document.dispatchEvent(new CustomEvent('cs:auth-error', {
           detail: { message: 'Your session is active, but your profile is still being prepared.' }
         }));
@@ -38,7 +41,7 @@
       }
 
       if (requiredRole !== 'any' && profile.role !== requiredRole) {
-        const destination = roleHomes[profile.role] || 'index.html';
+        const destination = requiredRole === 'owner' && profile.role !== 'admin' ? 'owner-application.html' : roleHomes[profile.role] || 'index.html';
         if (typeof CS !== 'undefined') CS.toast('This page is only available to ' + requiredRole + ' accounts.');
         // The old delayed redirect made a protected route appear briefly and
         // then "bounce" home. Resolve the role mismatch before rendering.
@@ -46,6 +49,12 @@
         return;
       }
 
+      onAuthStateChange((event, restored) => {
+        if (event === 'SIGNED_OUT' || (restored?.user && restored.user.id !== user.id)) {
+          body.classList.remove('auth-ready');
+          location.replace(event === 'SIGNED_OUT' ? 'auth.html' : currentRelativePath());
+        }
+      });
       body.classList.add('auth-ready');
       document.dispatchEvent(new CustomEvent('cs:auth-ready', { detail: { session, user, profile } }));
     } catch (error) {

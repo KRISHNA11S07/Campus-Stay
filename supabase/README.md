@@ -1,21 +1,23 @@
-# Supabase setup
+# CampusStay Supabase setup
 
-1. Create a Supabase project and enable Phone Auth. For Google OAuth, set the
-   **Site URL** to the deployed CampusStay URL and add both
-   `https://YOUR-APP/auth.html` and the matching local development URL (for
-   example `http://localhost:8000/auth.html`) under **Authentication → URL
-   Configuration → Redirect URLs**. Add the same authorized redirect URI to
-   the Google Cloud OAuth client. Supabase remains the secure OAuth callback,
-   then returns directly to CampusStay's `auth.html` callback handler.
-2. Run the SQL files in this exact order in the Supabase SQL editor:
-   `migrations/001_schema.sql` through `migrations/009_listing_details.sql`
-   in numeric order.
-3. Copy the URL and **anon** key from Supabase Dashboard → Settings → API into
-   `js/runtime-config.js`. Do not put a service-role key in this repository or
-   in browser code.
-4. Confirm that every table has RLS enabled and that the `property-media`
-   bucket is private.
+## Local and static-site authentication
 
-The existing SQL files are written for a fresh project. Before applying them
-to a project that contains data, export that data and review the migration in
-a staging project first.
+Serve the original checkout over HTTP on localhost or HTTPS on a static host. Each auth page loads the Supabase v2 browser library, the repository-relative `js/runtime-config.js`, then the client helper and page handlers. The ignored local file assigns `window.CAMPUSSTAY_RUNTIME_CONFIG` and is deliberately outside Git. See `js/runtime-config.example.js`. The helper accepts `supabaseUrl` with `supabasePublishableKey` or the existing `supabaseAnonKey`. A legacy JWT key must have the anon role. Only use public browser values for the original project.
+
+A GitHub Pages build must generate the ignored file. This repository includes a manual-only Pages workflow. In the repository variables provide `CAMPUSSTAY_SUPABASE_URL` and `CAMPUSSTAY_SUPABASE_PUBLISHABLE_KEY` for the intended environment. Its build invokes `node scripts/prepare-pages.cjs` in a fresh checkout, copies static site files and writes the public config into the artifact. The local config, backend, database files and test pages are excluded from that artifact. The build refuses missing/invalid values or an existing output directory. Choosing GitHub Actions as the Pages source and dispatching the publish job are operator release actions. A branch-only deployment omits the ignored file unless its own build injects it. The legacy GitLab workflow is separate.
+
+For an authorized hosted validation, enable the existing Google provider in the selected Supabase environment. In the Google web client allow the origin of the served application and use the exact **provider callback URL shown in the Supabase Google provider settings** for the authorized redirect URI. In Supabase, set the Site URL and allow the exact CampusStay callback URL produced by this environment, including the repository subdirectory on Pages. The app requests `auth.html?google_callback=1` relative to its own directory. Email confirmation returns to `auth.html`. Keep email confirmation enabled. Check both permitted redirect destinations, all provider consent settings and public legal links in the intended environment. Separate Google client secrets belong only in provider settings. [Supabase Google setup](https://supabase.com/docs/guides/auth/social-sign-in/auth-google) · [Supabase API keys](https://supabase.com/docs/guides/api/api-keys) · [GitHub Pages custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)
+
+## Migration sequencing
+
+Use 001 through 014 once, in numerical order, on an empty disposable database. For an existing database, first compare its migration history, schema, policies, functions, ACLs and private bucket with the expected predecessor. Apply only the outstanding verified versions in order and use transactional migrations. A mismatch requires its own reviewed plan. The corrected 005 preserves all colleges and listing affiliations. If the original 005 already ran, retain its history entry and use a verified pre-005 backup to assess lost records and mappings before planning any recovery.
+
+At commit 737a409 the reported statement 67 was the first named policy creation in 002. 001 does not create it. 002 removed older policy names and omitted its own names, so an existing policy caused 42710. The error cannot distinguish a retry, earlier manual application or schema/history drift. 002, 010 and 011 now pair policy creation with exact-name cleanup. The fresh chain omits the obsolete broad rules in 006, including four clauses PostgreSQL rejected. 007 retains schema-qualified legacy cleanup. Replay of these historical files against a hardened database would undo subsequent restrictions. Apply the forward migrations to a verified predecessor.
+
+- 012 removes browser privilege-promotion paths, corrects inquiry/booking/review authorization and the listing default, and audits role changes. It restricts review and analytics identifiers, retires the unverified-phone setter, reserves verified phone numbers, and prevents future duplicate booking reviews while retaining legacy reviews.
+- 013 separates application status and confirmed contact from the profile role, grants owner capabilities only after approval, and gates public listings, administrative review, report handling, audit and reviewed account-deletion requests. Legacy owners require independent verification before regaining owner access and public visibility.
+- 014 stores resumable private drafts, commits listing submission atomically, handles repeated requests, protects media paths and provides transactional edits to rules and facilities. Old rent periods remain unspecified until confirmed. Historical URL-only media need reconciliation before republication.
+
+The [Preview release plan](PREVIEW-RELEASE.md) includes the full file manifest, isolated Git commands, synthetic regression checks and legacy listing holds.
+
+See the [production preflight](PRODUCTION-REVIEW.md) before any production operation. The [engineering report](ENGINEERING.md) records exactly which test environments ran and which external checks are outstanding.

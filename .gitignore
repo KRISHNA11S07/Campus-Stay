@@ -31,3 +31,31 @@ Thumbs.db
 *.key
 *.p12
 *.pfx
+
+# Private handoff and internal review records
+/CAMPUSSTAY_HANDOFF.md
+/FRONTEND-AUDIT.md
+/supabase/ENGINEERING.md
+/supabase/PREVIEW-RELEASE.md
+/supabase/PRODUCTION-REVIEW.md
+
+# Local worktrees, backups, tool downloads, and database exports
+/backups/
+/campusstay-release-candidate/
+/.migration-validation/
+/.migration-validation-deps/
+/dumps/
+*.dump.gz
+*.sql.gz
+.pgpass
+.envrc
+service-account*.json
+client_secret_*.json
+
+# Python validation caches and Supabase CLI state
+__pycache__/
+*.pyc
+.pytest_cache/
+.cache/
+/supabase/.temp/
+/supabase/.branches/

@@ -1,7 +1,7 @@
 /* ============================================================
    CampusStay — homepage logic
    ============================================================ */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   /* College autocomplete */
   const datalist = document.getElementById('college-list');
   COLLEGES.forEach((c) => {
@@ -42,73 +42,31 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   });
 
-  /* Featured = top rated */
-  const featured = [...LISTINGS].sort((a, b) => CS.avgRating(b) - CS.avgRating(a)).slice(0, 6);
   const grid = document.getElementById('featured-grid');
-  if (grid) {
-    grid.innerHTML = featured.map((l) => CS.listingCard(l)).join('');
-    CS.bindWishlistButtons(grid);
-    grid.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
-    if (CS._bindTilt) CS._bindTilt();
-    CS.initLazyImages();
+  try {
+    const [listings] = await Promise.all([publishedKitListings(), CS.loadWishlist()]);
+    if (listings && listings.length) {
+      grid.innerHTML = listings.slice(0, 6).map((l) => CS.listingCard(l, l.distanceKm)).join('');
+      CS.bindWishlistButtons(grid);
+    } else {
+      grid.innerHTML = `
+        <div class="empty-state-card glass" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; border-radius: 20px;">
+          <span style="font-size: 2.5rem; display: block; margin-bottom: 0.8rem;">🏠</span>
+          <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text);">No approved stays are currently available within 5 km of KIT.</p>
+          <p style="color: var(--text-2); font-size: 0.9rem; margin-bottom: 1.5rem;">New verified properties around campus are added regularly. Check back soon or explore all listings.</p>
+          <a href="listings.html" class="btn btn-primary btn-sm">Explore All Stays →</a>
+        </div>`;
+    }
+  } catch (err) {
+    console.warn('[CampusStay] Featured listings load failed:', err?.message || err);
+    grid.innerHTML = `
+      <div class="empty-state-card glass" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; border-radius: 20px;">
+        <span style="font-size: 2.5rem; display: block; margin-bottom: 0.8rem;">⚠️</span>
+        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text);">Listings could not be loaded. Refresh to retry.</p>
+        <p style="color: var(--text-2); font-size: 0.9rem; margin-bottom: 1.5rem;">Unable to connect to the properties directory. Check your connection.</p>
+        <button type="button" class="btn btn-primary btn-sm" onclick="location.reload()">Refresh Page</button>
+      </div>`;
   }
-
-  /* Full-screen 4K property showcase */
-  const showcaseData = [
-    { img: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=2400&auto=format&fit=crop', kicker: 'Featured stay', title: 'Tarabai Park 2BHK Flat, Kolhapur', desc: 'Spacious 2BHK in a gated complex — minutes from KIT Kolhapur with sunset balcony.', rent: '₹12,000', rating: '4.6★', id: 'kit-04' },
-    { img: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=2400&auto=format&fit=crop', kicker: 'Top rated girls PG', title: 'Lakshmi Girls PG, Chandanwadi', desc: 'Biometric access, delicious home meals, CCTV and dedicated study space near KIT Kolhapur.', rent: '₹8,000', rating: '4.8★', id: 'kit-05' },
-    { img: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2400&auto=format&fit=crop', kicker: 'Premium co-living', title: 'Shivam Boys PG, Kasaba Bawda', desc: 'Just 800m from KIT gate — home-cooked meals, power backup and high-speed Wi-Fi.', rent: '₹7,500', rating: '4.7★', id: 'kit-01' },
-  ];
-  const stage = document.getElementById('showcase-stage');
-  if (stage) {
-    stage.innerHTML = showcaseData.map((s, i) => `
-      <div class="showcase-slide ${i === 0 ? 'active' : ''}" data-slide="${i}">
-        <div class="img" style="background-image:url('${s.img}')"></div>
-        <div class="grad"></div>
-        <div class="showcase-content"><div class="container"><div class="inner">
-          <span class="kicker">${s.kicker}</span>
-          <h2>${s.title}</h2>
-          <p>${s.desc}</p>
-          <div class="showcase-meta">
-            <div><b>${s.rent}</b><span>per month</span></div>
-            <div><b>${s.rating}</b><span>student rating</span></div>
-          </div>
-          <a class="btn btn-primary" href="property.html?id=${s.id}">View this stay →</a>
-        </div></div></div>
-      </div>`).join('') +
-      `<div class="showcase-dots">${showcaseData.map((_, i) => `<button class="${i === 0 ? 'active' : ''}" data-dot="${i}" aria-label="Slide ${i + 1}"></button>`).join('')}</div>`;
-    let cur = 0;
-    const slides = stage.querySelectorAll('.showcase-slide');
-    const dots = stage.querySelectorAll('[data-dot]');
-    const show = (n) => {
-      cur = (n + slides.length) % slides.length;
-      slides.forEach((s, i) => s.classList.toggle('active', i === cur));
-      dots.forEach((d, i) => d.classList.toggle('active', i === cur));
-    };
-    dots.forEach((d) => d.addEventListener('click', () => { show(+d.dataset.dot); restart(); }));
-    let timer = setInterval(() => show(cur + 1), 5000);
-    const restart = () => { clearInterval(timer); timer = setInterval(() => show(cur + 1), 5000); };
-  }
-
-  /* Animated counters */
-  const fmt = (n) => (n >= 1000 ? (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k+' : n + '+');
-  const counterIO = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const el = entry.target;
-      counterIO.unobserve(el);
-      const target = +el.dataset.count;
-      const t0 = performance.now(), dur = 1600;
-      const tick = (t) => {
-        const p = Math.min((t - t0) / dur, 1);
-        const eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = fmt(Math.round(target * eased));
-        if (p < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    });
-  }, { threshold: 0.4 });
-  document.querySelectorAll('[data-count]').forEach((el) => counterIO.observe(el));
 
   /* FAQ accordion */
   document.querySelectorAll('.faq-item').forEach((item) => {

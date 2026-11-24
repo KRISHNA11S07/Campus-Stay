@@ -15,7 +15,7 @@ document.addEventListener('cs:auth-ready', async (event) => {
   function renderPreferenceEditor() {
     const root = document.getElementById('preference-chips');
     if (!root) return;
-    const selected = new Set(profile.preferences?.lifestyle || []);
+    const selected = new Set(savedLifestyle);
     root.innerHTML = lifestyle.map(([id, symbol, label]) => `<button class="preference-chip ${selected.has(id) ? 'active' : ''}" type="button" data-preference="${id}" aria-pressed="${selected.has(id)}"><span class="preference-symbol" aria-hidden="true">${symbol}</span>${label}</button>`).join('');
     root.addEventListener('click', (clickEvent) => {
       const chip = clickEvent.target.closest('[data-preference]');
@@ -47,6 +47,7 @@ document.addEventListener('cs:auth-ready', async (event) => {
     });
   }
 
+  const savedLifestyle = Array.isArray(profile.preferences?.lifestyle) ? profile.preferences.lifestyle : [];
   if (page === 'profile') {
     const root = document.getElementById('profile-root');
     const name = profile.full_name || user.user_metadata?.full_name || 'CampusStay member';
@@ -54,7 +55,7 @@ document.addEventListener('cs:auth-ready', async (event) => {
     const avatar = profile.avatar_url
       ? `<img src="${escapeHTML(profile.avatar_url)}" alt="${escapeHTML(name)}">`
       : escapeHTML(initials(name));
-    const preferenceCount = profile.preferences?.lifestyle?.length || 0;
+    const preferenceCount = savedLifestyle.length;
     root.innerHTML = `
       <aside class="account-surface profile-summary">
         <div class="profile-avatar">${avatar}</div><h2>${escapeHTML(name)}</h2><p class="profile-email">${escapeHTML(user.email || 'Email not available')}</p>
@@ -72,8 +73,10 @@ document.addEventListener('cs:auth-ready', async (event) => {
 
   if (page === 'saved') {
     const root = document.getElementById('saved-root');
-    const savedIds = CS.wishlist();
-    const listings = (typeof LISTINGS === 'undefined' ? [] : LISTINGS).filter((listing) => savedIds.includes(listing.id));
+
+    let listings;
+    try { await CS.loadWishlist(); listings=(await publishedKitListings()).filter(listing=>CS.inWishlist(listing.id)); }
+    catch {root.textContent='Could not load saved listings. Refresh to retry.';return;}
     if (!listings.length) {
       root.innerHTML = '<div class="account-surface empty-account-state"><div class="empty-icon">♡</div><h2>Nothing saved yet</h2><p>When a room feels promising, save it here so it is easy to compare later.</p><a class="btn btn-primary" href="listings.html">Explore stays</a></div>';
     } else {
@@ -90,7 +93,7 @@ document.addEventListener('cs:auth-ready', async (event) => {
 
   if (page === 'matches') {
     const root = document.getElementById('matches-root');
-    const count = profile.preferences?.lifestyle?.length || 0;
+    const count = savedLifestyle.length;
     root.innerHTML = `<div class="empty-icon">✦</div><h2>${count ? 'Your match profile is ready' : 'Set your match profile'}</h2><p>${count ? 'We saved ' + count + ' lifestyle preference' + (count === 1 ? '' : 's') + '. Explore verified rooms while we make matching more specific.' : 'Choose a few optional lifestyle preferences and we will use them to improve future matches.'}</p><a class="btn btn-primary" href="${count ? 'listings.html' : 'preferences.html'}">${count ? 'Browse verified rooms' : 'Set preferences'}</a>`;
   }
 
@@ -98,7 +101,7 @@ document.addEventListener('cs:auth-ready', async (event) => {
     const root = document.getElementById('my-listings-root');
     root.innerHTML = '<div class="account-surface empty-account-state"><div class="empty-icon">⌂</div><h2>Loading your listings</h2></div>';
     try {
-      const { data, error } = await getSupabase().from('properties').select('id,title,area,type,rent,verification_status,property_media(file_url,storage_path,display_order)').eq('owner_id', user.id).order('created_at', { ascending: false });
+      const { data, error } = await getSupabase().from('properties').select('id,title,area,type,rent,rent_period,listing_status,verification_status,property_media(file_url,storage_path,display_order)').eq('owner_id', user.id).order('created_at', { ascending: false });
       if (error) throw error;
       if (!data?.length) {
         root.innerHTML = '<div class="account-surface empty-account-state"><div class="empty-icon">⌂</div><h2>Your first listing starts here</h2><p>Set up your property with photos, location privacy, amenities, and a preview before it is submitted for review.</p><a class="btn btn-primary" href="owner-onboarding.html?new=1">Set up a property</a></div>';
@@ -108,7 +111,7 @@ document.addEventListener('cs:auth-ready', async (event) => {
           const media = [...(listing.property_media || [])].sort((a, b) => a.display_order - b.display_order);
           const thumb = media[0]?.file_url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=700&auto=format&fit=crop';
           const status = ['pending', 'verified', 'rejected'].includes(listing.verification_status) ? listing.verification_status : 'pending';
-          return `<article class="account-surface listing-management-card"><img class="listing-thumb" src="${escapeHTML(thumb)}" alt="${escapeHTML(listing.title)}"><h2>${escapeHTML(listing.title)}</h2><p>${escapeHTML(listing.area || 'Area not set')} · ${escapeHTML(String(listing.type || '').toUpperCase())} · ₹${Number(listing.rent || 0).toLocaleString('en-IN')}/year</p><div class="listing-management-foot"><span class="status-pill ${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</span><a class="btn btn-ghost btn-sm" href="add-property.html?edit=${encodeURIComponent(listing.id)}&type=${encodeURIComponent(listing.type)}">Edit</a></div></article>`;
+          return `<article class="account-surface listing-management-card"><img class="listing-thumb" src="${escapeHTML(thumb)}" alt="${escapeHTML(listing.title)}"><h2>${escapeHTML(listing.title)}</h2><p>${escapeHTML(listing.area || 'Area not set')} · ${escapeHTML(String(listing.type || '').toUpperCase())} · ₹${Number(listing.rent || 0).toLocaleString('en-IN')}${listing.rent_period ? "/"+listing.rent_period : " (confirm period)"}</p><div class="listing-management-foot"><span class="status-pill ${status}">${status.charAt(0).toUpperCase() + status.slice(1)}</span><a class="btn btn-ghost btn-sm" href="add-property.html?edit=${encodeURIComponent(listing.id)}&type=${encodeURIComponent(listing.type)}">Edit</a></div></article>`;
         }).join('');
       }
     } catch (error) {
@@ -116,4 +119,23 @@ document.addEventListener('cs:auth-ready', async (event) => {
       root.innerHTML = '<div class="account-surface empty-account-state"><div class="empty-icon">!</div><h2>We could not load your listings</h2><p>Please refresh the page or try again in a moment.</p></div>';
     }
   }
+});
+
+document.addEventListener('cs:auth-ready', ({detail:{user}}) => {
+  const form = document.getElementById('support-request');
+  if (!form) return;
+  form.onsubmit = async event => {
+    event.preventDefault();
+    const input = form.querySelector('textarea'), button = form.querySelector('button');
+    const status = form.querySelector('[role=status]');
+    if (input.value.trim().length < 5) { status.textContent='Describe the issue in at least five characters.'; return; }
+    button.disabled = true;
+    try {
+      const {error} = await getSupabase().from('reports').insert({reporter_id:user.id,reason:input.value.trim()});
+      if (error) throw error;
+      form.reset();
+      status.textContent = 'Your request was sent to the administrators.';
+    } catch { status.textContent = 'The request could not be confirmed. Check your connection.'; }
+    finally { button.disabled = false; }
+  };
 });
