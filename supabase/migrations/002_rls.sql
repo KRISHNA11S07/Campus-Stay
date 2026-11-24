@@ -33,7 +33,8 @@ $$;
 REVOKE ALL ON FUNCTION public.get_my_role() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.get_my_role() TO authenticated;
 
--- Remove the original permissive policies so this migration is safe to rerun.
+-- Remove the original permissive policies. Current policies are also dropped
+-- by name immediately before recreation, so Preview replay cannot collide.
 DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
@@ -103,14 +104,17 @@ GRANT SELECT, INSERT, DELETE ON public.favorites TO authenticated;
 -- ============================================================
 -- Profiles
 -- ============================================================
+DROP POLICY IF EXISTS profiles_select_own ON public.profiles;
 CREATE POLICY profiles_select_own
   ON public.profiles FOR SELECT TO authenticated
   USING (id = auth.uid());
 
+DROP POLICY IF EXISTS profiles_select_admin ON public.profiles;
 CREATE POLICY profiles_select_admin
   ON public.profiles FOR SELECT TO authenticated
   USING (public.get_my_role() = 'admin');
 
+DROP POLICY IF EXISTS profiles_update_own_safe_columns ON public.profiles;
 CREATE POLICY profiles_update_own_safe_columns
   ON public.profiles FOR UPDATE TO authenticated
   USING (id = auth.uid())
@@ -119,10 +123,12 @@ CREATE POLICY profiles_update_own_safe_columns
 -- ============================================================
 -- Reference data
 -- ============================================================
+DROP POLICY IF EXISTS colleges_select_public ON public.colleges;
 CREATE POLICY colleges_select_public
   ON public.colleges FOR SELECT TO anon, authenticated
   USING (true);
 
+DROP POLICY IF EXISTS facilities_select_public ON public.facilities;
 CREATE POLICY facilities_select_public
   ON public.facilities FOR SELECT TO anon, authenticated
   USING (true);
@@ -130,18 +136,22 @@ CREATE POLICY facilities_select_public
 -- ============================================================
 -- Properties
 -- ============================================================
+DROP POLICY IF EXISTS properties_select_public_verified ON public.properties;
 CREATE POLICY properties_select_public_verified
   ON public.properties FOR SELECT TO anon, authenticated
   USING (verification_status = 'verified');
 
+DROP POLICY IF EXISTS properties_select_owner ON public.properties;
 CREATE POLICY properties_select_owner
   ON public.properties FOR SELECT TO authenticated
   USING (owner_id = auth.uid() AND public.get_my_role() = 'owner');
 
+DROP POLICY IF EXISTS properties_select_admin ON public.properties;
 CREATE POLICY properties_select_admin
   ON public.properties FOR SELECT TO authenticated
   USING (public.get_my_role() = 'admin');
 
+DROP POLICY IF EXISTS properties_insert_owner_pending ON public.properties;
 CREATE POLICY properties_insert_owner_pending
   ON public.properties FOR INSERT TO authenticated
   WITH CHECK (
@@ -152,6 +162,7 @@ CREATE POLICY properties_insert_owner_pending
 
 -- Owners can edit their own listing, including returning a verified listing
 -- to pending after a substantive edit, but can never mark it verified.
+DROP POLICY IF EXISTS properties_update_owner_unverified ON public.properties;
 CREATE POLICY properties_update_owner_unverified
   ON public.properties FOR UPDATE TO authenticated
   USING (owner_id = auth.uid() AND public.get_my_role() = 'owner')
@@ -161,17 +172,20 @@ CREATE POLICY properties_update_owner_unverified
     AND verification_status IN ('pending', 'rejected')
   );
 
+DROP POLICY IF EXISTS properties_delete_owner ON public.properties;
 CREATE POLICY properties_delete_owner
   ON public.properties FOR DELETE TO authenticated
   USING (owner_id = auth.uid() AND public.get_my_role() = 'owner');
 
 -- An admin dashboard will use these controlled admin permissions in a later
 -- milestone. No normal user can obtain the admin role through browser writes.
+DROP POLICY IF EXISTS properties_update_admin ON public.properties;
 CREATE POLICY properties_update_admin
   ON public.properties FOR UPDATE TO authenticated
   USING (public.get_my_role() = 'admin')
   WITH CHECK (public.get_my_role() = 'admin');
 
+DROP POLICY IF EXISTS properties_delete_admin ON public.properties;
 CREATE POLICY properties_delete_admin
   ON public.properties FOR DELETE TO authenticated
   USING (public.get_my_role() = 'admin');
@@ -179,6 +193,7 @@ CREATE POLICY properties_delete_admin
 -- ============================================================
 -- Property media
 -- ============================================================
+DROP POLICY IF EXISTS property_media_select_public_verified ON public.property_media;
 CREATE POLICY property_media_select_public_verified
   ON public.property_media FOR SELECT TO anon, authenticated
   USING (
@@ -189,6 +204,7 @@ CREATE POLICY property_media_select_public_verified
     )
   );
 
+DROP POLICY IF EXISTS property_media_select_owner ON public.property_media;
 CREATE POLICY property_media_select_owner
   ON public.property_media FOR SELECT TO authenticated
   USING (
@@ -199,10 +215,12 @@ CREATE POLICY property_media_select_owner
     )
   );
 
+DROP POLICY IF EXISTS property_media_select_admin ON public.property_media;
 CREATE POLICY property_media_select_admin
   ON public.property_media FOR SELECT TO authenticated
   USING (public.get_my_role() = 'admin');
 
+DROP POLICY IF EXISTS property_media_insert_owner ON public.property_media;
 CREATE POLICY property_media_insert_owner
   ON public.property_media FOR INSERT TO authenticated
   WITH CHECK (
@@ -213,6 +231,7 @@ CREATE POLICY property_media_insert_owner
     )
   );
 
+DROP POLICY IF EXISTS property_media_update_owner ON public.property_media;
 CREATE POLICY property_media_update_owner
   ON public.property_media FOR UPDATE TO authenticated
   USING (
@@ -230,6 +249,7 @@ CREATE POLICY property_media_update_owner
     )
   );
 
+DROP POLICY IF EXISTS property_media_delete_owner ON public.property_media;
 CREATE POLICY property_media_delete_owner
   ON public.property_media FOR DELETE TO authenticated
   USING (
@@ -243,6 +263,7 @@ CREATE POLICY property_media_delete_owner
 -- ============================================================
 -- Facilities and property rules
 -- ============================================================
+DROP POLICY IF EXISTS property_facilities_select_public_verified ON public.property_facilities;
 CREATE POLICY property_facilities_select_public_verified
   ON public.property_facilities FOR SELECT TO anon, authenticated
   USING (
@@ -253,6 +274,7 @@ CREATE POLICY property_facilities_select_public_verified
     )
   );
 
+DROP POLICY IF EXISTS property_facilities_select_owner ON public.property_facilities;
 CREATE POLICY property_facilities_select_owner
   ON public.property_facilities FOR SELECT TO authenticated
   USING (
@@ -263,6 +285,7 @@ CREATE POLICY property_facilities_select_owner
     )
   );
 
+DROP POLICY IF EXISTS property_facilities_insert_owner ON public.property_facilities;
 CREATE POLICY property_facilities_insert_owner
   ON public.property_facilities FOR INSERT TO authenticated
   WITH CHECK (
@@ -273,6 +296,7 @@ CREATE POLICY property_facilities_insert_owner
     )
   );
 
+DROP POLICY IF EXISTS property_facilities_delete_owner ON public.property_facilities;
 CREATE POLICY property_facilities_delete_owner
   ON public.property_facilities FOR DELETE TO authenticated
   USING (
@@ -283,6 +307,7 @@ CREATE POLICY property_facilities_delete_owner
     )
   );
 
+DROP POLICY IF EXISTS property_rules_select_public_verified ON public.property_rules;
 CREATE POLICY property_rules_select_public_verified
   ON public.property_rules FOR SELECT TO anon, authenticated
   USING (
@@ -293,6 +318,7 @@ CREATE POLICY property_rules_select_public_verified
     )
   );
 
+DROP POLICY IF EXISTS property_rules_select_owner ON public.property_rules;
 CREATE POLICY property_rules_select_owner
   ON public.property_rules FOR SELECT TO authenticated
   USING (
@@ -303,6 +329,7 @@ CREATE POLICY property_rules_select_owner
     )
   );
 
+DROP POLICY IF EXISTS property_rules_insert_owner ON public.property_rules;
 CREATE POLICY property_rules_insert_owner
   ON public.property_rules FOR INSERT TO authenticated
   WITH CHECK (
@@ -313,6 +340,7 @@ CREATE POLICY property_rules_insert_owner
     )
   );
 
+DROP POLICY IF EXISTS property_rules_update_owner ON public.property_rules;
 CREATE POLICY property_rules_update_owner
   ON public.property_rules FOR UPDATE TO authenticated
   USING (
@@ -330,6 +358,7 @@ CREATE POLICY property_rules_update_owner
     )
   );
 
+DROP POLICY IF EXISTS property_rules_delete_owner ON public.property_rules;
 CREATE POLICY property_rules_delete_owner
   ON public.property_rules FOR DELETE TO authenticated
   USING (
@@ -343,20 +372,24 @@ CREATE POLICY property_rules_delete_owner
 -- ============================================================
 -- Booking requests (no payment gateway in this milestone)
 -- ============================================================
+DROP POLICY IF EXISTS bookings_select_student ON public.bookings;
 CREATE POLICY bookings_select_student
   ON public.bookings FOR SELECT TO authenticated
   USING (student_id = auth.uid() AND public.get_my_role() = 'student');
 
+DROP POLICY IF EXISTS bookings_select_owner ON public.bookings;
 CREATE POLICY bookings_select_owner
   ON public.bookings FOR SELECT TO authenticated
   USING (owner_id = auth.uid() AND public.get_my_role() = 'owner');
 
+DROP POLICY IF EXISTS bookings_select_admin ON public.bookings;
 CREATE POLICY bookings_select_admin
   ON public.bookings FOR SELECT TO authenticated
   USING (public.get_my_role() = 'admin');
 
 -- A booking is currently only a zero-amount request. Payment fields remain
 -- server-controlled and are intentionally not handled here.
+DROP POLICY IF EXISTS bookings_insert_student_request ON public.bookings;
 CREATE POLICY bookings_insert_student_request
   ON public.bookings FOR INSERT TO authenticated
   WITH CHECK (
@@ -367,8 +400,8 @@ CREATE POLICY bookings_insert_student_request
     AND booking_status = 'pending'
     AND EXISTS (
       SELECT 1 FROM public.properties AS p
-      WHERE p.id = property_id
-        AND p.owner_id = owner_id
+      WHERE p.id = bookings.property_id
+        AND p.owner_id = bookings.owner_id
         AND p.verification_status = 'verified'
         AND p.available = true
     )
@@ -377,6 +410,7 @@ CREATE POLICY bookings_insert_student_request
 -- ============================================================
 -- Reviews and favorites
 -- ============================================================
+DROP POLICY IF EXISTS reviews_select_public_verified ON public.reviews;
 CREATE POLICY reviews_select_public_verified
   ON public.reviews FOR SELECT TO anon, authenticated
   USING (
@@ -387,6 +421,7 @@ CREATE POLICY reviews_select_public_verified
     )
   );
 
+DROP POLICY IF EXISTS reviews_insert_eligible_student ON public.reviews;
 CREATE POLICY reviews_insert_eligible_student
   ON public.reviews FOR INSERT TO authenticated
   WITH CHECK (
@@ -395,18 +430,21 @@ CREATE POLICY reviews_insert_eligible_student
     AND EXISTS (
       SELECT 1 FROM public.bookings AS b
       JOIN public.properties AS p ON p.id = b.property_id
-      WHERE b.id = booking_id
+      WHERE b.id = reviews.booking_id
         AND b.student_id = auth.uid()
-        AND b.property_id = property_id
+        AND b.property_id = reviews.property_id
+        AND b.owner_id = p.owner_id
         AND b.booking_status IN ('confirmed', 'completed')
         AND p.verification_status = 'verified'
     )
   );
 
+DROP POLICY IF EXISTS favorites_select_own_student ON public.favorites;
 CREATE POLICY favorites_select_own_student
   ON public.favorites FOR SELECT TO authenticated
   USING (student_id = auth.uid() AND public.get_my_role() = 'student');
 
+DROP POLICY IF EXISTS favorites_insert_own_student ON public.favorites;
 CREATE POLICY favorites_insert_own_student
   ON public.favorites FOR INSERT TO authenticated
   WITH CHECK (
@@ -418,6 +456,7 @@ CREATE POLICY favorites_insert_own_student
     )
   );
 
+DROP POLICY IF EXISTS favorites_delete_own_student ON public.favorites;
 CREATE POLICY favorites_delete_own_student
   ON public.favorites FOR DELETE TO authenticated
   USING (student_id = auth.uid() AND public.get_my_role() = 'student');

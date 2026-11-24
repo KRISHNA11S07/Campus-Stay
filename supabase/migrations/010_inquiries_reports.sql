@@ -3,6 +3,8 @@
 -- Run after 001–009. Safe to apply to existing data.
 -- ============================================================
 
+-- Replace only this migration's named policies on replay; keep their rules intact.
+
 -- Inquiries: students contact owners about a property
 CREATE TABLE IF NOT EXISTS public.inquiries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -42,20 +44,25 @@ CREATE INDEX IF NOT EXISTS idx_reports_status ON public.reports(status);
 -- RLS for inquiries
 ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.inquiries FROM anon, authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.inquiries TO authenticated;
+GRANT SELECT, INSERT (property_id, student_id, owner_id, message), UPDATE (status) ON public.inquiries TO authenticated;
 
+DROP POLICY IF EXISTS inquiries_select_student ON public.inquiries;
 CREATE POLICY inquiries_select_student ON public.inquiries
   FOR SELECT TO authenticated
   USING (student_id = auth.uid() AND public.get_my_role() = 'student');
 
+DROP POLICY IF EXISTS inquiries_select_owner ON public.inquiries;
 CREATE POLICY inquiries_select_owner ON public.inquiries
   FOR SELECT TO authenticated
-  USING (owner_id = auth.uid() AND public.get_my_role() = 'owner');
+  USING (owner_id = auth.uid() AND public.get_my_role() = 'owner'
+    AND EXISTS (SELECT 1 FROM public.properties p WHERE p.id = inquiries.property_id AND p.owner_id = inquiries.owner_id));
 
+DROP POLICY IF EXISTS inquiries_select_admin ON public.inquiries;
 CREATE POLICY inquiries_select_admin ON public.inquiries
   FOR SELECT TO authenticated
   USING (public.get_my_role() = 'admin');
 
+DROP POLICY IF EXISTS inquiries_insert_student ON public.inquiries;
 CREATE POLICY inquiries_insert_student ON public.inquiries
   FOR INSERT TO authenticated
   WITH CHECK (
@@ -63,33 +70,40 @@ CREATE POLICY inquiries_insert_student ON public.inquiries
     AND public.get_my_role() = 'student'
     AND EXISTS (
       SELECT 1 FROM public.properties p
-      WHERE p.id = property_id
+      WHERE p.id = inquiries.property_id AND p.owner_id = inquiries.owner_id
         AND p.verification_status = 'verified'
     )
   );
 
+DROP POLICY IF EXISTS inquiries_update_owner ON public.inquiries;
 CREATE POLICY inquiries_update_owner ON public.inquiries
   FOR UPDATE TO authenticated
-  USING (owner_id = auth.uid() AND public.get_my_role() = 'owner')
-  WITH CHECK (owner_id = auth.uid() AND public.get_my_role() = 'owner');
+  USING (owner_id = auth.uid() AND public.get_my_role() = 'owner'
+    AND EXISTS (SELECT 1 FROM public.properties p WHERE p.id = inquiries.property_id AND p.owner_id = inquiries.owner_id))
+  WITH CHECK (owner_id = auth.uid() AND public.get_my_role() = 'owner'
+    AND EXISTS (SELECT 1 FROM public.properties p WHERE p.id = inquiries.property_id AND p.owner_id = inquiries.owner_id));
 
 -- RLS for reports
 ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.reports FROM anon, authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.reports TO authenticated;
 
+DROP POLICY IF EXISTS reports_select_reporter ON public.reports;
 CREATE POLICY reports_select_reporter ON public.reports
   FOR SELECT TO authenticated
   USING (reporter_id = auth.uid());
 
+DROP POLICY IF EXISTS reports_select_admin ON public.reports;
 CREATE POLICY reports_select_admin ON public.reports
   FOR SELECT TO authenticated
   USING (public.get_my_role() = 'admin');
 
+DROP POLICY IF EXISTS reports_insert_reporter ON public.reports;
 CREATE POLICY reports_insert_reporter ON public.reports
   FOR INSERT TO authenticated
   WITH CHECK (reporter_id = auth.uid());
 
+DROP POLICY IF EXISTS reports_update_admin ON public.reports;
 CREATE POLICY reports_update_admin ON public.reports
   FOR UPDATE TO authenticated
   USING (public.get_my_role() = 'admin')
@@ -111,10 +125,12 @@ ALTER TABLE public.property_views ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.property_views FROM anon, authenticated;
 GRANT SELECT, INSERT ON public.property_views TO authenticated;
 
+DROP POLICY IF EXISTS property_views_insert_public ON public.property_views;
 CREATE POLICY property_views_insert_public ON public.property_views
   FOR INSERT TO anon, authenticated
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS property_views_select_owner ON public.property_views;
 CREATE POLICY property_views_select_owner ON public.property_views
   FOR SELECT TO authenticated
   USING (
@@ -125,6 +141,7 @@ CREATE POLICY property_views_select_owner ON public.property_views
     )
   );
 
+DROP POLICY IF EXISTS property_views_select_admin ON public.property_views;
 CREATE POLICY property_views_select_admin ON public.property_views
   FOR SELECT TO authenticated
   USING (public.get_my_role() = 'admin');

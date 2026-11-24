@@ -3,7 +3,7 @@
 -- Run this AFTER 002_rls.sql and 006_owner_role.sql
 --
 -- PROBLEM:
--- Migration 006_owner_role.sql creates overly-permissive "Anyone can view"
+-- Historical versions of migration 006 created overly-permissive "Anyone can view"
 -- SELECT policies that bypass the verification_status restriction established
 -- in 002_rls.sql. This allows anonymous/unauthenticated users to read
 -- pending and rejected properties, their media, facilities, and rules.
@@ -12,7 +12,7 @@
 -- Remove the permissive policies introduced by 006_owner_role.sql. PostgreSQL
 -- combines permissive policies with OR, so leaving its broad mutation or
 -- storage policies in place would bypass the stricter ownership checks in
--- 002_rls.sql. The self-service promote_to_owner() function remains.
+-- 002_rls.sql. New installations skip the legacy grants in 006.
 --
 -- This migration is idempotent — safe to run multiple times.
 -- ============================================================
@@ -55,7 +55,7 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE policyname = 'properties_select_public_verified'
+    WHERE schemaname = 'public' AND policyname = 'properties_select_public_verified'
       AND tablename = 'properties'
   ) THEN
     CREATE POLICY properties_select_public_verified
@@ -68,7 +68,7 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE policyname = 'properties_select_owner'
+    WHERE schemaname = 'public' AND policyname = 'properties_select_owner'
       AND tablename = 'properties'
   ) THEN
     CREATE POLICY properties_select_owner
@@ -82,7 +82,7 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE policyname = 'property_media_select_public_verified'
+    WHERE schemaname = 'public' AND policyname = 'property_media_select_public_verified'
       AND tablename = 'property_media'
   ) THEN
     CREATE POLICY property_media_select_public_verified
@@ -101,7 +101,7 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE policyname = 'property_media_select_owner'
+    WHERE schemaname = 'public' AND policyname = 'property_media_select_owner'
       AND tablename = 'property_media'
   ) THEN
     CREATE POLICY property_media_select_owner
@@ -121,7 +121,7 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE policyname = 'property_facilities_select_public_verified'
+    WHERE schemaname = 'public' AND policyname = 'property_facilities_select_public_verified'
       AND tablename = 'property_facilities'
   ) THEN
     CREATE POLICY property_facilities_select_public_verified
@@ -140,7 +140,7 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE policyname = 'property_facilities_select_owner'
+    WHERE schemaname = 'public' AND policyname = 'property_facilities_select_owner'
       AND tablename = 'property_facilities'
   ) THEN
     CREATE POLICY property_facilities_select_owner
@@ -160,7 +160,7 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE policyname = 'property_rules_select_public_verified'
+    WHERE schemaname = 'public' AND policyname = 'property_rules_select_public_verified'
       AND tablename = 'property_rules'
   ) THEN
     CREATE POLICY property_rules_select_public_verified
@@ -179,7 +179,7 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE policyname = 'property_rules_select_owner'
+    WHERE schemaname = 'public' AND policyname = 'property_rules_select_owner'
       AND tablename = 'property_rules'
   ) THEN
     CREATE POLICY property_rules_select_owner
