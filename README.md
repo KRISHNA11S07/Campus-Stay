@@ -10,8 +10,8 @@
 - **Property details** — image gallery, rent & deposit, facilities, Google Maps embed, distance from college, hostel rules (for hostels), availability status
 - **Direct contact** — Call and WhatsApp buttons connect students straight to verified owners (zero brokerage)
 - **Ratings & reviews** — signed-in students can post reviews that update the listing's average
-- **Wishlist** — save favourites with one tap (persisted in localStorage)
-- **Accounts** — student and property-owner sign in / sign up (mock auth, ready to swap for a real API)
+- **Wishlist** — save favourites with one tap (saved privately to the signed-in student’s Supabase account)
+- **Accounts** — Supabase sign-in, email confirmation and Google OAuth. Owner privileges require application review.
 - **Design** — liquid-glass / glassmorphism UI, gradient mesh background, floating cards, scroll-triggered reveals, animated counters, micro-interactions, dark/light mode, fully responsive
 
 ## 🚀 Run locally
@@ -26,30 +26,10 @@ python3 -m http.server 8000
 
 > Geolocation requires `localhost` or HTTPS.
 
-## 🌐 Deployment
+## Authentication and hosting
 
-Pushing to the default branch deploys automatically to **GitLab Pages** via `.gitlab-ci.yml`.
+Serve this directory as the static site root. Supabase Auth, PostgreSQL and private Storage power the application. The Express/MongoDB folder is a separate backend foundation. The working local configuration is ignored by Git. A Pages artifact must supply the original project URL and its browser publishable key. See [setup and migration notes](supabase/README.md).
 
-## 🗂️ Structure
+## Implementation and verification
 
-```
-├── index.html        # Homepage (hero, search, categories, featured, stats, FAQ)
-├── listings.html     # Search results — 5 km radius, filters, sorting, wishlist view
-├── property.html     # Property details — gallery, map, reviews, contact
-├── auth.html         # Student / owner sign in & sign up
-├── css/styles.css    # Liquid-glass design system (light + dark themes)
-└── js/
-    ├── data.js       # Mock data layer (colleges, listings) — swap for API
-    ├── main.js       # Shared core: theme, nav, reveal animations, wishlist, helpers
-    ├── home.js       # Homepage: search flow, geolocation, counters, FAQ
-    ├── listings.js   # Radius filtering, rating-first ranking, filter UI
-    ├── property.js   # Details page, gallery swap, review posting
-    └── auth.js       # Mock authentication
-```
-
-## 🔮 Next steps
-
-- Replace `js/data.js` with a real backend API (the data shape is documented there)
-- Real authentication (OAuth / OTP) replacing the localStorage mock
-- Owner dashboard for managing listings
-- Google Maps JS API with clustered pins on the listings page
+The student experience uses real approved inventory within 5 km of KIT. Owners can apply, save property drafts and submit listings. Administrators review applications, moderate listings and reports, and inspect the audit trail. The [engineering report](supabase/ENGINEERING.md) identifies verified workflows, local test boundaries and outstanding release checks. The [production assessment](supabase/PRODUCTION-REVIEW.md) covers the legacy role-promotion function and migration-history preflight.

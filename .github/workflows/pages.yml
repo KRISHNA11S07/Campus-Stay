@@ -1,0 +1,31 @@
+name: Publish CampusStay to Pages
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare static site
+        run: node scripts/prepare-pages.cjs
+        env:
+          CAMPUSSTAY_SUPABASE_URL: ${{ vars.CAMPUSSTAY_SUPABASE_URL }}
+          CAMPUSSTAY_SUPABASE_PUBLISHABLE_KEY: ${{ vars.CAMPUSSTAY_SUPABASE_PUBLISHABLE_KEY }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Publish reviewed artifact
+        id: deployment
+        uses: actions/deploy-pages@v4
