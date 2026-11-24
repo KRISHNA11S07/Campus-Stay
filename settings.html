@@ -284,10 +284,10 @@
         <section class="settings-section" id="sec-danger" role="tabpanel">
           <div class="settings-card danger-zone">
             <h2>Delete Account</h2>
-            <p class="card-sub">Permanently delete your CampusStay account and all associated data. This action cannot be undone.</p>
+            <p class="card-sub">Ask an administrator to review deletion of your account and associated data.</p>
             <div style="margin-top:1rem;">
               <button type="button" class="btn-danger" id="btn-delete-account">
-                Delete My Account
+                Request account deletion
               </button>
             </div>
           </div>
@@ -301,12 +301,12 @@
   <div class="modal-overlay" id="delete-modal">
     <div class="modal-card">
       <div class="modal-icon">⚠️</div>
-      <h3>Delete your account?</h3>
-      <p>This will permanently delete your account, profile, and all data. This action <strong>cannot be undone</strong>.<br><br>Type <strong>DELETE</strong> below to confirm.</p>
+      <h3>Request account deletion?</h3>
+      <p>Your request will be recorded for administrator review.<br><br>Type <strong>DELETE</strong> below to confirm.</p>
       <input type="text" class="confirm-input" id="delete-confirm-input" placeholder='Type "DELETE" to confirm' autocomplete="off">
       <div class="modal-actions">
         <button type="button" class="btn-modal-cancel" id="btn-modal-cancel">Cancel</button>
-        <button type="button" class="btn-modal-confirm" id="btn-modal-confirm" disabled>Delete Account</button>
+        <button type="button" class="btn-modal-confirm" id="btn-modal-confirm" disabled>Send request</button>
       </div>
     </div>
   </div>
@@ -319,7 +319,7 @@
   </footer>
 
   <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js" integrity="sha384-iLddHTLokph6Omwoyid4XKxHaWa6w41BnoEj0q5oOrzmYPpHIKt1wyjReA7s//pP" crossorigin="anonymous"></script>
   <script src="js/runtime-config.js"></script>
 
   <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
