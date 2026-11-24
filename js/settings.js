@@ -41,8 +41,12 @@ document.addEventListener('cs:auth-ready', async () => {
 
     // Avatar
     const preview = $('avatar-preview');
-    if (profile.avatar_url) {
-      preview.innerHTML = `<img src="${profile.avatar_url}" alt="Avatar">`;
+    const avatarUrl = CS.safeImageUrl(profile.avatar_url);
+    if (avatarUrl) {
+      const image = document.createElement('img');
+      image.src = avatarUrl;
+      image.alt = 'Avatar';
+      preview.replaceChildren(image);
     } else {
       const initials = (profile.full_name || '?').charAt(0).toUpperCase();
       preview.textContent = initials;
@@ -343,6 +347,7 @@ document.addEventListener('cs:auth-ready', async () => {
 
     try {
       await signOut();
+      location.replace("index.html");
     } catch (err) {
       console.error('Sign out error:', err);
       if (typeof CS !== 'undefined' && CS.toast) {
@@ -381,50 +386,28 @@ document.addEventListener('cs:auth-ready', async () => {
     confirmBtn.disabled = deleteInput.value.trim() !== 'DELETE';
   });
 
-  // Perform soft-delete
+  // Record a reviewed deletion request
   confirmBtn.addEventListener('click', async () => {
     if (deleteInput.value.trim() !== 'DELETE') return;
 
     confirmBtn.disabled = true;
-    confirmBtn.innerHTML = '<span class="spinner"></span> Deleting...';
+    confirmBtn.innerHTML = '<span class="spinner"></span> Sending request...';
 
     try {
       const sb = getSupabase();
       if (!sb) throw new Error('Supabase not configured');
 
-      // Soft-delete: clear profile data and mark as deactivated
-      const { error } = await sb
-        .from('profiles')
-        .update({
-          full_name: '[Deleted User]',
-          occupation: null,
-          age: null,
-          gender: null,
-          avatar_url: null,
-          preferences: { deactivated_at: new Date().toISOString() }
-        })
-        .eq('id', currentUser.id);
-
-      if (error) throw error;
-
-      // Sign out
-      await sb.auth.signOut();
-      localStorage.removeItem('cs:user');
-
-      if (typeof CS !== 'undefined' && CS.toast) {
-        CS.toast('Account deleted. Redirecting...');
-      }
-
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 1200);
+      const {error}=await sb.from('account_deletion_requests').insert({user_id:currentUser.id});
+      if(error && error.code!=='23505') throw error;
+      deleteModal.classList.remove('show');
+      CS.toast('Your account deletion request is recorded for review.');
     } catch (err) {
       console.error('Delete account error:', err);
       confirmBtn.disabled = false;
-      confirmBtn.textContent = 'Delete Account';
+      confirmBtn.textContent = 'Request deletion';
 
       if (typeof CS !== 'undefined' && CS.toast) {
-        CS.toast('❌ Failed to delete account: ' + (err.message || 'Unknown error'));
+        CS.toast('❌ Could not confirm deletion request: ' + (err.message || 'Unknown error'));
       }
     }
   });

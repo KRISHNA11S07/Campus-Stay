@@ -75,10 +75,10 @@ const CS = {
     const renderRoleLinks = (user) => {
       // Keep the primary information architecture stable after sign-in. Only
       // the dashboard destination changes with the verified database role.
-      const dashboard = user.role === 'owner' ? 'owner-dashboard.html' : 'matches.html';
+      const dashboard = user.role === 'admin' ? 'admin-dashboard.html' : user.role === 'owner' ? 'owner-dashboard.html' : 'matches.html';
       const links = [
         ['index.html#explore', 'Explore'],
-        ['index.html#showcase', 'Showcase'],
+        ['index.html#featured', 'Showcase'],
         ['index.html#how', 'How it works'],
         [user.role === 'owner' ? 'my-listings.html' : 'saved.html', 'Wishlist'],
         [dashboard, 'Dashboard']
@@ -150,7 +150,7 @@ const CS = {
           if (event.key === 'Escape' && dropdown.classList.contains('open')) { close(); trigger.focus(); }
         });
         wrap.querySelector('[data-logout]').addEventListener('click', async () => {
-          try { if (typeof signOut === 'function') await signOut(); } catch (error) { console.warn('[CampusStay] Sign out failed', error); }
+          try { if (typeof signOut === 'function') await signOut(); } catch { CS.toast('Sign out failed. Please try again.'); return; }
           CS.toast('Signed out successfully.');
           window.setTimeout(() => { window.location.href = 'index.html'; }, 350);
         });
@@ -220,7 +220,7 @@ const CS = {
         onAuthStateChange((event, session) => {
           if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') {
             if (session) {
-              renderAuthenticatedState(session).catch(() => {});
+              setTimeout(() => renderAuthenticatedState(session).catch(() => {}), 0);
             } else if (event === 'INITIAL_SESSION') {
               // No session on initial check — user is logged out
               restoreSignInButton();
@@ -511,20 +511,32 @@ const CS = {
   },
 
   /* ---------- wishlist ---------- */
-  wishlist: () => CS.read("wishlist", []),
-  inWishlist: (id) => CS.wishlist().includes(id),
-  toggleWishlist(id) {
-    const list = CS.wishlist();
-    const i = list.indexOf(id);
-    if (i >= 0) {
-      list.splice(i, 1);
-      CS.toast("Removed from wishlist");
-    } else {
-      list.push(id);
-      CS.toast("❤️ Saved to wishlist");
+  savedIds: [],
+  wishlist() { return this.savedIds; },
+  inWishlist(id) { return this.savedIds.includes(id); },
+  async loadWishlist() {
+    this.savedIds = [];
+    const user = await getCurrentUser();
+    if (!user) return;
+    const {data,error} = await getSupabase().from('favorites').select('property_id').eq('student_id',user.id);
+    if (error) throw error;
+    this.savedIds = data.map(row => row.property_id);
+  },
+  async toggleWishlist(id) {
+    const {user,profile} = await getAuthContext();
+    if (!user) {
+      location.assign('auth.html?next='+encodeURIComponent(location.pathname.split('/').pop()+location.search));
+      return;
     }
-    CS.store("wishlist", list);
-    return i < 0;
+    if (profile?.role !== 'student') { CS.toast('Saving stays is available to student accounts.'); return; }
+    const exists = this.inWishlist(id);
+    const table = getSupabase().from('favorites');
+    const result = exists ? await table.delete().eq('student_id',user.id).eq('property_id',id)
+      : await table.insert({student_id:user.id,property_id:id});
+    if (result.error && result.error.code !== '23505') throw result.error;
+    this.savedIds = exists ? this.savedIds.filter(value => value !== id) : [...this.savedIds,id];
+    CS.toast(exists ? 'Removed from saved stays.' : 'Stay saved.');
+    return !exists;
   },
 
   /* ---------- geo + formatting ---------- */
@@ -550,10 +562,9 @@ const CS = {
     );
   },
   avgRating(l) {
-    if (!l) return 4.5;
-    const extra = CS.read("reviews:" + l.id, []);
-    const all = [...(l.reviews || []), ...extra];
-    if (!all.length) return Number(l.rating) || 4.5;
+    if (!l) return 0;
+    const all = l.reviews || [];
+    if (!all.length) return Number(l.rating) || 0;
     return (
       Math.round(
         (all.reduce((s, r) => s + Number(r.rating || 5), 0) / all.length) * 10,
@@ -562,13 +573,14 @@ const CS = {
   },
   reviewCount(l) {
     if (!l) return 0;
-    return (l.reviews || []).length + CS.read("reviews:" + l.id, []).length;
+    return (l.reviews || []).length;
   },
 
   escapeHTML(value = "") {
     return String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[char]));
   },
   safeImageUrl(value) {
+    if (!value) return "";
     try {
       const url = new URL(String(value || ""), window.location.href);
       return ["https:", "blob:"].includes(url.protocol) ? url.href : "";
@@ -599,12 +611,12 @@ const CS = {
     const title = CS.escapeHTML(l.title || "Accommodation");
     const area = CS.escapeHTML(l.area || "Near campus");
     const type = CS.escapeHTML(String(l.type || "stay").toUpperCase());
-    const imgUrl = CS.escapeHTML(CS.safeImageUrl(l.images && l.images[0]) || "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1100&auto=format&fit=crop");
+    const imgUrl = CS.escapeHTML(CS.safeImageUrl(l.images && l.images[0]) || "");
 
     return `
     <article class="listing-card glass reveal in tilt card-3d">
       <a href="property.html?id=${id}" class="lc-media">
-        <img src="${imgUrl}" alt="${title}" loading="lazy">
+        ${imgUrl ? `<img src="${imgUrl}" alt="${title}" loading="lazy">` : '<span>No photo available</span>'}
         <span class="lc-badges">
           <span class="tag type">${type}</span>
           ${l.verified ? '<span class="tag verified">✓ Verified</span>' : ""}
@@ -615,12 +627,12 @@ const CS = {
       <div class="lc-body">
         <div class="lc-top">
           <a href="property.html?id=${id}"><h3>${title}</h3></a>
-          <span class="rating-chip">★ ${rating}</span>
+          <span class="rating-chip">${rating ? "★ "+rating : "Unrated"}</span>
         </div>
         <div class="lc-loc">📍 ${area} · ${CS.reviewCount(l)} reviews</div>
         <div class="lc-facilities">${facs}${more}</div>
         <div class="lc-foot">
-          <span class="price">${CS.inr(l.rent)}<small>/month</small></span>
+          <span class="price">${CS.inr(l.rent)}<small>${l.rent_period ? '/'+l.rent_period : ' (confirm period)'}</small></span>
           <span class="dist">${distanceKm != null ? "📏 " + distanceKm.toFixed(1) + " km away" : ""}</span>
         </div>
       </div>
@@ -628,9 +640,14 @@ const CS = {
   },
   bindWishlistButtons(scope = document) {
     scope.querySelectorAll("[data-wish]").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", async (e) => {
         e.preventDefault();
-        const added = CS.toggleWishlist(btn.dataset.wish);
+        btn.disabled = true;
+        let added;
+        try { added = await CS.toggleWishlist(btn.dataset.wish); }
+        catch { CS.toast('Could not confirm saved stays. Refresh to retry.'); }
+        finally { btn.disabled = false; }
+        if (typeof added !== 'boolean') return;
         btn.classList.toggle("active", added);
         btn.textContent = added ? "♥" : "♡";
       });

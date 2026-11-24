@@ -4,13 +4,18 @@ document.addEventListener('cs:auth-ready', async (event) => {
   const $ = (id) => document.getElementById(id);
   const escapeHTML = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
   const query = new URLSearchParams(location.search);
-  if (profile.preferences?.onboarding?.owner_complete === true && query.get('new') !== '1') {
-    window.location.replace('owner-dashboard.html');
-    return;
-  }
+  const sb = getSupabase();
+  const draftId = query.get('draft') || crypto.randomUUID();
+  let revision = 0;
 
   let currentStep = 1;
   let publishing = false;
+  let dirty = false;
+  $('owner-wizard-form').addEventListener('submit', event => event.preventDefault());
+  $('owner-wizard-form').addEventListener('input', () => { dirty = true; });
+  window.addEventListener('beforeunload', event => {
+    if (dirty) { event.preventDefault(); event.returnValue = ''; }
+  });
   let photos = [];
   let locationState = { lat: null, lng: null, source: null };
 
@@ -18,8 +23,6 @@ document.addEventListener('cs:auth-ready', async (event) => {
   $('owner-occupation').value = profile.occupation || '';
   $('owner-phone').value = String(profile.phone || '').replace(/^\+91/, '');
   $('owner-whatsapp').value = String(profile.whatsapp || '').replace(/^\+91/, '');
-  $('owner-age').value = profile.age || '';
-  $('owner-gender').value = profile.gender || '';
   $('property-type').value = query.get('type') || '';
 
   function renderColleges() {
@@ -30,10 +33,14 @@ document.addEventListener('cs:auth-ready', async (event) => {
 
   function renderAmenities() {
     const root = $('amenity-grid');
-    const items = typeof FACILITIES === 'undefined' ? [] : Object.entries(FACILITIES);
+    const items = references.map(row => [row.id,row]);
     root.innerHTML = items.map(([id, facility]) => `<label class="amenity-option"><input type="checkbox" value="${escapeHTML(id)}"><span class="amenity-check">✓</span><span>${escapeHTML(facility.icon || '•')} ${escapeHTML(facility.label || id)}</span></label>`).join('');
   }
+  const referenceResult = await sb.from('facilities').select('id,label,icon').order('label');
+  const references = referenceResult.data || [];
+  if (referenceResult.error) { setError('Could not load amenities. Refresh to retry.'); return; }
   renderColleges();
+  $('property-college').value = 'kit';
   renderAmenities();
 
   function setError(message = '') { $('wizard-error').textContent = message; }
@@ -46,7 +53,7 @@ document.addEventListener('cs:auth-ready', async (event) => {
       item.classList.toggle('done', number < currentStep);
     });
     $('wizard-back').hidden = currentStep === 1 || publishing;
-    $('wizard-next').textContent = currentStep === 7 ? 'Publish listing' : 'Continue';
+    $('wizard-next').textContent = currentStep === 7 ? 'Submit for review' : 'Continue';
     setError();
     if (currentStep === 6) renderPreview();
     document.querySelector('.owner-wizard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -62,25 +69,29 @@ document.addEventListener('cs:auth-ready', async (event) => {
     if (step === 1) {
       if (!/^[\p{L}][\p{L}\s.'-]{1,79}$/u.test(name) || name.split(' ').length < 2) return setError('Enter your first and last name.'), false;
       if (occupation.length < 2) return setError('Add your occupation or property role.'), false;
-      if (!/^[6-9]\d{9}$/.test($('owner-phone').value.replace(/\D/g, ''))) return setError('Enter a valid 10-digit phone number.'), false;
+      if ($('contact-mode').value === 'public' && !/^[6-9]\d{9}$/.test($('owner-phone').value)) return setError('Enter a valid 10-digit phone number.'), false;
     }
     if (step === 3) {
+      if (!Array.from(document.querySelectorAll('[data-step="3"] input')).every(input => input.checkValidity())) return setError('Check rent, deposit, capacity and distance.'), false;
       if (!$('property-type').value || $('property-title').value.trim().length < 4 || $('property-description').value.trim().length < 20) return setError('Add a property type, a clear title, and at least a short description.'), false;
       if (Number($('property-rent').value) < 500) return setError('Enter a monthly rent of at least ₹500.'), false;
     }
     if (step === 4) {
+      const coordinates = [$('property-lat').value,$('property-lng').value];
+      if (Boolean(coordinates[0]) !== Boolean(coordinates[1]) || Math.abs(Number(coordinates[0]))>90 || Math.abs(Number(coordinates[1]))>180) return setError('Enter a valid latitude and longitude together, or leave both blank.'), false;
       if ($('property-area').value.trim().length < 2) return setError('Add the area or locality students should see.'), false;
     }
-    if (step === 6 && photos.length === 0) return setError('Add at least one property photo before publishing.'), false;
+    if (step === 1 && $('contact-mode').value === 'public' && $('owner-whatsapp').value && !/^[6-9]\d{9}$/.test($('owner-whatsapp').value)) return setError('Enter a valid WhatsApp number or leave it blank.'), false;
+    if (step === 6 && photos.length === 0) return setError('Add at least one property photo before submitting.'), false;
     return true;
   }
 
   function renderPhotos() {
     const root = $('owner-photo-grid');
-    root.innerHTML = photos.map((photo, index) => `<article class="owner-photo"><img src="${photo.url}" alt="Property photo ${index + 1}">${index === 0 ? '<span class="owner-photo-primary">Primary image</span>' : ''}<div class="owner-photo-actions"><button type="button" data-photo-move="up" data-photo-index="${index}" aria-label="Move image earlier" ${index === 0 ? 'disabled' : ''}>←</button><button type="button" data-photo-move="down" data-photo-index="${index}" aria-label="Move image later" ${index === photos.length - 1 ? 'disabled' : ''}>→</button><button type="button" data-photo-remove="${index}" aria-label="Remove image">×</button></div></article>`).join('');
+    root.innerHTML = photos.map((photo, index) => `<article class="owner-photo"><img src="${escapeHTML(CS.safeImageUrl(photo.url))}" alt="Property photo ${index + 1}">${index === 0 ? '<span class="owner-photo-primary">Primary image</span>' : ''}<div class="owner-photo-actions"><button type="button" data-photo-move="up" data-photo-index="${index}" aria-label="Move image earlier" ${index === 0 ? 'disabled' : ''}>←</button><button type="button" data-photo-move="down" data-photo-index="${index}" aria-label="Move image later" ${index === photos.length - 1 ? 'disabled' : ''}>→</button><button type="button" data-photo-remove="${index}" aria-label="Remove image">×</button></div></article>`).join('');
     $('owner-upload-status').textContent = photos.length
       ? `${photos.length} photo${photos.length === 1 ? '' : 's'} ready${photos.length < 5 ? ' · we recommend at least 5' : ' · great coverage'}.`
-      : 'Your images are kept in this draft until you publish.';
+      : 'Your uploaded photos stay private during review.';
   }
 
   function imageDimensions(file) {
@@ -124,14 +135,16 @@ document.addEventListener('cs:auth-ready', async (event) => {
     const files = [...fileList];
     let rejected = 0;
     for (const file of files) {
+      if (photos.length >= 12) { rejected++; continue; }
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 8 * 1024 * 1024) { rejected += 1; continue; }
       try {
         const optimized = await optimizeImage(file);
         const { width, height } = await imageDimensions(optimized);
         if (width < 640 || height < 420) { rejected += 1; continue; }
-        photos.push({ file: optimized, url: URL.createObjectURL(optimized), width, height });
+        photos.push({ file: optimized, key:crypto.randomUUID(), url: URL.createObjectURL(optimized), width, height });
       } catch (_) { rejected += 1; }
     }
+    dirty = true;
     renderPhotos();
     if (rejected) $('owner-upload-status').textContent = `${rejected} file${rejected === 1 ? ' was' : 's were'} skipped. Use JPG, PNG, or WebP up to 8 MB and at least 640 × 420 px.`;
   }
@@ -196,6 +209,7 @@ document.addEventListener('cs:auth-ready', async (event) => {
   $('owner-photo-grid').addEventListener('click', (clickEvent) => {
     const remove = clickEvent.target.closest('[data-photo-remove]');
     const move = clickEvent.target.closest('[data-photo-move]');
+    if (remove || move) dirty = true;
     if (remove) {
       const index = Number(remove.dataset.photoRemove);
       URL.revokeObjectURL(photos[index].url);
@@ -221,6 +235,7 @@ document.addEventListener('cs:auth-ready', async (event) => {
     $('allow-location').disabled = true;
     $('location-message').textContent = 'Requesting location after your approval…';
     navigator.geolocation.getCurrentPosition((position) => {
+      dirty = true;
       locationState = { lat: position.coords.latitude, lng: position.coords.longitude, source: 'device' };
       $('property-lat').value = locationState.lat.toFixed(6);
       $('property-lng').value = locationState.lng.toFixed(6);
@@ -239,12 +254,25 @@ document.addEventListener('cs:auth-ready', async (event) => {
     const root = $('listing-preview');
     const photo = photos[0];
     const rent = Number($('property-rent').value || 0).toLocaleString('en-IN');
-    root.innerHTML = `<div class="listing-preview-media">${photo ? `<img src="${photo.url}" alt="Primary property preview">` : ''}<span>${photos.length} photo${photos.length === 1 ? '' : 's'} selected</span></div><div><h3>${escapeHTML($('property-title').value || 'Your property title')}</h3><p>📍 ${escapeHTML($('property-area').value || 'Area to be confirmed')} · ${escapeHTML(($('property-type').value || 'property').toUpperCase())}</p><p>${escapeHTML($('property-description').value || 'Your property description will appear here.')}</p><div class="preview-meta"><span>₹${rent}/month</span><span>${selectedAmenities().length} amenities</span><span>${document.querySelector('input[name="location-privacy"]:checked').value === 'area_only' ? 'Area only' : 'Approximate pin'}</span></div></div>`;
+    root.innerHTML = `<div class="listing-preview-media">${photo ? `<img src="${escapeHTML(CS.safeImageUrl(photo.url))}" alt="Primary property preview">` : ''}<span>${photos.length} photo${photos.length === 1 ? '' : 's'} selected</span></div><div><h3>${escapeHTML($('property-title').value || 'Your property title')}</h3><p>📍 ${escapeHTML($('property-area').value || 'Area to be confirmed')} · ${escapeHTML(($('property-type').value || 'property').toUpperCase())}</p><p>${escapeHTML($('property-description').value || 'Your property description will appear here.')}</p><div class="preview-meta"><span>₹${rent}/month</span><span>${selectedAmenities().length} amenities</span><span>${document.querySelector('input[name="location-privacy"]:checked').value === 'area_only' ? 'Area only' : 'Approximate pin'}</span></div></div>`;
+    const details = document.createElement('dl');
+    for (const [label,value] of [
+      ['Rent and deposit','₹'+rent+' per month · deposit ₹'+($('property-deposit').value || 0)],
+      ['Room arrangement',$('property-room-type').value],['Capacity',$('property-capacity').value],
+      ['Available from',$('property-available-from').value],['City',$('property-city').value],
+      ['Near college',$('property-college').selectedOptions[0]?.textContent],['Distance (km)',$('property-distance').value],
+      ['Facilities',Array.from(document.querySelectorAll('#amenity-grid input:checked'),n=>n.parentElement.textContent.trim()).join(', ')],
+      ['House rules',$('property-rules').value],['Owner',$('owner-name').value],
+      ['Contact',$('contact-mode').value==='public' ? [$('owner-phone').value,$('owner-whatsapp').value].filter(Boolean).join(' / ') : 'In-app enquiries only'],
+      ['Private address for your records',$('property-address').value]
+    ]) {
+      if (!value) continue;
+      const term=document.createElement('dt'), description=document.createElement('dd');
+      term.textContent=label; description.textContent=value; details.append(term,description);
+    }
+    root.append(details);
   }
 
-  function approximateCoordinate(value) {
-    return Number.isFinite(value) ? Math.round(value * 1000) / 1000 : null;
-  }
   function updatePublishProgress(percent, label) {
     const progress = $('publish-progress');
     progress.hidden = false;
@@ -252,122 +280,76 @@ document.addEventListener('cs:auth-ready', async (event) => {
     $('publish-progress-label').textContent = label;
   }
 
-  async function publishListing() {
-    if (!validStep(6) || publishing) return;
-    publishing = true;
-    setError();
-    $('wizard-next').disabled = true;
-    $('wizard-back').disabled = true;
-    const sb = getSupabase();
-    let propertyId = null;
-    const storagePaths = [];
-    try {
-      updatePublishProgress(8, 'Saving your owner profile…');
-      const age = $('owner-age').value ? Number($('owner-age').value) : null;
-      const gender = $('owner-gender').value || null;
-      const { error: ownerError } = await sb.from('profiles').update({
-        full_name: $('owner-name').value.trim().replace(/\s+/g, ' '), occupation: $('owner-occupation').value.trim(), age, gender
-      }).eq('id', user.id);
-      if (ownerError) throw ownerError;
-
-      const phone = '+91' + $('owner-phone').value.replace(/\D/g, '');
-      const whatsappDigits = $('owner-whatsapp').value.replace(/\D/g, '');
-      const whatsapp = whatsappDigits ? '+91' + whatsappDigits : phone;
-      const { error: contactError } = await sb.rpc('set_my_owner_contact', { p_phone: phone, p_whatsapp: whatsapp });
-      if (contactError) throw new Error('Owner contact setup is not deployed yet. Run migration 009_listing_details.sql and publish again.');
-
-      const manualLat = Number($('property-lat').value);
-      const manualLng = Number($('property-lng').value);
-      const exactLat = Number.isFinite(locationState.lat) ? locationState.lat : (Number.isFinite(manualLat) ? manualLat : null);
-      const exactLng = Number.isFinite(locationState.lng) ? locationState.lng : (Number.isFinite(manualLng) ? manualLng : null);
-      const privacy = document.querySelector('input[name="location-privacy"]:checked').value;
-      updatePublishProgress(19, 'Creating your private listing draft…');
-      const { data: property, error: propertyError } = await sb.from('properties').insert({
-        owner_id: user.id,
-        type: $('property-type').value,
-        title: $('property-title').value.trim(),
-        description: $('property-description').value.trim(),
-        area: $('property-area').value.trim(),
-        college_id: $('property-college').value || null,
-        rent: Number($('property-rent').value),
-        deposit: Number($('property-deposit').value || 0),
-        city: $('property-city').value.trim() || null,
-        available_from: $('property-available-from').value || null,
-        distance_km: $('property-distance').value ? Number($('property-distance').value) : null,
-        room_bed_count: $('property-capacity').value ? Number($('property-capacity').value) : null,
-        owner_name: $('owner-name').value.trim().replace(/\s+/g, ' '),
-        owner_phone: phone,
-        owner_whatsapp: whatsapp,
-        gender: $('property-gender').value,
-        // The public table only ever receives an approximate point.
-        lat: privacy === 'approximate' ? approximateCoordinate(exactLat) : null,
-        lng: privacy === 'approximate' ? approximateCoordinate(exactLng) : null,
-        verification_status: 'pending'
-      }).select('id').single();
-      if (propertyError) throw propertyError;
-      propertyId = property.id;
-
-      updatePublishProgress(31, 'Protecting your exact location…');
-      const { error: locationError } = await sb.from('property_locations').upsert({
-        property_id: propertyId,
-        owner_id: user.id,
-        exact_lat: exactLat,
-        exact_lng: exactLng,
-        private_address: $('property-address').value.trim() || null,
-        privacy_mode: privacy
-      });
-      if (locationError) {
-        if (/property_locations|does not exist|schema cache/i.test(locationError.message || '')) throw new Error('Location privacy is not deployed yet. Run migration 008_auth_onboarding_privacy.sql and publish again.');
-        throw locationError;
-      }
-
-      for (let index = 0; index < photos.length; index += 1) {
-        const photo = photos[index];
-        updatePublishProgress(34 + Math.round((index / photos.length) * 48), `Uploading photo ${index + 1} of ${photos.length}…`);
-        const extension = photo.file.name.split('.').pop().toLowerCase();
-        const path = `${user.id}/${propertyId}/${Date.now()}_${index}.${extension}`;
-        const { error: uploadError } = await sb.storage.from('property-media').upload(path, photo.file, { cacheControl: '3600', upsert: false, contentType: photo.file.type });
-        if (uploadError) throw uploadError;
-        storagePaths.push(path);
-        const { error: mediaError } = await sb.from('property_media').insert({ property_id: propertyId, file_url: '', file_type: 'image', storage_path: path, file_size: photo.file.size, display_order: index });
-        if (mediaError) throw mediaError;
-      }
-
-      updatePublishProgress(85, 'Saving amenities and property details…');
-      const amenities = selectedAmenities();
-      if (amenities.length) {
-        const { error } = await sb.from('property_facilities').insert(amenities.map((facility_id) => ({ property_id: propertyId, facility_id })));
-        if (error) throw error;
-      }
-      const rules = $('property-rules').value.split('\n').map((rule) => rule.trim()).filter(Boolean);
-      if (rules.length) {
-        const { error } = await sb.from('property_rules').insert(rules.map((rule_text, display_order) => ({ property_id: propertyId, rule_text, display_order })));
-        if (error) throw error;
-      }
-      const preferences = profile.preferences || {};
-      const { error: profileError } = await sb.from('profiles').update({ preferences: { ...preferences, onboarding: { ...(preferences.onboarding || {}), owner_complete: true } } }).eq('id', user.id);
-      if (profileError) throw profileError;
-      updatePublishProgress(100, 'Listing submitted for verification.');
-      CS.toast('Your listing was submitted for review.');
-      window.setTimeout(() => { window.location.href = 'owner-dashboard.html'; }, 800);
-    } catch (error) {
-      console.warn('[Owner onboarding] publish failed:', error.message);
-      // Do not leave an inaccessible partial listing behind if a privacy or upload step fails.
-      if (storagePaths.length) await sb.storage.from('property-media').remove(storagePaths);
-      if (propertyId) await sb.from('properties').delete().eq('id', propertyId);
-      updatePublishProgress(0, 'Upload paused. Nothing was published.');
-      setError(error.message && error.message.includes('migration 008') ? error.message : 'We could not publish this listing. Check your connection and try again.');
-      publishing = false;
-      $('wizard-next').disabled = false;
-      $('wizard-back').disabled = false;
-    }
+  function draftFields() {
+    return [...document.querySelectorAll('.wizard-panel input[id], .wizard-panel textarea[id], .wizard-panel select[id]')]
+      .filter(node => !['file','checkbox','radio'].includes(node.type));
   }
-
+  function payload() {
+    return {fields:Object.fromEntries(draftFields().map(node=>[node.id,node.value])),
+      privacy:document.querySelector('[name="location-privacy"]:checked').value, step:currentStep,
+      amenities:selectedAmenities(),photos:photos.filter(p=>p.path).map(p=>({path:p.path}))};
+  }
+  async function saveSnapshot() {
+    const snapshot = payload();
+    const result=await sb.rpc('save_listing_draft',{p_id:draftId,p_revision:revision,p_payload:snapshot});
+    if(result.error) throw result.error;
+    revision=result.data;
+    history.replaceState(null,'','owner-onboarding.html?draft='+encodeURIComponent(draftId));
+  }
+  async function persist(submit) {
+    if(publishing)return;
+    if(submit) for(const step of [1,3,4,6]) if(!validStep(step)){const message=$('wizard-error').textContent;setStep(step);setError(message);return;}
+    publishing=true;
+    document.querySelector('.owner-wizard').inert=true;
+    try {
+      await saveSnapshot();
+      for(const [index,photo] of photos.entries()) {
+        if(photo.path)continue;
+        updatePublishProgress(10+Math.round(index/photos.length*75),'Uploading photo '+(index+1)+' of '+photos.length);
+        const ext=({'image/webp':'webp','image/jpeg':'jpg','image/png':'png'})[photo.file.type];
+        const path=user.id+'/'+draftId+'/'+photo.key+'.'+ext;
+        const {error}=await sb.storage.from('property-media').upload(path,photo.file,{contentType:photo.file.type,upsert:false});
+        if(error && String(error.statusCode)!=='409' && error.error!=='Duplicate')throw error;
+        photo.path=path;
+        await saveSnapshot();
+      }
+      if(submit){
+        const result=await sb.rpc('submit_listing_draft',{p_id:draftId,p_revision:revision});
+        if(result.error)throw result.error;
+        updatePublishProgress(100,'Your property has been submitted for review.');
+        CS.toast('Your property has been submitted for review.');
+        dirty = false;
+        location.assign('owner-dashboard.html');
+      } else { dirty = false; updatePublishProgress(100,'Draft saved. Resume from your dashboard.'); }
+    } catch(error) {
+      if (submit) {
+        const receipt = await sb.from('listing_drafts').select('submitted_at').eq('id',draftId).maybeSingle();
+        if (receipt.data?.submitted_at) { dirty=false; CS.toast('Your property has been submitted for review.'); location.assign('owner-dashboard.html'); return; }
+      }
+      console.warn('[Listing draft]',error.code||'connection error');
+      setError('Save could not be confirmed. Your form is still here. Check your connection. If another tab saved this draft, reopen it from the dashboard.');
+    } finally {publishing=false;document.querySelector('.owner-wizard').inert=false;}
+  }
+  if(query.has('draft')){
+    const {data,error}=await sb.from('listing_drafts').select('payload,revision,submitted_at').eq('id',draftId).maybeSingle();
+    if(error || !data){setError('Draft unavailable. Return to your dashboard.');return;}
+    if(data.submitted_at){location.replace('owner-dashboard.html');return;}
+    revision=data.revision;
+    for(const node of draftFields()) if(data.payload.fields?.[node.id]!=null)node.value=data.payload.fields[node.id];
+    for(const node of document.querySelectorAll('#amenity-grid input'))node.checked=(data.payload.amenities||[]).includes(node.value);
+    for(const node of document.querySelectorAll('[name="location-privacy"]'))node.checked=node.value===data.payload.privacy;
+    photos=await Promise.all((data.payload.photos||[]).map(async p=>{
+      const result=await sb.storage.from('property-media').createSignedUrl(p.path,900);
+      return {path:p.path,url:result.data?.signedUrl||''};
+    }));
+    currentStep=Number(data.payload.step)||1;renderPhotos();
+  }
+  $('wizard-save').addEventListener('click',()=>persist(false));
   $('wizard-next').addEventListener('click', () => {
-    if (currentStep === 7) { publishListing(); return; }
+    if (currentStep === 7) { persist(true); return; }
     if (!validStep(currentStep)) return;
     setStep(currentStep + 1);
   });
   $('wizard-back').addEventListener('click', () => { if (!publishing) setStep(currentStep - 1); });
-  setStep(1);
+  setStep(currentStep);
 });

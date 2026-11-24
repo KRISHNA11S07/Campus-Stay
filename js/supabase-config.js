@@ -9,9 +9,8 @@ const _runtimeConfig = window.CAMPUSSTAY_RUNTIME_CONFIG || {};
 const SUPABASE_URL = typeof _runtimeConfig.supabaseUrl === 'string'
   ? _runtimeConfig.supabaseUrl.trim()
   : '';
-const SUPABASE_ANON_KEY = typeof _runtimeConfig.supabaseAnonKey === 'string'
-  ? _runtimeConfig.supabaseAnonKey.trim()
-  : '';
+const browserKey = _runtimeConfig.supabasePublishableKey || _runtimeConfig.supabaseAnonKey;
+const SUPABASE_ANON_KEY = typeof browserKey === 'string' ? browserKey.trim() : '';
 
 // Public browser key only. Keep Razorpay secrets on a server/Edge Function.
 const RAZORPAY_KEY_ID = 'YOUR_RAZORPAY_KEY_ID';
@@ -19,18 +18,27 @@ const RAZORPAY_KEY_ID = 'YOUR_RAZORPAY_KEY_ID';
 let _supabaseClient = null;
 
 function isSupabaseConfigured() {
-  return /^https:\/\/[^\s/]+\.supabase\.co\/?$/i.test(SUPABASE_URL)
-    && SUPABASE_ANON_KEY.length > 20;
+  return !getSupabaseConfigurationError();
 }
 
 function getSupabaseConfigurationError() {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    return 'Supabase is not configured. Add the project URL and publishable key to js/runtime-config.js.';
+    return 'Sign-in is unavailable because the Supabase browser configuration is missing.';
   }
-  if (!/^https:\/\/[^\s/]+\.supabase\.co\/?$/i.test(SUPABASE_URL)) {
+  const project = /^https:\/\/([a-z0-9-]+)\.supabase\.co\/?$/i.exec(SUPABASE_URL);
+  if (!project) {
     return 'Supabase URL must use the https://<project-ref>.supabase.co format.';
   }
-  return 'Supabase publishable key is missing or invalid.';
+  if (/^sb_publishable_[A-Za-z0-9_-]{12,}$/.test(SUPABASE_ANON_KEY)) return '';
+  // Older projects use an anon JWT as their public browser key.
+  const jwt = /^[A-Za-z0-9_-]+\.([A-Za-z0-9_-]+)\.[A-Za-z0-9_-]+$/.exec(SUPABASE_ANON_KEY);
+  if (jwt) {
+    try {
+      const claims = JSON.parse(atob(jwt[1].replace(/-/g, '+').replace(/_/g, '/')));
+      if (claims.role === 'anon' && (!claims.ref || claims.ref === project[1])) return '';
+    } catch { /* Malformed legacy key. */ }
+  }
+  return 'Sign-in requires a valid public Supabase browser key.';
 }
 
 function getSupabase() {
@@ -44,13 +52,17 @@ function getSupabase() {
     return null;
   }
 
-  _supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
-    }
-  });
+  try {
+    _supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
+  } catch {
+    console.warn('[CampusStay] Supabase client initialization failed.');
+  }
   return _supabaseClient;
 }
 
@@ -58,22 +70,24 @@ function getSupabase() {
 // RLS policies have authorized the current user to read each object.
 async function resolveMediaUrls(media, expiresIn = 3600) {
   if (!Array.isArray(media) || media.length === 0) return media || [];
-  const sb = getSupabase();
-  if (!sb) return media;
-
   const paths = [...new Set(media.map((item) => item?.storage_path).filter(Boolean))];
   if (paths.length === 0) return media;
 
-  const { data, error } = await sb.storage.from('property-media').createSignedUrls(paths, expiresIn);
-  if (error || !data) return media;
-
-  const signedByPath = new Map(data
-    .filter((item) => item?.path && item?.signedUrl)
-    .map((item) => [item.path, item.signedUrl]));
-  return media.map((item) => ({
+  const signedByPath = new Map();
+  try {
+    const result = await getSupabase()?.storage.from('property-media').createSignedUrls(paths, expiresIn);
+    if (result && !result.error) {
+      for (const item of result.data || []) {
+        if (item?.path && item.signedUrl && !item.error) signedByPath.set(item.path, item.signedUrl);
+      }
+    }
+  } catch {
+    // A failed signing request must leave path-backed media unavailable.
+  }
+  return media.map((item) => item.storage_path ? {
     ...item,
-    file_url: signedByPath.get(item.storage_path) || item.file_url || ''
-  }));
+    file_url: signedByPath.get(item.storage_path) || ''
+  } : item);
 }
 
 function cacheAuthenticatedUser(profile, user) {
@@ -115,7 +129,7 @@ async function getProfile(session = null) {
 
   const { data, error } = await sb
     .from('profiles')
-    .select('*')
+    .select('*,owner_applications(status)')
     .eq('id', activeSession.user.id)
     .maybeSingle();
 
@@ -123,7 +137,10 @@ async function getProfile(session = null) {
     console.warn('[CampusStay] Profile fetch failed:', error.message);
     return null;
   }
-  return data || null;
+  if (!data) return null;
+  const application = Array.isArray(data.owner_applications) ? data.owner_applications[0] : data.owner_applications;
+  const ownerStatus = application?.status || (data.role === 'owner' ? 'verification_required' : null);
+  return { ...data, ownerStatus, role: data.role === 'owner' && ownerStatus !== 'approved' ? 'student' : data.role };
 }
 
 async function waitForProfile(session, attempts = 4) {
@@ -168,8 +185,10 @@ function profileNeedsRoleSelection(profile) {
 }
 
 function getPostAuthDestination(profile, requestedRole) {
+  if (profile?.role === 'admin') return 'admin-dashboard.html';
+  if (profile?.ownerStatus && profile.ownerStatus !== 'approved') return 'owner-application.html';
   if (profileNeedsRoleSelection(profile)) return 'role-onboarding.html';
-  const role = profile?.role || requestedRole || 'student';
+  const role = profile?.role || 'student';
   if (role === 'owner') {
     // Existing owners without an onboarding marker remain on their dashboard.
     if (profile?.preferences?.onboarding?.owner_complete === false) return 'owner-onboarding.html';
@@ -195,10 +214,11 @@ function appUrl(path) {
 function safeNextPath(next) {
   if (!next) return null;
   try {
-    const decoded = decodeURIComponent(next);
-    // Only allow a same-site relative path; never follow an external redirect.
-    if (/^[a-z][a-z0-9+.-]*:/i.test(decoded) || decoded.startsWith('//')) return null;
-    return decoded.replace(/^\/+/, '');
+    const candidate = new URL(next, location.href);
+    const file = candidate.pathname.split('/').pop();
+    if (candidate.origin !== location.origin || !/^[a-z][a-z-]*[.]html$/.test(file) || file === 'auth.html') return null;
+    if (candidate.pathname !== new URL(file,location.href).pathname) return null;
+    return file + candidate.search + candidate.hash;
   } catch (_) {
     return null;
   }
@@ -214,21 +234,12 @@ function redirectAfterAuth(profile, requestedRole = null, delay = 0) {
   window.setTimeout(() => { window.location.href = destination; }, delay);
 }
 
-async function completeProfileFromAuth(session, { name = '', role = 'student', onboarding = null, allowRolePromotion = false } = {}) {
+async function completeProfileFromAuth(session, { name = '', onboarding = null } = {}) {
   const sb = getSupabase();
   if (!sb || !session?.user) return null;
 
   let profile = await waitForProfile(session);
   if (!profile) return null;
-
-  // A role selector never overwrites an existing account's role. New accounts
-  // start as students in the database trigger and may use the constrained RPC
-  // to opt into owner capabilities.
-  if (allowRolePromotion && role === 'owner' && profile.role === 'student') {
-    const { error } = await sb.rpc('promote_to_owner');
-    if (error) throw new Error('We could not set up the owner account. Please try again.');
-    profile = await waitForProfile(session);
-  }
 
   const currentPreferences = profile?.preferences || {};
   const nextPreferences = onboarding
@@ -250,11 +261,12 @@ async function completeProfileFromAuth(session, { name = '', role = 'student', o
 
 async function signOut() {
   const sb = getSupabase();
-  try {
-    if (sb) await sb.auth.signOut();
-  } finally {
-    clearAuthenticatedUserCache();
-  }
+  if (!sb) throw new Error('Session service unavailable');
+  const {error} = await sb.auth.signOut();
+  if (error) throw error;
+  clearAuthenticatedUserCache();
+  if (typeof CS !== 'undefined') CS.savedIds = [];
+  for (const key of Object.keys(sessionStorage)) if (key.startsWith('cs:property-') || key==='cs:origin') sessionStorage.removeItem(key);
 }
 
 async function sendOTP(phone, role) {
@@ -351,3 +363,22 @@ const CS_phone = {
     return message ? `${base}?text=${encodeURIComponent(message)}` : base;
   }
 };
+
+// Fetch the public inventory even when a signed-in owner can also read drafts.
+async function publishedKitListings() {
+  const sb=getSupabase();
+  if(!sb) throw new Error('Listing service unavailable');
+  const {data,error}=await sb.from('properties')
+    .select('id,type,title,area,city,lat,lng,rent,rent_period,deposit,available,distance_km,reviews(rating),property_media(file_url,storage_path,display_order),property_facilities(facility_id)')
+    .eq('college_id','kit').eq('available',true).eq('listing_status','published').eq('verification_status','verified').order('created_at',{ascending:false});
+  if(error)throw error;
+  const result=[];
+  for(const p of data){
+    const distance=p.lat!=null && p.lng!=null ? CS.haversineKm(COLLEGES[0],p) : p.distance_km;
+    if(distance==null || distance>5)continue;
+    const media=await resolveMediaUrls(p.property_media||[]);
+    result.push({...p,verified:true,distanceKm:Number(distance),facilities:p.property_facilities.map(f=>f.facility_id),
+      images:media.sort((a,b)=>a.display_order-b.display_order).map(m=>m.file_url).filter(Boolean)});
+  }
+  return result;
+}

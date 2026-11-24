@@ -19,14 +19,6 @@ document.addEventListener('cs:auth-ready', async () => {
     collegeSelect.appendChild(opt);
   });
 
-  // Pre-fill owner phone from profile
-  const profile = await getProfile();
-  if (profile && profile.phone) {
-    // Strip +91 or 91 prefix for display
-    let phone = profile.phone.replace(/^\+?91/, '');
-    $('prop-phone').value = phone;
-  }
-
   // Geolocation button
   $('btn-get-location').addEventListener('click', () => {
     if (!navigator.geolocation) {
@@ -73,14 +65,14 @@ document.addEventListener('cs:auth-ready', async () => {
 
     // Validate phone
     const phoneRaw = $('prop-phone').value.trim();
-    if (!/^\d{10}$/.test(phoneRaw)) {
+    if (phoneRaw && !/^[6-9]\d{9}$/.test(phoneRaw)) {
       CS.toast('❌ Please enter a valid 10-digit phone number.');
       return;
     }
 
     const propertyData = {
       owner_id: user.id,
-      type: propertyType,
+      type: $('prop-type').value,
       title: $('prop-title').value.trim(),
       description: $('prop-desc').value.trim(),
       area: $('prop-area').value.trim(),
@@ -90,8 +82,9 @@ document.addEventListener('cs:auth-ready', async () => {
       rent: parseInt($('prop-rent').value),
       deposit: parseInt($('prop-deposit').value) || 0,
       gender: $('prop-gender').value,
-      verification_status: 'pending',
-      available: true
+      listing_status: 'draft',
+      rent_period: editId ? ($('prop-rent').dataset.period || null) : 'year',
+      ...(editId ? {} : {available:true})
     };
 
     const btn = $('btn-next-step');
@@ -101,11 +94,10 @@ document.addEventListener('cs:auth-ready', async () => {
     try {
       const sb = getSupabase();
 
-      // Save owner phone to profile
-      const phoneFormatted = '+91' + phoneRaw;
-      await sb.from('profiles').update({ phone: phoneFormatted }).eq('id', user.id);
+      propertyData.owner_phone = phoneRaw ? '+91' + phoneRaw : null;
+      if (!phoneRaw) propertyData.owner_whatsapp = null;
 
-      let propertyId = editId || sessionStorage.getItem('cs:property-id');
+      let propertyId = editId;
 
       if (propertyId) {
         // Update existing
@@ -113,7 +105,7 @@ document.addEventListener('cs:auth-ready', async () => {
           .from('properties')
           .update(propertyData)
           .eq('id', propertyId)
-          .eq('owner_id', user.id);
+          .eq('owner_id', user.id).select('id').single();
         if (error) throw error;
       } else {
         // Insert new
@@ -156,7 +148,8 @@ document.addEventListener('cs:auth-ready', async () => {
       .single();
 
     if (error || !data) {
-      CS.toast('❌ Property not found.');
+      CS.toast('Property unavailable. Return to your dashboard.');
+      $('btn-next-step').disabled = true;
       return;
     }
 
@@ -165,17 +158,16 @@ document.addEventListener('cs:auth-ready', async () => {
     $('prop-area').value = data.area || '';
     $('prop-college').value = data.college_id || '';
     $('prop-rent').value = data.rent || '';
+    $('prop-rent').dataset.period=data.rent_period||'';
+    document.querySelector('label[for=prop-rent]').textContent=data.rent_period==='month'?'Monthly rent (₹/month)':data.rent_period==='year'?'Annual rent (₹/year)':'Rent (existing period unconfirmed)';
+    $('prop-rent').min = '1';
     $('prop-deposit').value = data.deposit || '';
     $('prop-gender').value = data.gender || 'any';
     $('prop-lat').value = data.lat || '';
     $('prop-lng').value = data.lng || '';
     $('prop-type').value = data.type;
 
-    // Re-load owner phone from profile (may have been updated)
-    const profile = await getProfile();
-    if (profile && profile.phone) {
-      $('prop-phone').value = profile.phone.replace(/^\+?91/, '');
-    }
+    $('prop-phone').value = String(data.owner_phone || '').replace(/^\+?91/, '');
 
     sessionStorage.setItem('cs:property-id', id);
     sessionStorage.setItem('cs:property-draft', JSON.stringify(data));

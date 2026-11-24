@@ -128,15 +128,14 @@ document.addEventListener('cs:auth-ready', async () => {
   // ── Remove media ─────────────────────────────────────
   async function removeMedia(mediaId, storagePath) {
     try {
-      // Delete from storage
-      if (storagePath) {
-        await sb.storage.from('property-media').remove([storagePath]);
-      }
-
-      // Delete from database
-      await sb.from('property_media').delete().eq('id', mediaId);
-
+      const removed = await sb.from('property_media').delete().eq('property_id',propertyId).eq('id',mediaId).select('id').single();
+      if (removed.error) throw removed.error;
       uploadedMedia = uploadedMedia.filter(m => m.id !== mediaId);
+      // Only unattached private storage is left if physical removal fails.
+      if (storagePath) {
+        const result = await sb.storage.from('property-media').remove([storagePath]);
+        if (result.error) updateStatus('Photo detached. Private storage cleanup is pending.');
+      }
       renderGrid();
       CS.toast('🗑️ Media removed.');
     } catch (err) {
@@ -159,12 +158,12 @@ document.addEventListener('cs:auth-ready', async () => {
       return `
         <div class="media-item" data-id="${m.id}">
           ${isVideo
-            ? `<video src="${m.file_url}" muted></video>`
-            : `<img src="${m.file_url}" alt="Property photo" loading="lazy">`
+            ? `<video src="${CS.escapeHTML(CS.safeImageUrl(m.file_url))}" muted></video>`
+            : `<img src="${CS.escapeHTML(CS.safeImageUrl(m.file_url))}" alt="Property photo" loading="lazy">`
           }
           ${isUploading
             ? `<div class="upload-progress" style="width:60%;"></div>`
-            : `<button class="remove-btn" data-remove="${m.id}" data-path="${m.storage_path || ''}" title="Remove">✕</button>`
+            : `<button class="remove-btn" data-remove="${m.id}" data-path="${CS.escapeHTML(m.storage_path || '')}" title="Remove">✕</button>`
           }
         </div>`;
     }).join('');

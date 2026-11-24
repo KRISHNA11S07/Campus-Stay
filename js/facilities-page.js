@@ -26,18 +26,19 @@ document.addEventListener('cs:auth-ready', async () => {
 
   if (error) {
     console.error('Error loading facilities:', error);
-    // Fallback to local data.js FACILITIES
-    renderFacilitiesFromLocal();
+    CS.toast("Facilities could not be loaded. Refresh before editing.");
+    return;
   } else {
     renderFacilities(allFacilities);
   }
 
   // Load existing selections
-  const { data: existing } = await sb
+  const { data: existing, error: selectionError } = await sb
     .from('property_facilities')
     .select('facility_id')
     .eq('property_id', propertyId);
 
+  if (selectionError) { CS.toast("Current facilities could not be loaded. Refresh before editing."); return; }
   if (existing) {
     existing.forEach(pf => selectedFacilities.add(pf.facility_id));
     updateSelectionUI();
@@ -46,23 +47,10 @@ document.addEventListener('cs:auth-ready', async () => {
   function renderFacilities(facilities) {
     const grid = $('fac-grid');
     grid.innerHTML = facilities.map(f => `
-      <label class="fac-select-item ${selectedFacilities.has(f.id) ? 'selected' : ''}" data-fac="${f.id}">
-        <input type="checkbox" value="${f.id}" ${selectedFacilities.has(f.id) ? 'checked' : ''}>
-        <span>${f.icon}</span>
-        <span>${f.label}</span>
-      </label>
-    `).join('');
-
-    bindCheckboxes();
-  }
-
-  function renderFacilitiesFromLocal() {
-    const grid = $('fac-grid');
-    grid.innerHTML = Object.entries(FACILITIES).map(([id, f]) => `
-      <label class="fac-select-item" data-fac="${id}">
-        <input type="checkbox" value="${id}">
-        <span>${f.icon}</span>
-        <span>${f.label}</span>
+      <label class="fac-select-item ${selectedFacilities.has(f.id) ? 'selected' : ''}" data-fac="${CS.escapeHTML(f.id)}">
+        <input type="checkbox" value="${CS.escapeHTML(f.id)}" ${selectedFacilities.has(f.id) ? 'checked' : ''}>
+        <span>${CS.escapeHTML(f.icon)}</span>
+        <span>${CS.escapeHTML(f.label)}</span>
       </label>
     `).join('');
 
@@ -99,18 +87,10 @@ document.addEventListener('cs:auth-ready', async () => {
     btn.innerHTML = '<span class="spinner"></span> Saving...';
 
     try {
-      // Delete existing facilities for this property
-      await sb.from('property_facilities').delete().eq('property_id', propertyId);
-
-      // Insert selected ones
-      if (selectedFacilities.size > 0) {
-        const rows = Array.from(selectedFacilities).map(fid => ({
-          property_id: propertyId,
-          facility_id: fid
-        }));
-        const { error } = await sb.from('property_facilities').insert(rows);
-        if (error) throw error;
-      }
+      const { error } = await sb.rpc('replace_listing_details', {
+        p_property: propertyId, p_section: 'facilities', p_values: Array.from(selectedFacilities)
+      });
+      if (error) throw error;
 
       // Store in sessionStorage for confirmation page
       sessionStorage.setItem('cs:property-facilities', JSON.stringify(Array.from(selectedFacilities)));

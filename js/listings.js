@@ -4,7 +4,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(location.search);
   const isWishlistView = params.get('view') === 'wishlist';
-  const college = COLLEGES.find((c) => c.id === params.get('college')) || null;
+  const college = COLLEGES.find((c) => c.id === params.get('college')) || COLLEGES[0];
   const RADIUS_KM = 5;
 
   /* Origin point: user geolocation (if granted on homepage) else the college */
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       newUrl.searchParams.delete('type');
       window.history.replaceState({}, '', newUrl);
     } else {
-      const cb = document.querySelector(`input[name="type"][value="${t}"]`);
+      const cb = Array.from(document.querySelectorAll('input[name="type"]')).find(input => input.value === t);
       if (cb) cb.checked = true;
     }
   }
@@ -61,49 +61,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   /* Distance annotate */
-  let withDistance = LISTINGS.map((l) => ({
-    l,
-    dist: origin ? CS.haversineKm(origin, l) : null,
-  }));
-
+  let withDistance = [];
   async function loadPublishedOwnerListings() {
-    const sb = typeof getSupabase === 'function' ? getSupabase() : null;
-    if (!sb) return;
-    const { data, error } = await sb
-      .from('properties')
-      .select('id,type,title,description,area,city,lat,lng,rent,deposit,available,verification_status,distance_km,property_media(file_url,storage_path,display_order),property_facilities(facility_id)')
-      .eq('verification_status', 'verified')
-      .order('created_at', { ascending: false });
-    if (error || !data?.length) return;
-    const hydrated = await Promise.all(data.map(async (property) => ({
-      ...property,
-      property_media: await resolveMediaUrls(property.property_media || [])
-    })));
-    const remote = hydrated.map((property) => ({
-      id: property.id,
-      type: property.type,
-      title: property.title,
-      area: [property.area, property.city].filter(Boolean).join(', ') || 'Near campus',
-      lat: property.lat,
-      lng: property.lng,
-      rent: Number(property.rent || 0),
-      deposit: Number(property.deposit || 0),
-      available: property.available !== false,
-      verified: true,
-      rating: 4.5,
-      reviews: [],
-      facilities: (property.property_facilities || []).map((item) => item.facility_id),
-      images: (property.property_media || []).sort((a, b) => (a.display_order || 0) - (b.display_order || 0)).map((item) => item.file_url),
-      distanceKm: Number(property.distance_km)
-    }));
-    withDistance = [...LISTINGS, ...remote].map((l) => ({
-      l,
-      dist: origin && Number.isFinite(l.lat) && Number.isFinite(l.lng)
-        ? CS.haversineKm(origin, l)
-        : (Number.isFinite(l.distanceKm) ? l.distanceKm : null)
-    }));
+    const [remote] = await Promise.all([publishedKitListings(), CS.loadWishlist()]);
+    withDistance=remote.map(l=>({l,dist:origin && l.lat!=null && l.lng!=null ? CS.haversineKm(origin,l) : l.distanceKm}));
   }
-
   function currentFilters() {
     return {
       types: [...document.querySelectorAll('input[name="type"]:checked')].map((i) => i.value),
@@ -126,13 +88,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const wl = CS.wishlist();
       rows = rows.filter((r) => wl.includes(r.l.id));
     } else if (origin) {
-      rows = rows.filter((r) => r.dist <= RADIUS_KM);
+      rows = rows.filter((r) => r.dist != null && r.dist <= RADIUS_KM);
     }
 
     rows = rows.filter((r) => {
       const l = r.l;
       if (f.types.length && !f.types.includes(l.type)) return false;
-      if (l.rent > f.maxRent) return false;
+      if ((l.rent_period==='year' ? l.rent/12 : l.rent) > f.maxRent) return false;
       if (origin && !isWishlistView && r.dist > f.maxDist) return false;
       if (CS.avgRating(l) < f.minRating) return false;
       if (f.verified && !l.verified) return false;
@@ -186,6 +148,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('sort').addEventListener('change', render);
   document.getElementById('clear-filters').addEventListener('click', resetFilters);
 
-  await loadPublishedOwnerListings();
+  try {await loadPublishedOwnerListings();} catch {document.getElementById('results-grid').textContent='Could not load listings. Refresh to retry.';return;}
   render();
 });

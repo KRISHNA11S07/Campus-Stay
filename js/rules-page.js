@@ -19,12 +19,13 @@ document.addEventListener('cs:auth-ready', async () => {
   $('btn-back').href = 'facilities.html?property=' + propertyId;
 
   // Load existing rules
-  const { data: existingRules } = await sb
+  const { data: existingRules, error: readError } = await sb
     .from('property_rules')
     .select('*')
     .eq('property_id', propertyId)
     .order('display_order');
 
+  if (readError) { CS.toast("Rules could not be loaded. Refresh before editing."); return; }
   if (existingRules && existingRules.length > 0) {
     rules = existingRules.map(r => ({ text: r.rule_text }));
   } else {
@@ -71,9 +72,7 @@ document.addEventListener('cs:auth-ready', async () => {
   }
 
   function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+    return CS.escapeHTML(str);
   }
 
   // ── Save & Continue ──────────────────────────────────
@@ -86,19 +85,10 @@ document.addEventListener('cs:auth-ready', async () => {
     btn.innerHTML = '<span class="spinner"></span> Saving...';
 
     try {
-      // Delete existing rules
-      await sb.from('property_rules').delete().eq('property_id', propertyId);
-
-      // Insert new rules
-      if (validRules.length > 0) {
-        const rows = validRules.map((r, i) => ({
-          property_id: propertyId,
-          rule_text: r.text.trim(),
-          display_order: i
-        }));
-        const { error } = await sb.from('property_rules').insert(rows);
-        if (error) throw error;
-      }
+      const { error } = await sb.rpc('replace_listing_details', {
+        p_property: propertyId, p_section: 'rules', p_values: validRules.map(rule => rule.text.trim())
+      });
+      if (error) throw error;
 
       // Store in sessionStorage
       sessionStorage.setItem('cs:property-rules', JSON.stringify(validRules.map(r => r.text)));
