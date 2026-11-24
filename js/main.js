@@ -73,23 +73,45 @@ const CS = {
     const escapeHTML = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
 
     const renderRoleLinks = (user) => {
-      // Keep the primary information architecture stable after sign-in. Only
-      // the dashboard destination changes with the verified database role.
-      const dashboard = user.role === 'admin' ? 'admin-dashboard.html' : user.role === 'owner' ? 'owner-dashboard.html' : 'matches.html';
-      const links = [
-        ['index.html#explore', 'Explore'],
-        ['index.html#featured', 'Showcase'],
-        ['index.html#how', 'How it works'],
-        [user.role === 'owner' ? 'my-listings.html' : 'saved.html', 'Wishlist'],
-        [dashboard, 'Dashboard']
-      ];
+      let links = [];
+      if (!user) {
+        links = [
+          ['index.html#explore', 'Explore'],
+          ['index.html#featured', 'Showcase'],
+          ['index.html#how', 'How it works'],
+          ['listings.html?view=wishlist', 'Wishlist'],
+          ['auth.html?next=matches.html', 'Dashboard']
+        ];
+      } else if (user.role === 'admin') {
+        links = [
+          ['admin-dashboard.html', 'Admin Dashboard'],
+          ['index.html#explore', 'Explore'],
+          ['index.html#featured', 'Showcase']
+        ];
+      } else if (user.role === 'owner') {
+        links = [
+          ['owner-dashboard.html', 'Owner Dashboard'],
+          ['my-listings.html', 'My Properties'],
+          ['add-property.html', 'Add Property'],
+          ['inquiries.html', 'Enquiries']
+        ];
+      } else {
+        links = [
+          ['index.html#explore', 'Explore'],
+          ['index.html#featured', 'Showcase'],
+          ['index.html#how', 'How it works'],
+          ['saved.html', 'Wishlist'],
+          ['inquiries.html', 'My Enquiries'],
+          ['matches.html', 'Student Dashboard']
+        ];
+      }
       document.querySelectorAll('.navbar .nav-links').forEach((container) => {
         container.innerHTML = links.map(([href, label]) => `<a href="${href}">${label}</a>`).join('');
       });
       document.querySelectorAll('.mobile-menu').forEach((container) => {
         const existingFooter = container.querySelector('.mobile-menu-footer');
         container.innerHTML = links.map(([href, label]) => `<a href="${href}">${label}</a>`).join('')
-          + '<a href="profile.html" class="btn btn-primary" data-auth-cta>Account</a>';
+          + (user ? '<a href="profile.html" class="btn btn-primary" data-auth-cta>Account</a>' : '<a href="auth.html" class="btn btn-primary" data-auth-cta>Sign in</a>');
         if (existingFooter) container.appendChild(existingFooter);
       });
     };
@@ -103,17 +125,39 @@ const CS = {
           ? `<img src="${escapeHTML(user.avatarUrl)}" alt="">`
           : escapeHTML(initials(user.name));
         const isOwner = user.role === 'owner';
-        const routes = [
-          ['profile.html', 'My profile'],
-          [isOwner ? 'settings.html' : 'preferences.html', isOwner ? 'Account preferences' : 'My preferences'],
-          [isOwner ? 'my-listings.html' : 'saved.html', isOwner ? 'My listings' : 'Saved rooms'],
-          ['notifications.html', 'Notifications'],
-          ['settings.html', 'Settings'],
-          ['help.html', 'Help & support']
-        ];
+        const isAdmin = user.role === 'admin';
+        const routes = isAdmin
+          ? [
+              ['admin-dashboard.html', 'Admin dashboard'],
+              ['profile.html', 'My profile'],
+              ['notifications.html', 'Notifications'],
+              ['settings.html', 'Settings'],
+              ['help.html', 'Help & support']
+            ]
+          : isOwner
+          ? [
+              ['profile.html', 'My profile'],
+              ['owner-dashboard.html', 'Owner dashboard'],
+              ['my-listings.html', 'My properties'],
+              ['add-property.html', 'Add property'],
+              ['inquiries.html', 'Enquiries'],
+              ['notifications.html', 'Notifications'],
+              ['settings.html', 'Settings'],
+              ['help.html', 'Help & support']
+            ]
+          : [
+              ['profile.html', 'My profile'],
+              ['preferences.html', 'My preferences'],
+              ['saved.html', 'Saved rooms'],
+              ['inquiries.html', 'My enquiries'],
+              ['notifications.html', 'Notifications'],
+              ['settings.html', 'Settings'],
+              ['help.html', 'Help & support']
+            ];
         const wrap = document.createElement('div');
         wrap.className = 'user-menu-wrap';
         wrap.dataset.userMenuMounted = 'true';
+        const roleLabel = isAdmin ? 'Administrator' : isOwner ? 'Property owner' : 'Student';
         wrap.innerHTML = `
           <button class="user-menu-trigger" type="button" aria-label="Open account menu" aria-expanded="false" aria-haspopup="menu">
             <span class="user-menu-avatar">${avatar}</span><span class="user-menu-name">${escapeHTML(firstName)}</span>
@@ -121,7 +165,7 @@ const CS = {
           <div class="user-dropdown" role="menu">
             <div class="user-dropdown-header">
               <span class="ud-avatar">${avatar}</span>
-              <div class="ud-info"><b>Hi, ${escapeHTML(firstName)}</b><span>${isOwner ? 'Property owner' : 'Student'}</span></div>
+              <div class="ud-info"><b>Hi, ${escapeHTML(firstName)}</b><span>${roleLabel}</span></div>
             </div>
             ${routes.map(([href, label]) => `<a href="${href}" role="menuitem"><span class="dd-icon" aria-hidden="true">${label === 'Notifications' ? '◌' : '›'}</span>${label}</a>`).join('')}
             <hr><button class="dd-danger" type="button" data-logout><span class="dd-icon" aria-hidden="true">←</span>Log out</button>
@@ -157,9 +201,20 @@ const CS = {
       });
     };
 
-    // The persistent Supabase session, rather than browser storage, controls
-    // what authenticated navigation is rendered.
-    if (typeof getAuthContext === 'function') {
+    document.addEventListener('cs:auth-ready', (event) => {
+      const { user, profile } = event.detail || {};
+      if (profile && user) {
+        mountUserMenu({
+          name: profile.full_name || user.user_metadata?.full_name || 'Member',
+          role: profile.role,
+          avatarUrl: profile.avatar_url || user.user_metadata?.avatar_url || ''
+        });
+      }
+    });
+
+    const initAuthNav = () => {
+      if (typeof getAuthContext !== 'function') return false;
+
       const renderAuthenticatedState = async (session = null) => {
         const context = session
           ? { session, user: session.user, profile: await waitForProfile(session) }
@@ -171,13 +226,15 @@ const CS = {
             role: profile.role,
             avatarUrl: profile.avatar_url || user.user_metadata?.avatar_url || ''
           });
+        } else {
+          restoreSignInButton();
         }
         document.body.classList.remove('cs-auth-pending');
         document.body.classList.add('cs-auth-ready');
       };
 
       const restoreSignInButton = () => {
-        // Remove any user menus and restore the Sign in link
+        renderRoleLinks(null);
         document.querySelectorAll('.user-menu-wrap').forEach((wrap) => {
           const link = document.createElement('a');
           link.href = 'auth.html';
@@ -186,7 +243,6 @@ const CS = {
           link.textContent = 'Sign in';
           wrap.replaceWith(link);
         });
-        // Also restore mobile menu auth CTAs
         document.querySelectorAll('.mobile-menu [data-auth-cta]').forEach((el) => {
           if (el.tagName === 'A') {
             el.href = 'auth.html';
@@ -197,7 +253,6 @@ const CS = {
         document.body.classList.add('cs-auth-ready');
       };
 
-      // Try instant rendering from cached user data to avoid flicker
       const cached = CS.read('user');
       if (cached && cached.name) {
         mountUserMenu({
@@ -222,7 +277,6 @@ const CS = {
             if (session) {
               setTimeout(() => renderAuthenticatedState(session).catch(() => {}), 0);
             } else if (event === 'INITIAL_SESSION') {
-              // No session on initial check — user is logged out
               restoreSignInButton();
             }
           }
@@ -232,6 +286,11 @@ const CS = {
           }
         });
       }
+      return true;
+    };
+
+    if (!initAuthNav()) {
+      window.addEventListener('DOMContentLoaded', () => { initAuthNav(); });
     }
   },
 

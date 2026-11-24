@@ -106,14 +106,21 @@ function clearAuthenticatedUserCache() {
 }
 
 async function getSession() {
-  const sb = getSupabase();
-  if (!sb) return null;
-  const { data, error } = await sb.auth.getSession();
-  if (error) {
-    console.warn('[CampusStay] Session restore failed:', error.message);
+  try {
+    const sb = getSupabase();
+    if (!sb) return null;
+    const { data, error } = await sb.auth.getSession();
+    if (error) {
+      console.warn('[CampusStay] Session restore failed:', error.message);
+      clearAuthenticatedUserCache();
+      return null;
+    }
+    return data.session || null;
+  } catch (err) {
+    console.warn('[CampusStay] getSession exception:', err?.message || err);
+    clearAuthenticatedUserCache();
     return null;
   }
-  return data.session || null;
 }
 
 async function getCurrentUser() {
@@ -373,8 +380,11 @@ async function publishedKitListings() {
     .eq('college_id','kit').eq('available',true).eq('listing_status','published').eq('verification_status','verified').order('created_at',{ascending:false});
   if(error)throw error;
   const result=[];
+  const kitCollege = (typeof COLLEGES !== 'undefined' && Array.isArray(COLLEGES) && COLLEGES[0]) ? COLLEGES[0] : { lat: 16.6945, lng: 74.2342 };
   for(const p of data){
-    const distance=p.lat!=null && p.lng!=null ? CS.haversineKm(COLLEGES[0],p) : p.distance_km;
+    const distance = (p.lat != null && p.lng != null && typeof CS !== 'undefined' && typeof CS.haversineKm === 'function')
+      ? CS.haversineKm(kitCollege, p)
+      : p.distance_km;
     if(distance==null || distance>5)continue;
     const media=await resolveMediaUrls(p.property_media||[]);
     result.push({...p,verified:true,distanceKm:Number(distance),facilities:p.property_facilities.map(f=>f.facility_id),

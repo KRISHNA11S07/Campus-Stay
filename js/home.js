@@ -42,13 +42,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
   });
 
-  const grid=document.getElementById('featured-grid');
+  const grid = document.getElementById('featured-grid');
   try {
-    const [listings]=await Promise.all([publishedKitListings(),CS.loadWishlist()]);
-    grid.innerHTML=listings.slice(0,6).map(l=>CS.listingCard(l,l.distanceKm)).join('');
-    if(!listings.length)grid.textContent='No approved stays are currently available within 5 km of KIT.';
-    CS.bindWishlistButtons(grid);
-  } catch {grid.textContent='Listings could not be loaded. Refresh to retry.';}
+    const [listings] = await Promise.all([publishedKitListings(), CS.loadWishlist()]);
+    if (listings && listings.length) {
+      grid.innerHTML = listings.slice(0, 6).map((l) => CS.listingCard(l, l.distanceKm)).join('');
+      CS.bindWishlistButtons(grid);
+    } else {
+      grid.innerHTML = `
+        <div class="empty-state-card glass" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; border-radius: 20px;">
+          <span style="font-size: 2.5rem; display: block; margin-bottom: 0.8rem;">🏠</span>
+          <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text);">No approved stays are currently available within 5 km of KIT.</p>
+          <p style="color: var(--text-2); font-size: 0.9rem; margin-bottom: 1.5rem;">New verified properties around campus are added regularly. Check back soon or explore all listings.</p>
+          <a href="listings.html" class="btn btn-primary btn-sm">Explore All Stays →</a>
+        </div>`;
+    }
+  } catch (err) {
+    console.warn('[CampusStay] Featured listings load failed:', err?.message || err);
+    grid.innerHTML = `
+      <div class="empty-state-card glass" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem; border-radius: 20px;">
+        <span style="font-size: 2.5rem; display: block; margin-bottom: 0.8rem;">⚠️</span>
+        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text);">Listings could not be loaded. Refresh to retry.</p>
+        <p style="color: var(--text-2); font-size: 0.9rem; margin-bottom: 1.5rem;">Unable to connect to the properties directory. Check your connection.</p>
+        <button type="button" class="btn btn-primary btn-sm" onclick="location.reload()">Refresh Page</button>
+      </div>`;
+  }
 
   /* FAQ accordion */
   document.querySelectorAll('.faq-item').forEach((item) => {

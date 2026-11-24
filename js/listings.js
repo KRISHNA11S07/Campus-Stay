@@ -148,6 +148,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('sort').addEventListener('change', render);
   document.getElementById('clear-filters').addEventListener('click', resetFilters);
 
-  try {await loadPublishedOwnerListings();} catch {document.getElementById('results-grid').textContent='Could not load listings. Refresh to retry.';return;}
+  try {
+    await loadPublishedOwnerListings();
+  } catch (err) {
+    console.warn('[CampusStay] Load listings failed:', err?.message || err);
+    document.getElementById('results-grid').innerHTML = `
+      <div class="empty-state glass" style="grid-column:1/-1; text-align:center; padding:3.5rem 1.5rem; border-radius:20px;">
+        <div class="big" style="font-size:2.5rem; margin-bottom:0.75rem;">⚠️</div>
+        <h3>Could not load listings. Refresh to retry.</h3>
+        <p style="color:var(--text-2); margin:.5rem 0 1.2rem;">We had trouble communicating with the server. Please check your connection.</p>
+        <button class="btn btn-primary" onclick="location.reload()">Refresh Page</button>
+      </div>`;
+    return;
+  }
   render();
 });

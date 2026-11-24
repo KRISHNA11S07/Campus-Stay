@@ -78,23 +78,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateUI() {
     const signingUp = mode === 'signup';
-    const owner = role === 'owner';
     document.documentElement.dataset.authMode = mode;
     document.documentElement.dataset.authRole = role;
 
-    $('auth-title').textContent = signingUp
-      ? (owner ? 'Start listing with confidence' : 'Find a place that feels right')
-      : (owner ? 'Welcome back, owner' : 'Welcome back');
-    $('auth-sub').textContent = signingUp
-      ? (owner ? 'Create your account, then build your first listing step by step.' : 'Create your student account in a few calm, simple steps.')
-      : (owner ? 'Manage listings, enquiries and your property setup.' : 'Pick up your rental search exactly where you left it.');
-    $('signup-form').hidden = !signingUp;
-    $('signin-form').hidden = signingUp;
-    $('auth-role-copy').textContent = owner ? 'You are continuing as an Owner' : 'You are continuing as a Student';
-    $('btn-signup').textContent = owner ? 'Create owner account' : 'Create student account';
-    $('btn-signin').textContent = 'Sign in as ' + (owner ? 'Owner' : 'Student');
-    $('btn-switch-mode').textContent = signingUp ? 'Sign in instead' : 'Create an account';
-    $('auth-switch-copy').textContent = signingUp ? 'Already have an account?' : 'New to CampusStay?';
+    const titleEl = $('auth-title');
+    if (titleEl) {
+      titleEl.textContent = signingUp ? 'Create your account' : 'Welcome back';
+    }
+    const subEl = $('auth-sub');
+    if (subEl) {
+      subEl.textContent = signingUp
+        ? 'Join CampusStay to discover verified student accommodation near KIT Kolhapur.'
+        : 'Sign in to access your saved stays, enquiries, and dashboard.';
+    }
+    if ($('signup-form')) $('signup-form').hidden = !signingUp;
+    if ($('signin-form')) $('signin-form').hidden = signingUp;
+    if ($('auth-role-copy')) {
+      $('auth-role-copy').textContent = role === 'owner' ? 'You are continuing as an Owner' : 'You are continuing as a Student';
+    }
+    if ($('btn-signup')) $('btn-signup').textContent = 'Create account';
+    if ($('btn-signin')) $('btn-signin').textContent = 'Sign in';
+    if ($('btn-switch-mode')) $('btn-switch-mode').textContent = signingUp ? 'Sign in instead' : 'Create an account';
+    if ($('auth-switch-copy')) $('auth-switch-copy').textContent = signingUp ? 'Already have an account?' : 'New to CampusStay?';
     clearErrors();
     hideMessage();
   }
@@ -201,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       showMessage(friendlyAuthError(error, 'We could not create your account. Please try again.'), 'error');
     } finally {
-      if (!redirecting) setBusy(submit, false, role === 'owner' ? 'Create owner account' : 'Create student account');
+      if (!redirecting) setBusy(submit, false, 'Create account');
     }
   });
 
@@ -239,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'error'
       );
     } finally {
-      if (!redirecting) setBusy(submit, false, 'Sign in as ' + (role === 'owner' ? 'Owner' : 'Student'));
+      if (!redirecting) setBusy(submit, false, 'Sign in');
     }
   });
 
@@ -276,8 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const next = sessionStorage.getItem('cs:auth-next') || '';
         let resolvedProfile = profile;
         const googleName = user.user_metadata?.full_name || user.user_metadata?.name || '';
-        // An incomplete profile is created by the database trigger on a first
-        // Google login. Existing profiles keep their database role.
         if (!resolvedProfile?.full_name) {
           resolvedProfile = await completeProfileFromAuth(session, {
             name: googleName,
@@ -301,8 +304,10 @@ document.addEventListener('DOMContentLoaded', () => {
         redirectAfterAuth(profile, profile.role, 0);
       }
     } catch (error) {
-      console.warn('[Auth] Session restoration failed:', error.message);
-      showMessage('We could not restore that session. Please sign in again.', 'error');
+      console.warn('[Auth] Session restoration failed:', error?.message || error);
+      if (googleCallback) {
+        showMessage('We could not restore that session. Please sign in again.', 'error');
+      }
     }
   }
 
