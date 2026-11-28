@@ -112,7 +112,7 @@ body {
     radial-gradient(ellipse 68% 82% at 9% 20%, rgba(191, 220, 255, 0.82), transparent 69%),
     radial-gradient(ellipse 70% 82% at 92% 24%, rgba(232, 220, 255, 0.8), transparent 68%),
     radial-gradient(ellipse 75% 76% at 54% 102%, rgba(255, 218, 208, 0.76), transparent 69%),
-    linear-gradient(135deg, #f9fbff, #fdfcff 52%, #fffafa);
+    url("../assets/twilight-campus-sunset.webp");
   filter: none;
 }
 
@@ -121,13 +121,21 @@ body {
     radial-gradient(ellipse 68% 82% at 9% 20%, rgba(99, 102, 241, 0.22), transparent 69%),
     radial-gradient(ellipse 70% 82% at 92% 24%, rgba(139, 92, 236, 0.18), transparent 68%),
     radial-gradient(ellipse 75% 76% at 54% 102%, rgba(236, 72, 153, 0.14), transparent 69%),
-    linear-gradient(135deg, #0b0f1c, #0d1019 52%, #0a0c14);
+    url("../assets/twilight-campus-sunset.webp");
   filter: none;
 }
 
 [data-theme="light"] .cinema-bg .scrim,
 .cinema-bg .scrim {
   background: linear-gradient(180deg, rgba(251, 252, 255, 0.08), rgba(251, 252, 255, 0.38));
+}
+
+@media (max-width: 1024px) {
+  [data-theme="light"] .cinema-bg .scrim {
+    background:
+      radial-gradient(ellipse 68% 32% at 50% 43%, rgba(251, 252, 255, 0.64) 32%, transparent),
+      linear-gradient(180deg, rgba(251, 252, 255, 0.08), rgba(251, 252, 255, 0.38));
+  }
 }
 
 [data-theme="dark"] .cinema-bg .scrim {
